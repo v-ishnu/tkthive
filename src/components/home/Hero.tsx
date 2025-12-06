@@ -226,7 +226,7 @@ export default function Hero () {
             <div className="mb-8 animate-in fade-in slide-in-from-top-4 duration-700 w-full max-w-xl mx-auto">
                 <div 
                     className="relative overflow-hidden bg-white/5 backdrop-blur-md border border-white/10 rounded-full p-1.5 pr-6 flex items-center gap-4 cursor-pointer hover:bg-white/10 transition-all group"
-                    onClick={() => onSearch(currentEvent.title)}
+                   
                 >
                     <div className="bg-primary text-black text-[10px] md:text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wider shrink-0 flex flex-col items-center min-w-[90px]">
                         <span className="text-[8px] opacity-70">STARTS IN</span>
@@ -291,7 +291,7 @@ export default function Hero () {
             {['Music', 'Sports', 'Gaming', 'Art', 'Tech', 'Food'].map((tag) => (
                 <button 
                     key={tag}
-                    onClick={() => onSearch(tag)}
+                  
                     className="px-4 py-1.5 md:px-5 md:py-2 rounded-full border border-white/10 hover:border-primary/50 bg-white/5 hover:bg-white/10 text-xs md:text-sm font-medium text-gray-400 hover:text-primary transition-all"
                 >
                     {tag}
