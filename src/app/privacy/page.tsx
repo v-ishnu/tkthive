@@ -1,4 +1,4 @@
-
+"use client";
 import React from 'react';
 import { Shield, Eye, Lock, Globe, Server, UserCheck } from 'lucide-react';
 import { HivePattern } from '../../components/HivePattern';
