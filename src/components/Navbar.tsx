@@ -1,4 +1,4 @@
-
+"use client";
 import React, { useState } from 'react';
 import { MapPin, Search, User, Menu, LogOut, Ticket, X, Home, Calendar, Info } from 'lucide-react';
 import { LocationData, User as UserType } from '../types';
