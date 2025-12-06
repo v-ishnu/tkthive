@@ -1,6 +1,6 @@
 "use client"
 import { useState,useEffect } from "react";
-import { Hero } from "@/components/home/Hero";
+import Hero from "@/components/home/Hero";
 import { FeaturedEvents } from "@/components/home/FeaturedEvents";
 import { MOCK_EVENTS } from '../constants';
 import { EventData } from "../types";
@@ -14,7 +14,7 @@ const [events, setEvents] = useState<EventData[]>(MOCK_EVENTS);
 
     <>
       <section>
-        <Hero/>
+        {<Hero/>}
       </section>
      <section>
              <div className="container mx-auto px-4 py-12 space-y-20">

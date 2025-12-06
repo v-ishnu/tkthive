@@ -19,7 +19,7 @@ const SCRAMBLE_WORDS = [
 
 const SCRAMBLE_CHARS = "!<-_/]{—=+?A_T_S_D_F_E_G_H_J_K_L_I_V_";
 
-export const Hero: React.FC<HeroProps> = ({ onSearch, currentLocation }) => {
+export default function Hero () {
   const [query, setQuery] = useState('');
   
   // Scramble State
@@ -144,7 +144,7 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, currentLocation }) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (query.trim()) {
-      onSearch(query);
+   
       const section = document.getElementById('events-section');
       if (section) section.scrollIntoView({ behavior: 'smooth' });
     }
@@ -255,7 +255,7 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, currentLocation }) => {
         </h1>
         
         <p className="text-gray-400 text-base md:text-xl max-w-2xl mb-12 leading-relaxed">
-          The ultimate platform for finding events in {currentLocation} and beyond.
+          The ultimate platform for finding events in ..... and beyond.
         </p>
 
         {/* Search Bar Container */}
