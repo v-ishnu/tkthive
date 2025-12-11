@@ -1,5 +1,7 @@
+
 import React, { useState, useMemo } from 'react';
 import { ArrowUpRight } from 'lucide-react';
+import Link from 'next/link';
 import { EventData } from '../../types';
 
 interface FeaturedEventsProps {
@@ -7,7 +9,7 @@ interface FeaturedEventsProps {
 
 }
 
-export const FeaturedEvents: React.FC<FeaturedEventsProps> = ({ events}) => {
+export const FeaturedEvents: React.FC<FeaturedEventsProps> = ({ events }) => {
   const [activeIndex, setActiveIndex] = useState(0);
 
   // Filter for featured events, fallback to first 4 if none found
@@ -40,7 +42,7 @@ export const FeaturedEvents: React.FC<FeaturedEventsProps> = ({ events}) => {
       <div className="flex items-center justify-between mb-8">
         <div>
             <h2 className="text-2xl md:text-3xl font-bold flex items-center gap-3 text-white">
-                Featured Collections 
+                Featured Collections <span className="text-2xl animate-pulse">✨</span>
             </h2>
             <p className="text-gray-400 mt-2 text-sm md:text-base">Hand-picked events you can't miss</p>
         </div>
@@ -65,7 +67,7 @@ export const FeaturedEvents: React.FC<FeaturedEventsProps> = ({ events}) => {
                 onMouseEnter={() => setActiveIndex(index)}
                 onClick={() => {
                     setActiveIndex(index);
-                  
+                   
                 }}
                 className={`
                 relative rounded-3xl overflow-hidden cursor-pointer transition-[flex] duration-700 ease-[cubic-bezier(0.25,0.1,0.25,1)]
@@ -94,13 +96,13 @@ export const FeaturedEvents: React.FC<FeaturedEventsProps> = ({ events}) => {
                             {status}
                         </span>
                         
-                        <div className={`
+                        <Link href={`/events/${event.id}`} className={`
                             w-10 h-10 md:w-12 md:h-12 rounded-full bg-primary flex items-center justify-center
                             transition-all duration-500 transform
                             ${activeIndex === index ? 'scale-100 opacity-100 rotate-0' : 'scale-50 opacity-0 -rotate-45'}
                         `}>
                             <ArrowUpRight className="text-black" size={20} />
-                        </div>
+                        </Link>
                     </div>
 
                     <div className={`
@@ -127,9 +129,9 @@ export const FeaturedEvents: React.FC<FeaturedEventsProps> = ({ events}) => {
                             <CalendarIcon />
                             {event.date}
                             </p>
-                            <button className="mt-4 text-sm text-white border-b border-primary hover:text-primary transition-colors pb-0.5">
+                            <Link href={`/events/${event.id}`} className="mt-4 text-sm text-white border-b border-primary hover:text-primary transition-colors pb-0.5">
                                 View Details
-                            </button>
+                            </Link>
                         </div>
                     </div>
                 </div>

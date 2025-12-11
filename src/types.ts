@@ -1,4 +1,5 @@
 
+
 export interface SubEvent {
   id: string;
   title: string;
@@ -30,6 +31,16 @@ export interface EventResult {
   details?: string;
 }
 
+export interface RegistrationFormField {
+  id: string;
+  label: string;
+  type: 'text' | 'email' | 'tel' | 'select' | 'url' | 'number' | 'textarea';
+  options?: string[]; // For select
+  required: boolean;
+  placeholder?: string;
+  scope?: 'booking' | 'attendee'; // 'booking' = asked once (e.g. Team Name), 'attendee' = asked for each person (e.g. T-Shirt Size)
+}
+
 export interface TicketTier {
   id: string;
   name: string;
@@ -37,14 +48,17 @@ export interface TicketTier {
   type: 'individual' | 'group';
   maxMembers?: number; // e.g., 5 for a team
   description?: string;
+  // Custom fields specific to this ticket type (e.g. Song Name for singing, Github for coding)
+  requiredFields?: RegistrationFormField[];
 }
 
-export interface RegistrationFormField {
+export interface AddOn {
   id: string;
-  label: string;
-  type: 'text' | 'email' | 'tel' | 'select';
-  options?: string[];
-  required: boolean;
+  name: string;
+  price: string;
+  description?: string;
+  imageUrl?: string;
+  type: 'merch' | 'meal' | 'access' | 'other';
 }
 
 export interface Organizer {
@@ -62,7 +76,8 @@ export interface EventData {
   imageUrl: string;
   price: string;
   category?: string;
-  sourceUrl?: string; // For grounding
+  subCategory?: string; 
+  sourceUrl?: string; 
   accessType?: 'public' | 'private';
   
   organizer: Organizer; 
@@ -70,7 +85,6 @@ export interface EventData {
   organization?: string; 
   subEvents?: SubEvent[];
   
-  // New fields for Tabs
   isLive?: boolean;
   prizes?: Prize[];
   guests?: Guest[];
@@ -78,11 +92,11 @@ export interface EventData {
   results?: EventResult[];
   liveStreamUrl?: string;
 
-  // New fields for Registration
+  // Registration Constraints
+  maxTicketsPerUser?: number; // e.g., 1 for strict contests
   ticketTiers?: TicketTier[];
-  registrationFields?: RegistrationFormField[];
+  addOns?: AddOn[];
 
-  // Feature Flags
   featured?: boolean;
 }
 
@@ -98,6 +112,13 @@ export interface GroundingChunk {
   };
 }
 
+export interface AttendeeDetail {
+    name: string;
+    email: string;
+    phone?: string;
+    customData?: Record<string, string>;
+}
+
 export interface Ticket {
   id: string;
   eventId: string;
@@ -109,9 +130,11 @@ export interface Ticket {
   price: string;
   bookingDate: string;
   attendees: number;
+  attendeeDetails?: AttendeeDetail[];
   seat?: string;
   row?: string;
   status?: 'upcoming' | 'completed' | 'expired';
+  customData?: Record<string, string>; // Booking level custom data
 }
 
 export interface User {
@@ -119,5 +142,13 @@ export interface User {
   email: string;
   avatar: string;
   phone?: string;
+  role?: 'Member' | 'Pro' | 'Organizer';
+  coverImage?: string;
+  location?: string;
+  stats?: {
+      events: number;
+      followers: number;
+      following: number;
+  };
   tickets: Ticket[];
 }

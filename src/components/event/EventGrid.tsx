@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { EventCard } from '../EventCard';
 import { EventData } from '../../types';
@@ -11,7 +12,7 @@ interface EventGridProps {
 export const EventGrid: React.FC<EventGridProps> = ({ events, loading, onEventClick }) => {
   if (loading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
         {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
           <div key={i} className="bg-card rounded-xl h-[200px] animate-pulse border border-white/5">
             <div className="h-32 bg-white/5 rounded-t-xl" />
