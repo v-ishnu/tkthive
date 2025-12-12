@@ -15,9 +15,10 @@ export default function RegistrationPage() {
     // Initialize event data
     useEffect(() => {
         if (params.id) {
-            // Find the event from MOCK_EVENTS using the ID from URL
-            // converting params.id to string or number as needed to match MOCK_EVENTS id type
-            const foundEvent = MOCK_EVENTS.find(e => e.id === params.id || e.id === Number(params.id));
+            // IDs are strings in EventData
+            const id = Array.isArray(params.id) ? params.id[0] : params.id;
+            const foundEvent = MOCK_EVENTS.find(e => e.id === id);
+
             if (foundEvent) {
                 setEvent(foundEvent);
             }
