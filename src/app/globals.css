@@ -56,6 +56,8 @@ html {
   /* Your custom dark/yellow theme */
   --primary: #FFD60A;
   --primary-hover: #EBC300;
+    /* --primary: #d6a51f;
+  --primary-hover: #0079eb; */
   --bg-dark: #070606;
   --bg-card: #0F0F0F;
   --bg-card-hover: #161616;
@@ -111,9 +113,10 @@ html {
   scroll-behavior: smooth;
 }
 
-@keyframes marquee {
+/* Horizontal Auto Scroll (0 to -50%) */
+@keyframes marquee-infinite {
   0% {
-    transform: translateX(0);
+    transform: translateX(0%);
   }
 
   100% {
@@ -121,11 +124,12 @@ html {
   }
 }
 
-.animate-marquee {
-  animation: marquee 30s linear infinite;
+.animate-marquee-infinite {
+  animation: marquee-infinite 30s linear infinite;
 }
 
-.animate-marquee:hover {
+/* Pause on hover (handled by group-hover in JS/HTML usually, or plain hover) */
+.group:hover .animate-marquee-infinite {
   animation-play-state: paused;
 }
 
@@ -134,7 +138,42 @@ html {
   display: none;
 }
 
+
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* Vertical Auto Scroll */
+@keyframes vertical-marquee {
+  0% {
+    transform: translateY(0%);
+  }
+
+  100% {
+    transform: translateY(-50%);
+  }
+}
+
+@keyframes vertical-marquee-reverse {
+  0% {
+    transform: translateY(-50%);
+  }
+
+  100% {
+    transform: translateY(0%);
+  }
+}
+
+.animate-vertical-marquee {
+  animation: vertical-marquee 40s linear infinite;
+}
+
+.animate-vertical-marquee-reverse {
+  animation: vertical-marquee-reverse 40s linear infinite;
+}
+
+.animate-vertical-marquee:hover,
+.animate-vertical-marquee-reverse:hover {
+  animation-play-state: paused;
 }

@@ -234,13 +234,13 @@ export const EventsSection: React.FC<EventsSectionProps> = ({
           />
           <div className={`absolute inset-0 bg-gradient-to-r ${currentProfile.gradient} via-dark/80 to-dark`} />
           <div className="absolute inset-0 bg-gradient-to-t from-dark via-transparent to-transparent" />                <div className="absolute bottom-0 left-0 p-4 md:p-8 z-10">
-            <div className={`flex items-center gap-2 ${currentProfile.color} font-bold uppercase tracking-widest text-xs md:text-sm mb-2 animate-in slide-in-from-left-4 fade-in duration-500`}>
-              <currentProfile.icon size={16} className="md:w-[18px] md:h-[18px]" /> {currentProfile.label} Hub
+            <div className={`flex items-center gap-2 ${currentProfile.color} font-bold uppercase tracking-widest text-[10px] md:text-xs mb-2 animate-in slide-in-from-left-4 fade-in duration-500`}>
+              <currentProfile.icon size={14} className="md:w-4 md:h-4" /> {currentProfile.label} Hub
             </div>
-            <h1 className="text-3xl md:text-5xl font-bold text-white mb-2 animate-in slide-in-from-left-4 fade-in duration-700 delay-100">
+            <h1 className="text-2xl md:text-4xl font-bold text-white mb-2 animate-in slide-in-from-left-4 fade-in duration-700 delay-100">
               {currentProfile.label}
             </h1>
-            <p className="text-gray-300 text-sm md:text-base max-w-xl animate-in slide-in-from-left-4 fade-in duration-900 delay-200">
+            <p className="text-gray-300 text-xs md:text-sm max-w-xl animate-in slide-in-from-left-4 fade-in duration-900 delay-200">
               {currentProfile.description} • {filteredEvents.length} Events Found
             </p>
           </div>

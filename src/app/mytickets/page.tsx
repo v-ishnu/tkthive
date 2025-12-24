@@ -84,7 +84,7 @@ export default function TicketsPage() {
     if (!user || !user.tickets) return null; // Safe guard
 
     return (
-        <div className="min-h-screen pt-24 pb-12 container mx-auto px-4">
+        <div className="min-h-screen pt-12 pb-12 container mx-auto px-4">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
                 <div>
                     <h1 className="text-3xl md:text-4xl font-bold text-white mb-2 flex items-center gap-3">
@@ -147,7 +147,7 @@ export default function TicketsPage() {
                     )}
                 </div>
             ) : (
-                <div className="space-y-8 flex flex-row gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {filteredTickets.map((ticket) => (
                         <TicketCard key={ticket.id} ticket={ticket} />
                     ))}

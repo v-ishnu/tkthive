@@ -38,7 +38,7 @@ export const FeaturedEvents: React.FC<FeaturedEventsProps> = ({ events }) => {
   if (featuredEvents.length === 0) return null;
 
   return (
-    <div className="w-full">
+    <div className="container mx-auto w-full">
       <div className="flex items-center justify-between mb-8">
         <div>
             <h2 className="text-2xl md:text-3xl font-bold flex items-center gap-3 text-white">

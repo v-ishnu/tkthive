@@ -62,9 +62,9 @@ export interface AddOn {
 }
 
 export interface Organizer {
-    name: string;
-    imageUrl?: string;
-    description?: string;
+  name: string;
+  imageUrl?: string;
+  description?: string;
 }
 
 export interface EventData {
@@ -76,15 +76,15 @@ export interface EventData {
   imageUrl: string;
   price: string;
   category?: string;
-  subCategory?: string; 
-  sourceUrl?: string; 
+  subCategory?: string;
+  sourceUrl?: string;
   accessType?: 'public' | 'private';
-  
-  organizer: Organizer; 
 
-  organization?: string; 
+  organizer: Organizer;
+
+  organization?: string;
   subEvents?: SubEvent[];
-  
+
   isLive?: boolean;
   prizes?: Prize[];
   guests?: Guest[];
@@ -103,6 +103,7 @@ export interface EventData {
 export interface LocationData {
   city: string;
   country: string;
+  imageUrl?: string;
 }
 
 export interface GroundingChunk {
@@ -113,10 +114,10 @@ export interface GroundingChunk {
 }
 
 export interface AttendeeDetail {
-    name: string;
-    email: string;
-    phone?: string;
-    customData?: Record<string, string>;
+  name: string;
+  email: string;
+  phone?: string;
+  customData?: Record<string, string>;
 }
 
 export interface Ticket {
@@ -146,9 +147,9 @@ export interface User {
   coverImage?: string;
   location?: string;
   stats?: {
-      events: number;
-      followers: number;
-      following: number;
+    events: number;
+    followers: number;
+    following: number;
   };
   tickets: Ticket[];
 }

@@ -234,7 +234,7 @@ export default function RegistrationPage() {
                     <select
                         required={field.required}
                         value={value || ''}
-                        className="w-full bg-black/40 border border-white/10 rounded-xl p-3 focus:border-primary/50 outline-none text-white appearance-none cursor-pointer"
+                        className="w-full bg-black/40 border border-white/10 rounded-xl p-2 md:p-3 text-xs md:text-sm focus:border-primary/50 outline-none text-white appearance-none cursor-pointer"
                         onChange={(e) => onChange(e.target.value)}
                     >
                         <option value="">{field.placeholder || 'Select an option'}</option>
@@ -243,7 +243,7 @@ export default function RegistrationPage() {
                         ))}
                     </select>
                     <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500">
-                        <ChevronDown size={16} />
+                        <ChevronDown size={14} />
                     </div>
                 </div>
             );
@@ -255,7 +255,7 @@ export default function RegistrationPage() {
                     rows={3}
                     value={value || ''}
                     placeholder={field.placeholder}
-                    className="w-full bg-black/40 border border-white/10 rounded-xl p-3 focus:border-primary/50 outline-none text-white resize-none"
+                    className="w-full bg-black/40 border border-white/10 rounded-xl p-2 md:p-3 text-xs md:text-sm focus:border-primary/50 outline-none text-white resize-none"
                     onChange={(e) => onChange(e.target.value)}
                 />
             );
@@ -266,7 +266,7 @@ export default function RegistrationPage() {
                 required={field.required}
                 value={value || ''}
                 placeholder={field.placeholder}
-                className="w-full bg-black/40 border border-white/10 rounded-xl p-3 focus:border-primary/50 outline-none text-white placeholder:text-gray-600"
+                className="w-full bg-black/40 border border-white/10 rounded-xl p-2 md:p-3 text-xs md:text-sm focus:border-primary/50 outline-none text-white placeholder:text-gray-600"
                 onChange={(e) => onChange(e.target.value)}
             />
         );
@@ -346,27 +346,27 @@ export default function RegistrationPage() {
                                 Primary Contact Details
                             </h2>
                             <div className="grid md:grid-cols-2 gap-6">
-                                <div className="space-y-2">
-                                    <label className="text-sm text-gray-400">Full Name *</label>
+                                <div className="space-y-1.5">
+                                    <label className="text-xs text-gray-400 font-semibold uppercase tracking-wide">Full Name *</label>
                                     <input
                                         type="text" required value={primaryUser.name}
-                                        className="w-full bg-black/40 border border-white/10 rounded-xl p-3 focus:border-primary/50 outline-none text-white"
+                                        className="w-full bg-black/40 border border-white/10 rounded-xl p-2 md:p-3 text-xs md:text-sm focus:border-primary/50 outline-none text-white"
                                         onChange={(e) => handlePrimaryChange('name', e.target.value)}
                                     />
                                 </div>
-                                <div className="space-y-2">
-                                    <label className="text-sm text-gray-400">Email *</label>
+                                <div className="space-y-1.5">
+                                    <label className="text-xs text-gray-400 font-semibold uppercase tracking-wide">Email *</label>
                                     <input
                                         type="email" required value={primaryUser.email}
-                                        className="w-full bg-black/40 border border-white/10 rounded-xl p-3 focus:border-primary/50 outline-none text-white"
+                                        className="w-full bg-black/40 border border-white/10 rounded-xl p-2 md:p-3 text-xs md:text-sm focus:border-primary/50 outline-none text-white"
                                         onChange={(e) => handlePrimaryChange('email', e.target.value)}
                                     />
                                 </div>
-                                <div className="space-y-2">
-                                    <label className="text-sm text-gray-400">Phone *</label>
+                                <div className="space-y-1.5">
+                                    <label className="text-xs text-gray-400 font-semibold uppercase tracking-wide">Phone *</label>
                                     <input
                                         type="tel" required value={primaryUser.phone}
-                                        className="w-full bg-black/40 border border-white/10 rounded-xl p-3 focus:border-primary/50 outline-none text-white"
+                                        className="w-full bg-black/40 border border-white/10 rounded-xl p-2 md:p-3 text-xs md:text-sm focus:border-primary/50 outline-none text-white"
                                         onChange={(e) => handlePrimaryChange('phone', e.target.value)}
                                     />
                                 </div>
@@ -420,20 +420,20 @@ export default function RegistrationPage() {
 
                                         <div className="grid md:grid-cols-2 gap-4 mb-4">
                                             <div className="space-y-1">
-                                                <label className="text-xs text-gray-500">Name</label>
+                                                <label className="text-[10px] md:text-xs text-gray-500 font-semibold uppercase tracking-wide">Name</label>
                                                 <input
                                                     type="text" required value={attendee.name}
-                                                    className="w-full bg-dark border border-white/10 rounded-lg p-2 text-sm text-white focus:border-purple-500/50 outline-none"
+                                                    className="w-full bg-dark border border-white/10 rounded-lg p-2 text-xs md:text-sm text-white focus:border-purple-500/50 outline-none"
                                                     onChange={(e) => handleAttendeeChange(idx, 'name', e.target.value)}
                                                     readOnly={idx === 0} // Syncs with primary above
                                                     placeholder={idx === 0 ? "Use Contact Name" : "Attendee Name"}
                                                 />
                                             </div>
                                             <div className="space-y-1">
-                                                <label className="text-xs text-gray-500">Email</label>
+                                                <label className="text-[10px] md:text-xs text-gray-500 font-semibold uppercase tracking-wide">Email</label>
                                                 <input
                                                     type="email" required value={attendee.email}
-                                                    className="w-full bg-dark border border-white/10 rounded-lg p-2 text-sm text-white focus:border-purple-500/50 outline-none"
+                                                    className="w-full bg-dark border border-white/10 rounded-lg p-2 text-xs md:text-sm text-white focus:border-purple-500/50 outline-none"
                                                     onChange={(e) => handleAttendeeChange(idx, 'email', e.target.value)}
                                                     readOnly={idx === 0}
                                                     placeholder={idx === 0 ? "Use Contact Email" : "attendee@example.com"}

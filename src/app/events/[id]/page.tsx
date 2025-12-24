@@ -6,6 +6,7 @@ import { AdSection } from '@/components/home/Adsection';
 import { useParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import { MOCK_EVENTS } from '@/constants';
+import { EventReviews } from '@/components/events/EventReviews';
 
 
 export default function EventDetails() {
@@ -104,6 +105,7 @@ export default function EventDetails() {
 
                 {/* Main Content */}
                 <div className="lg:w-2/3 order-2 lg:order-1">
+                    {/* ... other content ... */}
 
                     {/* Tabs Navigation */}
                     <div className="flex gap-4 mb-8 overflow-x-auto pb-2 scrollbar-hide border-b border-white/10">
@@ -345,6 +347,7 @@ export default function EventDetails() {
                             ))}
                         </div>
                     </div>
+                    <EventReviews />
                 </div>
 
                 {/* Sidebar Booking Card */}
@@ -430,6 +433,6 @@ export default function EventDetails() {
                     align="left"
                 />
             </div>
-        </div>
+        </div >
     );
 };
