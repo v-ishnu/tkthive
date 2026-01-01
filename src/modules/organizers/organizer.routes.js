@@ -3,8 +3,8 @@ import protect from "../../lib/middleware/protect.middleware.js";
 import { createOrganizerController } from "./controller/org.create.js";
 import { inviteStaffController } from "./controller/inviteOwner.controller.js";
 import { authorize } from "../../lib/middleware/authorize.middleware.js";
-import { getMyOrganizers, getOrganizerController } from "./controller/Admin.getOrgcontroller.js";
-// import { getOrganizerController } from "./controller/admin.getOrgcontroller.js";
+import { getMyOrganizers } from "./controller/Admin.getOrgcontroller.js";
+import { getOrganizerController } from "./controller/user.getOrgcontroller.js";
 
 const organizerRouter = Router();
 
