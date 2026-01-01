@@ -24,7 +24,7 @@ export const cashfreeWebhook = async (req, res) => {
 
   const event = JSON.parse(rawBody.toString("utf8"));
 
-  const eventType = event.type;
+  // const eventType = event.type;
   const orderId = event.data?.order?.order_id;
   const orderStatus = event.data?.order?.order_status;
   const paymentStatus = event.data?.payment?.payment_status;

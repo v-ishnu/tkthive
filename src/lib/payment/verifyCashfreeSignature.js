@@ -14,10 +14,12 @@ export function verifyCashfreeSignature({
       .update(signedPayload)
       .digest("base64");
 
-    return crypto.timingSafeEqual(
-      Buffer.from(signature),
-      Buffer.from(expectedSignature)
-    );
+
+    return expectedSignature === signature;
+    // return crypto.timingSafeEqual(
+    //   Buffer.from(signature),
+    //   Buffer.from(expectedSignature)
+    // );
   } catch {
     return false;
   }
