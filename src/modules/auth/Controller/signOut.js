@@ -1,0 +1,27 @@
+import { accessTokenCookieOptions, refreshTokenCookieOptions } from "../../../../config/cookies.config.js";
+import { signOutService } from "../Service/signout.service.js";
+
+
+export const signOutController = async (req, res) => {
+    try {
+        const rToken = req.cookies?.rToken;
+        console.log("🔍 Logout refresh token:", rToken);
+
+
+        // await signOutService(rToken);
+
+        res.clearCookie("aToken", accessTokenCookieOptions);
+        res.clearCookie("rToken", refreshTokenCookieOptions);
+
+        return res.status(200).json({
+            message: "Logged out successfully"
+        });
+    } catch (error) {
+        console.error("❌ Logout error:", error);
+
+        return res.status(500).json({
+          message: "LOGOUT_FAILED",
+          error: error.message || error,
+        });
+    }
+}
