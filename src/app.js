@@ -61,6 +61,7 @@ try {
 
 // Routes
 import authRouter from "../src/modules/auth/auth.routes.js";
+import userRouter from "./modules/users/user.routes.js";
 import organizerRouter from "./modules/organizers/organizer.routes.js";
 import adminRouter from "./modules/admin/admin.route.js";
 import eventRouter from "./modules/events/event.routes.js";
@@ -68,6 +69,7 @@ import bookingRoute from "./modules/booking/booking.routes.js";
 import paymentRoute from "./modules/payment/payment.routes.js";
 
 app.use("/api/v1/auth", authRouter);
+app.use("/api/profile", userRouter);
 app.use('/organizer', organizerRouter);
 app.use("/admin/auth", adminRouter);
 app.use("/api/event", eventRouter)

@@ -7,9 +7,11 @@ import { eventCreate } from "./eventCreate.js";
 import { createTickets } from "../tickets/createTicket.js";
 import { getEvent, getEventById } from "./getEvent.js";
 // import { ticketBooking } from "../booking/ticketBooking.js";
-import { ticketBooking } from "../booking/controller/ticketBooking.js";
+// import { ticketBooking } from "../booking/controller/ticketBooking.js";
 import { createAddon } from "./createAddon.js";
 import { updateAddon } from "./updateAddon.js";
+import { createCustomField, updateCustomField, deleteCustomField } from "./customField.js";
+import { updateEvent } from "./updateEvent.js";
 
 const eventRouter = Router();
 
@@ -18,6 +20,14 @@ eventRouter.post("/create-event",
     authorize(Permission.CREATE_EVENT),
     eventCreate
 );
+
+// Update Event
+eventRouter.patch("/update-event/:eventId",
+    protect,
+    authorize(Permission.MANAGE_EVENT),
+    updateEvent
+);
+
 
 // Fetch All Event
 eventRouter.get("/get-event", protect, getEvent)
@@ -34,32 +44,57 @@ eventRouter.get("/get/:eventId",protect, getEventById )
 //     }
 // );
 
+
+// Create Ticket or Ticket Type
 eventRouter.post("/:eventId/create-ticket",
     protect,
     // loadEventContext,
-    authorize(Permission.MANAGE_OWN_EVENT),
+    authorize(Permission.MANAGE_EVENT),
     createTickets
 );
 
+// Create Addon
 eventRouter.post("/:eventId/create-addon",
     protect,
     // loadEventContext,
-    authorize(Permission.MANAGE_OWN_EVENT),
+    authorize(Permission.MANAGE_EVENT),
     createAddon
 );
 
+// Update Addon
 eventRouter.post("/:eventId/:addonId/update-addon",
     protect,
     // loadEventContext,
-    authorize(Permission.MANAGE_OWN_EVENT),
+    authorize(Permission.MANAGE_EVENT),
     updateAddon
 );
 
-eventRouter.post(
-    "/get/:eventId/tickets/:ticketId/book",
+// Create Custom Field
+eventRouter.post("/:eventId/custom-field",
     protect,
-    ticketBooking
+    authorize(Permission.MANAGE_EVENT),
+    createCustomField
 );
+
+
+// Update Custom Field
+eventRouter.put("/custom-field/:fieldId",
+    protect,
+    authorize(Permission.MANAGE_EVENT),
+    updateCustomField
+);
+
+eventRouter.delete('/del-field/:fieldId',
+    protect,
+    authorize(Permission.MANAGE_EVENT),
+    deleteCustomField
+)
+
+// eventRouter.post(
+//     "/get/:eventId/tickets/:ticketId/book",
+//     protect,
+//     ticketBooking
+// );
 
 
 export default eventRouter;

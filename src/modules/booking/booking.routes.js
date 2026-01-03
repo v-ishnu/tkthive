@@ -1,10 +1,10 @@
 import {Router} from "express";
 import protect from "../../lib/middleware/protect.middleware.js";
-import { registerForEvent } from "./controller/eventRegistration.js";
+import { checkoutRegistration } from "./controller/checkoutRegistration.js";
+import { checkoutPayment } from "./controller/checkoutPayment.js";
 
 const bookingRoute = Router();
 
-bookingRoute.post("/event/:eventId/register", protect, registerForEvent);
-
-
+bookingRoute.post("/event/:eventId/register", protect, checkoutRegistration);
+bookingRoute.post("/CHECK-OUT/:orderID", protect, checkoutPayment);
 export default bookingRoute;

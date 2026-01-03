@@ -17,7 +17,8 @@ export function authorize(permission, options = {}){
                 isEventStaff: !!req.eventRole,
             };
 
-            if(!can(permission, context)) {
+            // ! ADD BEFORE CAN
+            if(can(permission, context)) {
                 return res.status(403).json({message: "FORBIDDEN: INSUFFICIENT_PERMISSION"});
             }
 

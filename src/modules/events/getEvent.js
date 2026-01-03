@@ -44,6 +44,7 @@ export const getEventById = async(req, res) => {
             where: { id: eventId },
             include: {
               tickets: true,
+              customFields: true,
               organizer: {
                 select: {
                   id: true,

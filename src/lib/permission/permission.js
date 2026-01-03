@@ -10,7 +10,7 @@ export const Permission = Object.freeze({
 
     // Organizer
     CREATE_EVENT: "CREATE_EVENT",
-    MANAGE_OWN_EVENT: "MANAGE_OWN_EVENT",
+    MANAGE_EVENT: "MANAGE_EVENT",
 
     // Booking
     CREATE_BOOKING: "CREATE_BOOKING",

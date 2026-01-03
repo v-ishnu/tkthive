@@ -185,11 +185,12 @@ model Event {
   organizerId String @map("organizer_id") @db.ObjectId
   createdBy   String @map("created_by") @db.ObjectId
 
-  shareCode      String?
-  isDiscoverable Boolean        @default(true)
-  approvalStatus ApprovalStatus @default(PENDING)
-  approvedBy     String?        @map("approved_by") @db.ObjectId
-  approvedAt     DateTime?
+  shareCode       String?
+  isDiscoverable  Boolean        @default(true)
+  hasCustomFields Boolean        @default(false)
+  approvalStatus  ApprovalStatus @default(PENDING)
+  approvedBy      String?        @map("approved_by") @db.ObjectId
+  approvedAt      DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -230,7 +231,7 @@ type SelectedAddon {
 }
 
 // =====================================
-// TICKET
+// TICKET {ADMIN INTENT} //User only select this, Basicaly it is a Ticket type
 // =====================================
 model Ticket {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
@@ -242,51 +243,22 @@ model Ticket {
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
 
-  event    Event     @relation(fields: [eventId], references: [id])
-  bookings Booking[]
+  event              Event               @relation(fields: [eventId], references: [id])
+  bookingItems       BookingItem[]
+  eventRegistrations EventRegistration[]
 
-  // bookings Booking[]
   @@index([eventId])
   @@map("tickets")
-}
-
-// =====================================
-// EVENT REGISTRATION (USER INTENT)
-// =====================================
-model EventRegistration {
-  id       String @id @default(auto()) @map("_id") @db.ObjectId
-  eventId  String @map("event_id") @db.ObjectId
-  userId   String @map("user_id") @db.ObjectId
-  ticketId String @db.ObjectId
-
-  addons SelectedAddon[]
-
-  totalAmount Float
-  qrCode      String        @unique
-  status      BookingStatus @default(PENDING)
-  scanned     Boolean       @default(false)
-
-  createdAt DateTime @default(now())
-
-  event Event @relation(fields: [eventId], references: [id])
-  user  User  @relation(fields: [userId], references: [id])
-
-  responses EventFieldResponse[]
-
-  @@index([eventId, userId])
-  @@index([eventId, scanned])
-  @@map("event_registrations")
 }
 
 // =====================================
 // BOOKING (PAYMENT ONLY)
 // =====================================
 model Booking {
-  id       String @id @default(auto()) @map("_id") @db.ObjectId
-  userId   String @map("user_id") @db.ObjectId
-  ticketId String @map("ticket_id") @db.ObjectId
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  userId  String @map("user_id") @db.ObjectId
+  orderId String @unique @map("order_id") // 🔑 one payment per order
 
-  orderId  String
   payment  Float
   currency String @default("INR")
   // qrCode        String        @unique Beacuse In this booking only ticket id is available
@@ -300,14 +272,63 @@ model Booking {
   expiresAt   DateTime
   createdAt   DateTime  @default(now())
 
-  user   User   @relation(fields: [userId], references: [id])
-  ticket Ticket @relation(fields: [ticketId], references: [id])
-  // addon  Addon  @relation(fields: [addonId], references: [id])
+  user               User                @relation(fields: [userId], references: [id])
+  items              BookingItem[]
+  eventRegistrations EventRegistration[]
 
   @@index([userId])
-  @@index([ticketId])
-  @@index([orderId])
   @@map("bookings")
+}
+
+model BookingItem {
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  bookingId String @db.ObjectId
+  ticketId  String @db.ObjectId
+
+  ticketName String
+  unitPrice  Float
+  quantity   Int
+  totalPrice Float
+
+  booking Booking @relation(fields: [bookingId], references: [id])
+  ticket  Ticket  @relation(fields: [ticketId], references: [id])
+
+  @@index([bookingId])
+  @@map("booking_items")
+}
+
+// =====================================
+// EVENT REGISTRATION (USER INTENT)
+// =====================================
+model EventRegistration {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  eventId   String @map("event_id") @db.ObjectId
+  userId    String @map("user_id") @db.ObjectId
+  bookingId String @db.ObjectId
+  ticketId  String @db.ObjectId
+
+  orderId String @map("order_id") @db.ObjectId
+
+  addons SelectedAddon[]
+
+  unitPrice Float
+  qrCode    String        @unique
+  status    BookingStatus @default(PENDING)
+  scanned   Boolean       @default(false)
+
+  createdAt DateTime @default(now())
+
+  event   Event   @relation(fields: [eventId], references: [id])
+  user    User    @relation(fields: [userId], references: [id])
+  booking Booking @relation(fields: [bookingId], references: [id])
+  ticket  Ticket  @relation(fields: [ticketId], references: [id])
+
+  responses EventFieldResponse[]
+
+  @@index([bookingId])
+  @@index([eventId, scanned])
+  @@map("event_registrations")
 }
 
 /**
@@ -318,6 +339,8 @@ model Booking {
 model EventCustomField {
   id       String          @id @default(auto()) @map("_id") @db.ObjectId
   eventId  String          @map("event_id") @db.ObjectId
+  ticketId String?         @map("ticket_id") @db.ObjectId
+
   label    String
   type     CustomFieldType
   required Boolean         @default(false)
@@ -328,6 +351,23 @@ model EventCustomField {
   responses EventFieldResponse[]
 
   @@map("event_custom_fields")
+}
+
+/**
+ * =========================
+ * // FIELD RESPONSES
+ * =========================
+ */
+model EventFieldResponse {
+  id             String @id @default(auto()) @map("_id") @db.ObjectId
+  registrationId String @map("registration_id") @db.ObjectId
+  fieldId        String @map("field_id") @db.ObjectId
+  value          String
+
+  registration EventRegistration @relation(fields: [registrationId], references: [id])
+  field        EventCustomField  @relation(fields: [fieldId], references: [id])
+
+  @@map("event_field_responses")
 }
 
 /**
@@ -365,21 +405,4 @@ model EventStaffInvitation {
   @@index([eventId]) // ✅ add here
   @@index([email, eventId])
   @@map("event_staff_invitations")
-}
-
-/**
- * =========================
- * // FIELD RESPONSES
- * =========================
- */
-model EventFieldResponse {
-  id             String @id @default(auto()) @map("_id") @db.ObjectId
-  registrationId String @map("registration_id") @db.ObjectId
-  fieldId        String @map("field_id") @db.ObjectId
-  value          String
-
-  registration EventRegistration @relation(fields: [registrationId], references: [id])
-  field        EventCustomField  @relation(fields: [fieldId], references: [id])
-
-  @@map("event_field_responses")
 }
