@@ -1,6 +1,6 @@
 import { Router } from "express";
 import protect from "../../lib/middleware/protect.middleware.js";
-import signInController from "./Controller/signin.js";
+import signInController from "./Controller/signIn.js";
 import signUpController from "./Controller/signUp.js";
 import { authenticateMe } from "./Controller/authMe.js";
 
