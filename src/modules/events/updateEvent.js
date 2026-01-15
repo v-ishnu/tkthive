@@ -8,6 +8,7 @@ export async function updateEvent(req, res) {
       title,
       description,
       venue,
+      imageUrl, // ✅ Added
       startDate,
       endDate,
       evType,
@@ -15,6 +16,14 @@ export async function updateEvent(req, res) {
       shareCode,
       isDiscoverable,
       hasCustomFields,
+      // New Fields
+      info,
+      announcement,
+      isOnline,
+      isPrivate,
+      isRegistrationOpen,
+      totalBooked,
+      totalTickets,
     } = req.body;
 
     // 1. Check if event exists
@@ -34,7 +43,18 @@ export async function updateEvent(req, res) {
       data: {
         ...(title !== undefined && { title }),
         ...(description !== undefined && { description }),
-        ...(venue !== undefined && { venue }),
+        ...(venue !== undefined && {
+          venue: {
+            name: venue.name,
+            city: venue.city,
+            state: venue.state,
+            country: venue.country,
+            pincode: venue.pincode,
+            latitude: venue.latitude,
+            longitude: venue.longitude
+          }
+        }),
+        ...(imageUrl !== undefined && { imageUrl }), // ✅ Added
         ...(startDate !== undefined && { startDate: new Date(startDate) }),
         ...(endDate !== undefined && { endDate: new Date(endDate) }),
         ...(evType !== undefined && { evType }),
@@ -42,6 +62,16 @@ export async function updateEvent(req, res) {
         ...(shareCode !== undefined && { shareCode }),
         ...(isDiscoverable !== undefined && { isDiscoverable }),
         ...(hasCustomFields !== undefined && { hasCustomFields }),
+
+        // New Fields
+        ...(info !== undefined && { info }),
+        ...(announcement !== undefined && { announcement }),
+        ...(isOnline !== undefined && { isOnline: Boolean(isOnline) }),
+        ...(isPrivate !== undefined && { isPrivate: Boolean(isPrivate) }),
+        ...(isRegistrationOpen !== undefined && { isRegistrationOpen: Boolean(isRegistrationOpen) }),
+        ...(totalBooked !== undefined && { totalBooked: parseInt(totalBooked) }),
+        ...(totalTickets !== undefined && { totalTickets: parseInt(totalTickets) }),
+        ...(req.body.coupons !== undefined && { coupons: req.body.coupons }), // ✅ Added
       },
     });
 

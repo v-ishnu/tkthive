@@ -21,6 +21,8 @@ export const createAddon = async (req, res) => {
       });
     }
 
+    
+
     /* =============================
        CHECK EVENT EXISTS
     ============================== */
@@ -36,28 +38,15 @@ export const createAddon = async (req, res) => {
     }
 
     /* =============================
-       CREATE ADDON OBJECT
+       CREATE ADDON
     ============================== */
-    const addon = {
-      id: new ObjectId().toString(),   // ✅ manual ObjectId
-      eventId: eventId,
-      name,
-      price,
-      quantity,
-      sold: 0,
-      isActive,
-      createdAt: new Date()
-    };
-
-    /* =============================
-       PUSH ADDON INTO EVENT
-    ============================== */
-    await prisma.event.update({
-      where: { id: eventId },
+    const addon = await prisma.addon.create({
       data: {
-        addons: {
-          push: addon
-        }
+        eventId,
+        name,
+        price,
+        quantity,
+        isActive
       }
     });
 

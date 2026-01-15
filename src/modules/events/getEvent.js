@@ -1,12 +1,26 @@
-import {prisma} from "../../../config/prisma.js";
+import { prisma } from "../../../config/prisma.js";
 
-export const getEvent = async(req, res ) => {
+export const getEvent = async (req, res) => {
     try {
+        const { city } = req.query;
+
+        const where = {};
+
+        // Filter by City if provided and not "All" (case-insensitive check safe)
+        if (city && city.toUpperCase() !== 'ALL') {
+            where.venue = {
+                is: {
+                    city: city
+                }
+            };
+        }
+
         const events = await prisma.event.findMany({
-            include:{
+            where,
+            include: {
                 tickets: true,
-                organizer:{
-                    select:{
+                organizer: {
+                    select: {
                         id: true,
                         name: true,
                         type: true
@@ -32,38 +46,145 @@ export const getEvent = async(req, res ) => {
 };
 
 
-export const getEventById = async(req, res) => {
+export const getEventById = async (req, res) => {
     try {
-        const {eventId} = req.params;
+        const { eventId: slugOrId } = req.params;
 
-        if(!eventId){
+        if (!slugOrId) {
             throw new Error("EVENTID_NULL");
         }
 
-        const event = await prisma.event.findUnique({
-            where: { id: eventId },
-            include: {
-              tickets: true,
-              customFields: true,
-              organizer: {
-                select: {
-                  id: true,
-                  name: true,
-                  type: true,
+        let event;
+
+        // Check if slugOrId is a valid ObjectId (24 char hex string)
+        if (/^[0-9a-fA-F]{24}$/.test(slugOrId)) {
+            event = await prisma.event.findUnique({
+                where: { id: slugOrId },
+                include: {
+                    tickets: true,
+                    tabs: true,
+                    addons: true,
+                    customFields: { orderBy: { order: 'asc' } },
+                    organizer: { select: { id: true, name: true, type: true } },
                 },
-              },
-            },
-          });
+            });
+        }
 
+        // If not found by ID (or invalid ObjectId), try finding by slug
+        if (!event) {
+            event = await prisma.event.findUnique({
+                where: { slug: slugOrId },
+                include: {
+                    tickets: true,
+                    tabs: true,
+                    addons: true,
+                    customFields: { orderBy: { order: 'asc' } },
+                    organizer: { select: { id: true, name: true, type: true, contactEmail: true, contactPhone: true, website: true } },
+                },
+            });
+        }
 
-        return res.status(201).json({
+        if (!event) {
+            throw new Error("EVENT_NOT_FOUND");
+        }
+
+        // Processing to group custom fields
+        const allCustomFields = event.customFields || [];
+
+        // 1. Separate Global (Event-Scope) vs Ticket-Specific Fields
+        const globalCustomFields = allCustomFields.filter(f => !f.ticketId);
+
+        // 2. Map ticketId -> [fields]
+        const ticketFieldsMap = {};
+        allCustomFields.forEach(field => {
+            if (field.ticketId) {
+                if (!ticketFieldsMap[field.ticketId]) {
+                    ticketFieldsMap[field.ticketId] = [];
+                }
+                ticketFieldsMap[field.ticketId].push(field);
+            }
+        });
+
+        // 3. Attach fields to relevant tickets
+        const ticketsWithFields = event.tickets.map(ticket => ({
+            ...ticket,
+            customFields: ticketFieldsMap[ticket.id] || []
+        }));
+
+        // 4. Construct response event object
+        // Exclude coupons from response
+        const { coupons, ...safeEvent } = event;
+
+        const responseEvent = {
+            ...safeEvent,
+            customFields: globalCustomFields, // Only event-level fields here
+            tickets: ticketsWithFields
+        };
+
+        return res.status(200).json({
             message: "EVENT_FETCHED",
-            event,
+            event: responseEvent,
         })
     } catch (error) {
         console.error(error);
         return res.status(500).json({
             message: "EVENT_FATCH_FAILED"
+        });
+    }
+}
+
+
+export const getEventTickets = async (req, res) => {
+    try {
+        const { eventId } = req.params;
+
+        // Fetch event with relevant data only
+        const event = await prisma.event.findUnique({
+            where: { id: eventId },
+            include: {
+                tickets: true,
+                customFields: {
+                    orderBy: { order: 'asc' }
+                }
+            }
+        });
+
+        if (!event) {
+            return res.status(404).json({ message: "EVENT_NOT_FOUND" });
+        }
+
+        const allCustomFields = event.customFields || [];
+
+        // 1. Global Custom Fields
+        const eventCustomFields = allCustomFields.filter(f => !f.ticketId);
+
+        // 2. Map ticketId -> [fields]
+        const ticketFieldsMap = {};
+        allCustomFields.forEach(field => {
+            if (field.ticketId) {
+                if (!ticketFieldsMap[field.ticketId]) {
+                    ticketFieldsMap[field.ticketId] = [];
+                }
+                ticketFieldsMap[field.ticketId].push(field);
+            }
+        });
+
+        // 3. Attach fields to tickets
+        const tickets = event.tickets.map(ticket => ({
+            ...ticket,
+            customFields: ticketFieldsMap[ticket.id] || []
+        }));
+
+        return res.status(200).json({
+            message: "TICKETS_FETCHED",
+            eventCustomFields,
+            tickets
+        });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            message: "TICKET_FETCH_FAILED"
         });
     }
 }

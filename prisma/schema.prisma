@@ -87,6 +87,30 @@ enum PaymentStatus {
   REFUNDED
 }
 
+enum TicketType {
+  INDIVIDUAL
+  GROUP
+}
+
+enum CustomTabType {
+  ABOUT
+  SCHEDULE
+  SUBMISSIONS
+  DOCUMENTS
+  SPONSORS
+  CUSTOM
+}
+
+enum EventCategory {
+  TECH
+  ESPORTS
+  SPORTS
+  ARTS
+  FEST
+  CONCERT
+  OTHERS
+}
+
 // =====================================
 // MODELS
 // =====================================
@@ -110,8 +134,32 @@ model User {
 
   adminOrganizers   Organizer[] @relation("AdminOrganizers")
   createdOrganizers Organizer[] @relation("OrganizerCreator") // ✅ ADD THIS
+  notifications     Notification[] // ✅ Added relation
 
   @@map("users")
+}
+
+model Notification {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+
+  userId    String?  @db.ObjectId // null = broadcast
+  role      PlatformRole? // ADMIN / ORGANIZER / USER (for role-based)
+
+  title     String
+  message   String
+  type      String   // EVENT, BOOKING, PAYMENT, SYSTEM
+  actionUrl String?  // deep link (frontend route)
+
+  data      Json?    // extra payload (eventId, bookingId)
+
+  isRead    Boolean  @default(false)
+
+  createdAt DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id])
+
+  @@index([userId, isRead])
+  @@map("notifications")
 }
 
 model Otp {
@@ -134,7 +182,7 @@ model Organizer {
 
   // Business profile
   about        String?
-  logoUrl      String?
+  tkthiveUrl      String?
   website      String?
   contactEmail String?
   contactPhone String?
@@ -176,32 +224,52 @@ model Event {
   id          String          @id @default(auto()) @map("_id") @db.ObjectId
   title       String
   description String?
-  venue       String
+  venue       Venue
+  imageUrl    String?        // ✅ Added
+  slug        String?        @unique // ✅ Added for URL-friendly lookup
   startDate   DateTime
   endDate     DateTime
   evType      EventVisibility
   price       String
 
-  organizerId String @map("organizer_id") @db.ObjectId
+  organizerId String? @map("organizer_id") @db.ObjectId
   createdBy   String @map("created_by") @db.ObjectId
 
-  shareCode       String?
-  isDiscoverable  Boolean        @default(true)
-  hasCustomFields Boolean        @default(false)
-  approvalStatus  ApprovalStatus @default(PENDING)
-  approvedBy      String?        @map("approved_by") @db.ObjectId
-  approvedAt      DateTime?
+  shareCode             String?
+  isDiscoverable        Boolean        @default(true)
+  isSingleTicket        Boolean        @default(false)
+  allowMultipleBookings Boolean        @default(true)
+  hasCustomFields       Boolean        @default(false)
+  
+  // New Fields
+  info                 String?
+  announcement         String?
+  isOnline             Boolean        @default(false)
+  isPrivate            Boolean        @default(false)
+  isRegistrationOpen   Boolean        @default(true)
+  totalBooked          Int            @default(0)
+  totalTickets         Int            @default(0)
+
+  approvalStatus        ApprovalStatus @default(PENDING)
+  approvedBy            String?        @map("approved_by") @db.ObjectId
+  approvedAt            DateTime?
+
+  category              EventCategory  @default(OTHERS)
+  subCategory           String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  organizer             Organizer              @relation(fields: [organizerId], references: [id])
+  organizer             Organizer?              @relation(fields: [organizerId], references: [id])
   staff                 EventStaff[]
   tickets               Ticket[]
   addons                Addon[]
+  tabs                  EventTab[]
   customFields          EventCustomField[]
   registrations         EventRegistration[]
   eventStaffInvitations EventStaffInvitation[]
+  
+  coupons               Coupon[]       // ✅ Added
 
   @@index([organizerId])
   @@map("events")
@@ -212,15 +280,22 @@ model Event {
  * // Embedded Types
  * =======================
  */
-type Addon {
-  id        String   @db.ObjectId
-  eventId   String   @db.ObjectId
-  name      String
-  price     Float
-  quantity  Int
-  sold      Int      @default(0)
+model Addon {
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  eventId String @map("event_id") @db.ObjectId
+
+  name     String
+  price    Float
+  quantity Int?
+  sold     Int    @default(0)
+
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
+
+  event Event @relation(fields: [eventId], references: [id])
+
+  @@index([eventId])
+  @@map("addons")
 }
 
 type SelectedAddon {
@@ -230,22 +305,53 @@ type SelectedAddon {
   quantity Int
 }
 
+type Coupon {
+  code               String
+  discountPercentage Float
+  limit              Int?
+  used               Int      @default(0)
+}
+
+type Venue {
+  name      String
+  city      String
+  state     String
+  country   String
+  pincode   String
+  latitude  String
+  longitude String
+}
+
 // =====================================
 // TICKET {ADMIN INTENT} //User only select this, Basicaly it is a Ticket type
 // =====================================
 model Ticket {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  eventId   String   @map("event_id") @db.ObjectId
-  name      String
-  price     Float
-  quantity  Int
-  sold      Int      @default(0)
-  isActive  Boolean  @default(true)
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  eventId String @map("event_id") @db.ObjectId
+
+  name  String
+  price Float
+
+  type       TicketType @default(INDIVIDUAL)
+  maxMembers Int?
+
+  startDate DateTime?
+  endDate   DateTime?
+  startTime String?
+  endTime   String?
+
+  quantity Int
+  sold     Int     @default(0)
+  isActive Boolean @default(true)
+
+  allowMultipleBooking Boolean @default(true)
+
   createdAt DateTime @default(now())
 
-  event              Event               @relation(fields: [eventId], references: [id])
   bookingItems       BookingItem[]
   eventRegistrations EventRegistration[]
+
+  event Event @relation(fields: [eventId], references: [id])
 
   @@index([eventId])
   @@map("tickets")
@@ -265,6 +371,13 @@ model Booking {
 
   bookingStatus BookingStatus @default(PENDING)
   paymentStatus PaymentStatus @default(PENDING)
+  
+  registrationData Json? // Stores full payload (items, attendees, addons) for postponed creation
+  
+  discount      Float?   // ✅ Added
+  appliedCoupon String?  // ✅ Added
+
+  // scanned       Boolean       @default(false)
 
   // scanned       Boolean       @default(false)
   usedAt      DateTime?
@@ -293,6 +406,9 @@ model BookingItem {
   booking Booking @relation(fields: [bookingId], references: [id])
   ticket  Ticket  @relation(fields: [ticketId], references: [id])
 
+  addons SelectedAddon[]
+  attendeeData Json? // Stores raw attendee data (names, fields, etc.) for registration creation
+
   @@index([bookingId])
   @@map("booking_items")
 }
@@ -308,7 +424,9 @@ model EventRegistration {
   bookingId String @db.ObjectId
   ticketId  String @db.ObjectId
 
-  orderId String @map("order_id") @db.ObjectId
+  orderId String @map("order_id")
+
+  groupIndex Int?
 
   addons SelectedAddon[]
 
@@ -337,20 +455,44 @@ model EventRegistration {
  * =========================
  */
 model EventCustomField {
-  id       String          @id @default(auto()) @map("_id") @db.ObjectId
-  eventId  String          @map("event_id") @db.ObjectId
-  ticketId String?         @map("ticket_id") @db.ObjectId
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
+  eventId  String  @map("event_id") @db.ObjectId
+  ticketId String? @map("ticket_id") @db.ObjectId
 
   label    String
+  placeholder String? // Added placeholder
   type     CustomFieldType
   required Boolean         @default(false)
   options  String[]        @default([])
   order    Int
 
+  scope String @default("attendee")
+
   event     Event                @relation(fields: [eventId], references: [id])
   responses EventFieldResponse[]
 
   @@map("event_custom_fields")
+}
+
+model EventTab {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  eventId   String   @map("event_id") @db.ObjectId
+
+  key       String   // about | schedule | docs | sponsors | custom
+  title     String
+  schema    Json?
+  data      Json?
+
+  order     Int
+  isActive  Boolean  @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  event Event @relation(fields: [eventId], references: [id])
+
+  @@index([eventId, key])
+  @@map("event_tabs")
 }
 
 /**

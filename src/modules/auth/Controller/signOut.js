@@ -5,7 +5,7 @@ import { signOutService } from "../Service/signout.service.js";
 export const signOutController = async (req, res) => {
     try {
         const rToken = req.cookies?.rToken;
-        console.log("🔍 Logout refresh token:", rToken);
+        console.log("🔍 logout refresh token:", rToken);
 
 
         // await signOutService(rToken);
@@ -17,11 +17,11 @@ export const signOutController = async (req, res) => {
             message: "Logged out successfully"
         });
     } catch (error) {
-        console.error("❌ Logout error:", error);
+        console.error("❌ logout error:", error);
 
         return res.status(500).json({
-          message: "LOGOUT_FAILED",
-          error: error.message || error,
+            message: "LOGOUT_FAILED",
+            error: error.message || error,
         });
     }
 }

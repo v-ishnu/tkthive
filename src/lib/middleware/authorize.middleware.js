@@ -1,9 +1,9 @@
-import {can} from "../permission/can.js"
+import { can } from "../permission/can.js"
 
-export function authorize(permission, options = {}){
-    return async(req, res, next) => {
+export function authorize(permission, options = {}) {
+    return async (req, res, next) => {
         try {
-            if(!req.user){
+            if (!req.user) {
                 return res.status(401).json({
                     message: "UNAUTHENTICATED"
                 });
@@ -18,8 +18,8 @@ export function authorize(permission, options = {}){
             };
 
             // ! ADD BEFORE CAN
-            if(can(permission, context)) {
-                return res.status(403).json({message: "FORBIDDEN: INSUFFICIENT_PERMISSION"});
+            if (!can(permission, context)) {
+                return res.status(403).json({ message: "FORBIDDEN: INSUFFICIENT_PERMISSION" });
             }
 
             next();

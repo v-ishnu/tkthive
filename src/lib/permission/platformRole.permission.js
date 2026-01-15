@@ -11,12 +11,12 @@ export const PlatformRolePermission = {
         Permission.MANAGE_ORGANIZER,
         Permission.CREATE_ORGANIZER,
         Permission.CREATE_EVENT,
-        Permission.MANAGE_OWN_EVENT,
+        Permission.MANAGE_EVENT,
     ],
 
     ORGANIZER:[
         Permission.CREATE_EVENT,
-        Permission.MANAGE_OWN_EVENT,
+        Permission.MANAGE_EVENT,
         Permission.VIEW_REPORTS
     ],
     USER:[

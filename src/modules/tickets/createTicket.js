@@ -4,41 +4,60 @@ export const createTickets = async (req, res) => {
     try {
         const user = req.user;
         const { eventId } = req.params;
-        const { tickets } = req.body;
+        const {
+            name,
+            price,
+            quantity,
+            type,
+            maxMembers,
+            startDate,
+            endDate,
+            startTime,
+            endTime,
+            allowMultipleBooking
+        } = req.body;
 
-        if(!user){
-            return res.status(401).json({message: "USER_NOT_EXISTS"})
+        if (!user) {
+            return res.status(401).json({ message: "USER_NOT_EXISTS" })
         }
 
-        if(!Array.isArray(tickets) || tickets.length === 0 ){
-            return res.status(400)/json({
-                message: "AT_LEAST_ONE_TICKET_REQUIRED"
+        // Basic validation
+        if (!name || price === undefined || !quantity) {
+            return res.status(400).json({
+                message: "MISSING_REQUIRED_FIELDS"
             });
         }
 
         // 3. Find Event
         const event = await prisma.event.findUnique({
-            where:{id: eventId}
+            where: { id: eventId }
         });
 
-        if(!event){
+        if (!event) {
             return res.status(404).json({
                 message: "EVENT_NOT_EXIST"
             });
         }
 
-        const createdTicket = await prisma.ticket.createMany({
-            data: tickets.map(ticket => ({
+        const createdTicket = await prisma.ticket.create({
+            data: {
                 eventId,
-                name: ticket.name,
-                price: ticket.price,
-                quantity: ticket.quantity
-            })),
+                name,
+                price,
+                quantity,
+                type: type || "INDIVIDUAL",
+                maxMembers,
+                startDate: startDate ? new Date(startDate) : undefined,
+                endDate: endDate ? new Date(endDate) : undefined,
+                startTime,
+                endTime,
+                allowMultipleBooking: allowMultipleBooking !== undefined ? allowMultipleBooking : true
+            },
         });
 
         return res.status(201).json({
             message: "TICKET_CREATED",
-            count: createdTicket.count
+            ticket: createdTicket
         });
     } catch (error) {
         console.error(error);

@@ -3,26 +3,34 @@ import { accessTokenCookieOptions, refreshTokenCookieOptions } from "../../../..
 import { generateAccessToken, generateRefreshToken } from "../../../lib/jwt.js";
 import { storeRefreshTokenInLocalRedis } from "../../../lib/store.redis.js";
 import sendWelcomeMail from "../../../utils/mail/welcome.mail.js";
-import {signUpAdminOrganizer} from "../service/signup.service.js"
+import { signUpAdminOrganizer } from "../service/signup.service.js"
 import { signUpAdminSchema } from "../admin.guard.js";
 
 export const signUpAdmin = async (req, res) => {
     try {
         const validateData = signUpAdminSchema.parse(req.body);
 
+        // SECURITY: Public signup is ONLY for ADMINs (or first admin). 
+        // Example requirement: "only admin role can signup not organizer"
+        if (validateData.platformRole !== "ADMIN") {
+            return res.status(403).json({
+                message: "Organizers must be created by an Admin."
+            });
+        }
+
         try {
             const user = await signUpAdminOrganizer(validateData);
             return res.status(201).json({
-                message: "Admin/Organizer created successfully",
+                message: "Admin created successfully",
                 user,
-              });
+            });
         } catch (error) {
             if (
                 error.message === "ADMIN_OR_ORGANIZER_EXISTS" ||
                 error.message === "EMAIL_ALREADY_EXISTS"
-              ) {
+            ) {
                 return res.status(409).json({
-                  message: "Email already registered",
+                    message: "Email already registered",
                 });
             }
         }
@@ -37,7 +45,7 @@ export const signUpAdmin = async (req, res) => {
 
         await storeRefreshTokenInLocalRedis(user.id, refreshToken);
 
-        if(user.email){
+        if (user.email) {
             try {
                 await sendWelcomeMail(user.email);
                 console.log("Welcome Mail sent to:", user.email);
@@ -46,13 +54,13 @@ export const signUpAdmin = async (req, res) => {
             }
         }
         return res
-        .cookie("access_token",accessToken, accessTokenCookieOptions)
-        .cookie("refresh_token",refreshToken, refreshTokenCookieOptions)
-        .status(201)
-        .json({
-            message:"ADMIN_OR_ORGANIZER registered successfully and looged in successfully",
-            data: user
-        })
+            .cookie("access_token", accessToken, accessTokenCookieOptions)
+            .cookie("refresh_token", refreshToken, refreshTokenCookieOptions)
+            .status(201)
+            .json({
+                message: "ADMIN_OR_ORGANIZER registered successfully and looged in successfully",
+                data: user
+            })
     } catch (error) {
         // Zod validation error
         if (error instanceof ZodError) {
@@ -62,7 +70,7 @@ export const signUpAdmin = async (req, res) => {
             });
         }
 
-              // Business error
+        // Business error
         if (error.message === "USER_EXISTS") {
             return res.status(409).json({
                 message: "User already exists",

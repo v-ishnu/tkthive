@@ -18,9 +18,27 @@ export const getOrganizerController = async (req, res) => {
       });
     }
 
+    // Access Control
+    if (user.platformRole !== "ADMIN") {
+      const isAssociated = await prisma.userOrganizer.findUnique({
+        where: {
+          userId_organizerId: {
+            userId: user.id,
+            organizerId: orgId
+          }
+        }
+      });
+
+      if (!isAssociated) {
+        return res.status(403).json({
+          message: "FORBIDDEN_ACCESS_TO_ORGANIZER",
+        });
+      }
+    }
+
     const organizer = await prisma.organizer.findUnique({
       where: {
-        id: orgId, // ✅ STRING
+        id: orgId,
       },
       select: {
         id: true,
@@ -28,9 +46,13 @@ export const getOrganizerController = async (req, res) => {
         type: true,
         about: true,
         website: true,
+        tkthiveUrl: true,
+        contactEmail: true,
+        contactPhone: true,
         totalEvents: true,
         totalTicketsSold: true,
         createdAt: true,
+        adminId: true, // Admin might want to see who manages this
       },
     });
 

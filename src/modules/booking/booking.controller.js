@@ -1,0 +1,565 @@
+
+
+import { prisma } from "../../../config/prisma.js";
+import { getPaymentProvider } from "../payment/factory/paymentProviderFactory.js";
+import crypto from "crypto";
+import sendRegistrationSuccessEmail from "../../utils/mail/registrationSuccess.mail.js";
+import { createNotification } from "../notifications/notification.service.js";
+
+/* 
+  1. initiateBooking()
+  → Validate stock, custom fields
+  → Create Booking + Items (PENDING)
+  → Does NOT return payment session anymore
+*/
+export const initiateBooking = async (req, res) => {
+    const { eventId } = req.params;
+    const userId = req.user.id;
+    const { tickets, couponCode } = req.body;
+
+    if (!tickets || !Array.isArray(tickets)) {
+        return res.status(400).json({ message: "INVALID_TICKETS_DATA" });
+    }
+
+    const event = await prisma.event.findUnique({
+        where: { id: eventId },
+        include: { tickets: true, addons: true, customFields: true }
+    });
+
+    if (!event) return res.status(404).json({ message: "EVENT_NOT_FOUND" });
+
+    // Check for Duplicate Registration
+
+    const existingBooking = await prisma.booking.findFirst({
+        where: {
+            userId: userId,
+            items: {
+                some: {
+                    ticket: {
+                        eventId: eventId
+                    }
+                }
+            },
+            bookingStatus: { in: ["CONFIRMED", "PENDING"] }
+        }
+    });
+
+    if (existingBooking) {
+        return res.status(400).json({ message: "YOU HAVE ALREADY REGISTERED FOR THIS EVENT" });
+    }
+
+
+    let totalAmount = 0;
+    const bookingItems = [];
+
+    for (const item of tickets) {
+        const ticket = event.tickets.find(t => t.id === item.ticketId);
+        if (!ticket || !ticket.isActive) return res.status(400).json({ message: "INVALID_TICKET", details: item.ticketId });
+
+        if (ticket.sold + item.quantity > ticket.quantity) {
+            return res.status(400).json({ message: "TICKET_SOLD_OUT", details: ticket.name });
+        }
+
+        if (item.attendees && item.attendees.length !== item.quantity) {
+            return res.status(400).json({ message: "ATTENDEE_COUNT_MISMATCH", details: ticket.name });
+        }
+
+        const ticketTotal = ticket.price * item.quantity;
+        let addonTotal = 0;
+        const selectedAddons = [];
+
+        if (item.addons?.length) {
+            for (const ad of item.addons) {
+                const addon = event.addons.find(a => a.id === ad.addonId);
+                if (!addon || !addon.isActive) continue;
+                addonTotal += addon.price * ad.quantity;
+                selectedAddons.push({
+                    addonId: addon.id,
+                    name: addon.name,
+                    price: addon.price,
+                    quantity: ad.quantity
+                });
+            }
+        }
+
+        totalAmount += ticketTotal + addonTotal;
+
+        bookingItems.push({
+            ticketId: ticket.id,
+            ticketName: ticket.name,
+            unitPrice: ticket.price,
+            quantity: item.quantity,
+            totalPrice: ticketTotal + addonTotal,
+            addons: selectedAddons,
+            attendeeData: item.attendees // Save raw attendee data (names, fields, etc.)
+        });
+    }
+
+    // Coupon Logic
+    let discount = 0;
+    let appliedCoupon = null;
+
+    if (couponCode && event.coupons && Array.isArray(event.coupons)) {
+        const coupon = event.coupons.find(c => c.code === couponCode);
+        if (coupon) {
+            // Check limit if applicable
+            if (coupon.limit && coupon.used >= coupon.limit) {
+                return res.status(400).json({ message: "COUPON_LIMIT_REACHED" });
+            }
+
+            discount = (totalAmount * coupon.discountPercentage) / 100;
+            totalAmount = Math.max(0, totalAmount - discount); // Prevent negative
+            appliedCoupon = couponCode;
+        } else {
+            return res.status(400).json({ message: "INVALID_COUPON" });
+        }
+    }
+
+    const orderId = `ORD_${Date.now()}_${crypto.randomUUID()}`;
+
+    await prisma.booking.create({
+        data: {
+            userId,
+            orderId,
+            payment: totalAmount,
+            discount: discount > 0 ? discount : undefined,
+            appliedCoupon: appliedCoupon,
+            bookingStatus: "PENDING",
+            paymentStatus: "PENDING",
+            expiresAt: new Date(Date.now() + 15 * 60 * 1000),
+            items: { create: bookingItems },
+
+        }
+    });
+
+    // Just return Order ID. Frontend will then call /create-payment-session if needed.
+    return res.status(201).json({
+        message: "BOOKING_INITIATED",
+        orderId,
+        amount: totalAmount
+    });
+};
+
+/* 
+  2. createPaymentSession()
+  → Create PaymentIntent (Cashfree/Razorpay/etc)
+*/
+export const createPaymentSession = async (req, res) => {
+    const { orderId, provider = "CASHFREE", returnUrl, customerDetails } = req.body;
+    let user = req.user;
+
+    // Use provided customerDetails to override/augment user info (e.g. phone entered in form)
+    if (customerDetails) {
+        user = { ...user, ...customerDetails };
+    }
+
+    try {
+        const booking = await prisma.booking.findUnique({ where: { orderId } });
+        if (!booking) return res.status(404).json({ message: "BOOKING_NOT_FOUND" });
+
+        if (booking.paymentStatus === "PAID") return res.status(400).json({ message: "ALREADY_PAID" });
+
+        const providerService = getPaymentProvider(provider);
+
+        // session might be a string (Cashfree sessionId) or object depending on provider
+        const session = await providerService.initiate({
+            orderId,
+            amount: booking.payment,
+            user,
+            returnUrl
+        });
+
+        return res.json({
+            orderId,
+            provider,
+            session
+        });
+    } catch (error) {
+        console.error("Create Payment Session Error:", error);
+        return res.status(500).json({ message: "PAYMENT_SESSION_FAILED", error: error.message });
+    }
+};
+
+/* 
+  3. confirmPaymentWebhook()
+  → Verify payment status
+  → Mark Booking PAID
+  → Create Registrations + QR
+  → Update Stock
+*/
+export const cashfreeWebhook = async (req, res) => {
+    try {
+        const signature = req.headers["x-webhook-signature"];
+        const rawBody = req.rawBody; // REQUIRED
+
+        if (!signature) {
+            return res.status(400).json({ message: "SIGNATURE_MISSING" });
+        }
+
+        // 1️⃣ Verify Signature
+        const expectedSignature = crypto
+            .createHmac("sha256", process.env.CASHFREE_WEBHOOK_SECRET)
+            .update(rawBody)
+            .digest("base64");
+
+        if (signature !== expectedSignature) {
+            return res.status(401).json({ message: "INVALID_SIGNATURE" });
+        }
+
+        const payload = JSON.parse(rawBody.toString());
+
+        // 2️⃣ Only care about successful payments
+        if (payload.type !== "PAYMENT_SUCCESS_WEBHOOK") {
+            return res.status(200).json({ message: "IGNORED_EVENT" });
+        }
+
+        const orderId = payload.data?.order?.order_id;
+        const orderStatus = payload.data?.order?.order_status;
+
+        if (!orderId) {
+            return res.status(400).json({ message: "ORDER_ID_MISSING" });
+        }
+
+        if (orderStatus !== "PAID") {
+            return res.status(200).json({ message: "PAYMENT_NOT_PAID" });
+        }
+
+        // 3️⃣ Finalize booking (idempotent)
+        const result = await finalizeBooking(orderId);
+
+        return res.status(200).json({
+            message: "WEBHOOK_PROCESSED",
+            result
+        });
+
+    } catch (error) {
+        console.error("CASHFREE WEBHOOK ERROR:", error);
+        return res.status(500).json({ message: "WEBHOOK_FAILED" });
+    }
+};
+
+/*
+  4. verifyBooking (Synchronous)
+  → Frontend calls this after payment flow
+  → Checks status with Provider
+  → If PAID, finalize booking immediately
+*/
+export const verifyBooking = async (req, res) => {
+    const { orderId } = req.params;
+
+    if (!orderId) return res.status(400).json({ message: "ORDER_ID_REQUIRED" });
+
+    try {
+        // 1. Check Provider Status
+        const providerService = getPaymentProvider("CASHFREE");
+        const providerData = await providerService.verify({ orderId });
+
+        if (providerData.order_status !== "PAID") {
+            return res.status(200).json({
+                status: providerData.order_status,
+                message: "PAYMENT_NOT_PAID",
+                bookingStatus: "PENDING"
+            });
+        }
+
+        // 2. Finalize Booking (Idempotent)
+        const result = await finalizeBooking(orderId);
+
+        return res.status(200).json({
+            status: "PAID",
+            message: result.message,
+            bookingStatus: result.bookingStatus || "CONFIRMED"
+        });
+
+    } catch (error) {
+        console.error("Verify Booking Error:", error);
+        return res.status(500).json({ message: "VERIFICATION_FAILED" });
+    }
+};
+
+// --- Helper: Finalize Booking ---
+// Handles DB updates, Stock, Registration creation.
+// Idempotent: Checks if already PAID.
+async function finalizeBooking(orderId) {
+    const booking = await prisma.booking.findUnique({
+        where: { orderId },
+        include: { items: { include: { ticket: true } } }
+    });
+
+    if (!booking) return { success: false, message: "BOOKING_NOT_FOUND" };
+    if (booking.paymentStatus === "PAID") return { success: true, message: "ALREADY_PROCESSED", bookingStatus: booking.bookingStatus };
+
+    // Transaction
+    await prisma.$transaction(async tx => {
+        // 1. Update Booking
+        await tx.booking.update({
+            where: { orderId },
+            data: { paymentStatus: "PAID", bookingStatus: "CONFIRMED" }
+        });
+
+        // 2. Process Items
+        for (const item of booking.items) {
+            // Update Stock
+            await tx.ticket.update({
+                where: { id: item.ticketId },
+                data: { sold: { increment: item.quantity } }
+            });
+
+            // 2. Create Registrations from BookingItem Data
+            const attendees = item.attendeeData || [];
+
+            for (let i = 0; i < item.quantity; i++) {
+                const attendee = attendees[i] || {};
+                const fieldResponses = attendee.responses ? attendee.responses.map(r => ({
+                    fieldId: r.fieldId,
+                    value: String(r.value)
+                })) : [];
+
+                await tx.eventRegistration.create({
+                    data: {
+                        eventId: item.ticket.eventId,
+                        userId: booking.userId,
+                        bookingId: booking.id,
+                        ticketId: item.ticketId,
+                        orderId: booking.orderId,
+                        unitPrice: item.unitPrice,
+                        qrCode: `QR_${Date.now()}_${crypto.randomUUID()}`,
+                        status: "CONFIRMED",
+                        addons: item.addons, // Addons from BookingItem
+                        responses: {
+                            create: fieldResponses
+                        }
+                    }
+                });
+            }
+        }
+    });
+
+    // Send Email Async
+    (async () => {
+        try {
+            const user = await prisma.user.findUnique({ where: { id: booking.userId } });
+            if (!user) return;
+
+            // Fetch Event Title (assuming simple ticket structure where all items belong to same event or we just take first)
+            // Ideally booking.items[0].ticket.event.title if we included it, but we only included ticket.
+            // Let's refetch minimal event info or rely on what we have.
+            const firstTicket = await prisma.ticket.findUnique({
+                where: { id: booking.items[0].ticketId },
+                include: { event: { select: { title: true } } }
+            });
+
+            const totalTickets = booking.items.reduce((acc, item) => acc + item.quantity, 0);
+
+            await sendRegistrationSuccessEmail({
+                email: user.email,
+                orderId: booking.orderId,
+                amount: booking.payment,
+                ticketCount: totalTickets,
+                eventTitle: firstTicket?.event?.title || "Event",
+                actionUrl: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/mytickets`
+            });
+        } catch (err) {
+            console.error("Email Sending Failed in Finalize:", err);
+        }
+
+        // Create Notification
+        try {
+            await createNotification({
+                userId: booking.userId,
+                title: "Payment Successful!",
+                message: `Your payment for ${booking.items.length} ticket(s) was successful.`,
+                type: "ticket",
+                actionUrl: "/mytickets",
+                data: { orderId: booking.orderId, amount: booking.payment }
+            });
+        } catch (err) {
+            console.error("Notification Error in Finalize:", err);
+        }
+
+    })();
+
+    return { success: true, message: "BOOKING_FINALIZED", bookingStatus: "CONFIRMED" };
+}
+
+
+export const registerFreeEvent = async (req, res) => {
+    const { eventId } = req.params;
+    const { tickets } = req.body;
+    const userId = req.user.id;
+    const userEmail = req.user.email; // Capture for email
+
+    // Logic from previous step... adapted for consistency
+    const inputTickets = tickets || [];
+
+    if (inputTickets.length === 0) return res.status(400).json({ message: "NO_TICKETS" });
+
+    // ... (Free event logic remains largely same: validate -> transaction create booking/regs -> update stock)
+    // Re-implementing correctly for this file
+    try {
+        const event = await prisma.event.findUnique({ where: { id: eventId }, include: { tickets: true } });
+        if (!event) return res.status(404).json({ message: "EVENT_NOT_FOUND" });
+
+        // Check for Duplicate Registration
+        if (!event.allowMultipleBookings) {
+            const existingBooking = await prisma.booking.findFirst({
+                where: {
+                    userId: userId,
+                    items: {
+                        some: {
+                            ticket: {
+                                eventId: eventId
+                            }
+                        }
+                    },
+                    bookingStatus: { in: ["CONFIRMED", "PENDING"] }
+                }
+            });
+
+            if (existingBooking) {
+                return res.status(400).json({ message: "ALREADY_REGISTERED" });
+            }
+        }
+
+        const bookingItemsToCreate = [];
+        const registrationsToCreate = [];
+        const orderId = `FREE_${Date.now()}_${crypto.randomUUID()}`;
+        let totalCount = 0;
+
+        for (const item of inputTickets) {
+            const ticket = event.tickets.find(t => t.id === item.ticketId);
+            if (!ticket || ticket.price > 0) return res.status(400).json({ message: "INVALID_FREE_TICKET" });
+            if (ticket.sold + item.quantity > ticket.quantity) return res.status(400).json({ message: "SOLD_OUT" });
+
+            totalCount += item.quantity;
+            bookingItemsToCreate.push({
+                ticketId: ticket.id,
+                ticketName: ticket.name,
+                unitPrice: 0,
+                quantity: item.quantity,
+                totalPrice: 0,
+                addons: []
+            });
+
+            for (let i = 0; i < item.quantity; i++) {
+                registrationsToCreate.push({ ticketId: ticket.id });
+            }
+        }
+
+        await prisma.$transaction(async tx => {
+            const booking = await tx.booking.create({
+                data: {
+                    userId,
+                    orderId,
+                    payment: 0,
+                    bookingStatus: "CONFIRMED",
+                    paymentStatus: "PAID",
+                    expiresAt: new Date(),
+                    items: { create: bookingItemsToCreate }
+                }
+            });
+
+            for (const reg of registrationsToCreate) {
+                await tx.eventRegistration.create({
+                    data: {
+                        eventId,
+                        userId,
+                        bookingId: booking.id,
+                        ticketId: reg.ticketId,
+                        orderId: booking.orderId,
+                        unitPrice: 0,
+                        qrCode: crypto.randomUUID(),
+                        status: "CONFIRMED",
+                        addons: []
+                    }
+                });
+                // Assuming no custom fields update here for brevity or it matches similar logic
+            }
+
+            for (const item of inputTickets) {
+                await tx.ticket.update({
+                    where: { id: item.ticketId },
+                    data: { sold: { increment: item.quantity } }
+                });
+            }
+        });
+
+        // Send Email Async
+        sendRegistrationSuccessEmail({
+            email: userEmail,
+            orderId,
+            amount: 0,
+            ticketCount: totalCount,
+            eventTitle: event.title,
+            actionUrl: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/mytickets`
+        }).catch(err => console.error("Email API Error:", err));
+
+        // Create Notification
+        createNotification({
+            userId,
+            title: "Registration Confirmed!",
+            message: `You have successfully registered for ${event.title}.`,
+            type: "ticket",
+            actionUrl: "/mytickets",
+            data: { orderId, amount: 0 }
+        }).catch(err => console.error("Notification Error:", err));
+
+        return res.json({ message: "FREE_REGISTRATION_SUCCESS", orderId });
+    } catch (e) {
+        console.error(e);
+        return res.status(500).send("ERROR");
+    }
+};
+
+export const getBooking = async (req, res) => {
+    const { orderId } = req.params;
+    const booking = await prisma.booking.findUnique({
+        where: { orderId },
+        include: { items: true }
+    });
+    if (!booking) return res.status(404).json({ message: "NOT_FOUND" });
+    res.json(booking);
+};
+
+export const validateCoupon = async (req, res) => {
+    try {
+        const { eventId } = req.params;
+        const { couponCode } = req.body;
+
+        if (!couponCode) {
+            return res.status(400).json({ message: "COUPON_CODE_REQUIRED" });
+        }
+
+        const event = await prisma.event.findUnique({
+            where: { id: eventId },
+        });
+
+        if (!event) {
+            return res.status(404).json({ message: "EVENT_NOT_FOUND" });
+        }
+
+        if (!event.coupons || !Array.isArray(event.coupons)) {
+            return res.status(400).json({ message: "INVALID_COUPON" });
+        }
+
+        const coupon = event.coupons.find(c => c.code === couponCode);
+
+        if (!coupon) {
+            return res.status(400).json({ message: "INVALID_COUPON" });
+        }
+
+        if (coupon.limit && coupon.used >= coupon.limit) {
+            return res.status(400).json({ message: "COUPON_LIMIT_REACHED" });
+        }
+
+        return res.status(200).json({
+            message: "COUPON_VALID",
+            discountPercentage: coupon.discountPercentage,
+            code: coupon.code
+        });
+
+    } catch (error) {
+        console.error("Validate Coupon Error:", error);
+        return res.status(500).json({ message: "VALIDATION_FAILED" });
+    }
+};
