@@ -1,11 +1,11 @@
 import { ZodError } from "zod";
 import { signInSchema } from "../auth.guard.js";
-import { signInService } from "../Service/signin.service.js";
+import { signInService } from "../service/signin.service.js";
 import { generateAccessToken, generateRefreshToken } from "../../../lib/jwt.js";
 import { storeRefreshTokenInLocalRedis } from "../../../lib/store.redis.js";
 import { accessTokenCookieOptions, refreshTokenCookieOptions } from "../../../../config/cookies.config.js";
 
-import { sendOtp } from "../Service/otp.service.js";
+import { sendOtp } from "../service/otp.service.js";
 
 const signInController = async (req, res) => {
 

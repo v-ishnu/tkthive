@@ -1,4 +1,4 @@
-import { verifyOtp } from "../Service/otp.service.js";
+import { verifyOtp } from "../service/otp.service.js";
 import { prisma } from "../../../../config/prisma.js";
 import { generateAccessToken, generateRefreshToken } from "../../../lib/jwt.js";
 import { storeRefreshTokenInLocalRedis } from "../../../lib/store.redis.js";

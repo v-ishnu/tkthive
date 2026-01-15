@@ -1,5 +1,5 @@
 import { prisma } from "../../../../config/prisma.js";
-import { sendOtp } from "../Service/otp.service.js";
+import { sendOtp } from "../service/otp.service.js";
 
 export const forgotPasswordController = async (req, res) => {
     try {

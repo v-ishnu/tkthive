@@ -1,5 +1,5 @@
 import { prisma } from "../../../../config/prisma.js";
-import { verifyOtp } from "../Service/otp.service.js";
+import { verifyOtp } from "../service/otp.service.js";
 import bcrypt from "bcryptjs";
 
 export const resetPasswordController = async (req, res) => {

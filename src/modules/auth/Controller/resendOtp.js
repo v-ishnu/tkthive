@@ -1,4 +1,4 @@
-import { sendOtp } from "../Service/otp.service.js";
+import { sendOtp } from "../service/otp.service.js";
 import { prisma } from "../../../../config/prisma.js";
 
 export const resendOtpController = async (req, res) => {

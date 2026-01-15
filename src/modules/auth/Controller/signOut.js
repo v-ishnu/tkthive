@@ -1,5 +1,5 @@
 import { accessTokenCookieOptions, refreshTokenCookieOptions } from "../../../../config/cookies.config.js";
-import { signOutService } from "../Service/signout.service.js";
+import { signOutService } from "../service/signout.service.js";
 
 
 export const signOutController = async (req, res) => {

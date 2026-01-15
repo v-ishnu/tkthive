@@ -1,7 +1,7 @@
 import { ZodError } from "zod";
 import { signUpSchema } from "../auth.guard.js";
-import { signUpService } from "../Service/signup.service.js";
-import { sendOtp } from "../Service/otp.service.js";
+import { signUpService } from "../service/signup.service.js";
+import { sendOtp } from "../service/otp.service.js";
 
 
 const signUpController = async (req, res) => {
