@@ -14,6 +14,7 @@ interface EventsSectionProps {
   loading: boolean;
   onEventClick: (event: EventData) => void;
   locationCity: string;
+  availableLocations?: string[];
   selectedCategory: string; // Passed from App/Navbar
   onCategoryChange: (category: string) => void;
 }
@@ -21,7 +22,7 @@ interface EventsSectionProps {
 // Category Configuration
 const CATEGORY_PROFILES = [
   {
-    id: 'Tech',
+    id: 'TECH',
     label: 'Tech & Coding',
     icon: Cpu,
     description: "Hackathons, Webinars, Summits, and Workshops.",
@@ -31,7 +32,7 @@ const CATEGORY_PROFILES = [
     subTabs: ['All', 'Hackathon', 'Webinar', 'Summit', 'Workshop']
   },
   {
-    id: 'Esports',
+    id: 'ESPORTS',
     label: 'Esports',
     icon: Gamepad2,
     description: "Tournaments, Scrims, and LAN Events.",
@@ -41,7 +42,7 @@ const CATEGORY_PROFILES = [
     subTabs: ['All', 'Tournament', 'Scrims', 'LAN Event']
   },
   {
-    id: 'Sports',
+    id: 'SPORTS',
     label: 'Sports',
     icon: Trophy,
     description: "Cricket, Football, Marathons, and more.",
@@ -51,7 +52,7 @@ const CATEGORY_PROFILES = [
     subTabs: ['All', 'Cricket', 'Football', 'Marathon', 'Badminton']
   },
   {
-    id: 'Art',
+    id: 'ARTS',
     label: 'Arts & Culture',
     icon: Palette,
     description: "Exhibitions, Workshops, Theatre, and Stand-up.",
@@ -61,7 +62,7 @@ const CATEGORY_PROFILES = [
     subTabs: ['All', 'Exhibition', 'Workshop', 'Theatre', 'Comedy']
   },
   {
-    id: 'Festival',
+    id: 'FEST',
     label: 'Festivals',
     icon: PartyPopper,
     description: "Cultural, Food, and Music Festivals.",
@@ -71,7 +72,7 @@ const CATEGORY_PROFILES = [
     subTabs: ['All', 'Music', 'Food', 'Cultural']
   },
   {
-    id: 'Concert',
+    id: 'CONCERT',
     label: 'Concerts',
     icon: Music,
     description: "Live Gigs, DJ Nights, and Performances.",
@@ -81,12 +82,12 @@ const CATEGORY_PROFILES = [
     subTabs: ['All', 'Live Gig', 'DJ Night', 'Classical']
   },
   {
-    id: 'Others',
+    id: 'OTHERS',
     label: 'Others',
     icon: MoreHorizontal,
     description: "Networking, Meetups, and Miscellaneous.",
     banner: "https://images.unsplash.com/photo-1528605248644-14dd04022da1?q=80&w=2070&auto=format&fit=crop",
-    color: "text-gray-400",
+    color: "text-text-secondary",
     gradient: "from-gray-600/20 to-gray-900/5",
     subTabs: ['All', 'Networking', 'Meetup', 'Charity']
   },
@@ -107,6 +108,7 @@ export const EventsSection: React.FC<EventsSectionProps> = ({
   loading,
   onEventClick,
   locationCity,
+  availableLocations = [],
   selectedCategory,
   onCategoryChange
 }) => {
@@ -129,8 +131,16 @@ export const EventsSection: React.FC<EventsSectionProps> = ({
     setActiveSubTab('All'); // Reset subtab on category switch
   }, [selectedCategory]);
 
+  // Helper to normalize category ID (handle case sensitivity)
+  const getNormalizedCategory = (cat: string) => {
+    if (!cat || cat.toLowerCase() === 'all') return 'All';
+    return cat.toUpperCase();
+  };
+
+  const activeProfileId = getNormalizedCategory(filters.category);
+
   // Derive Current Profile
-  const currentProfile = CATEGORY_PROFILES.find(p => p.id === filters.category) || CATEGORY_PROFILES.find(p => p.id === 'All')!;
+  const currentProfile = CATEGORY_PROFILES.find(p => p.id === activeProfileId) || CATEGORY_PROFILES.find(p => p.id === 'All')!;
 
   // Main Filter Logic
   const filteredEvents = useMemo(() => {
@@ -138,8 +148,8 @@ export const EventsSection: React.FC<EventsSectionProps> = ({
     const now = new Date();
 
     // 1. Main Category Filtering
-    if (filters.category !== 'All') {
-      result = result.filter(e => e.category === filters.category);
+    if (activeProfileId !== 'All') {
+      result = result.filter(e => e.category === activeProfileId);
     }
 
     // 2. Sub-Category/Tab Filtering
@@ -156,18 +166,18 @@ export const EventsSection: React.FC<EventsSectionProps> = ({
         });
       } else {
         // If Specific category, filter by subCategory field
-        result = result.filter(e => e.subCategory === activeSubTab);
+        result = result.filter(e => e.subCategory?.toLowerCase() === activeSubTab.toLowerCase());
       }
     }
 
     // 3. Detailed Filters (Sidebar)
     if (filters.search) {
       const q = filters.search.toLowerCase();
-      result = result.filter(e => e.title.toLowerCase().includes(q) || e.venue.toLowerCase().includes(q));
+      result = result.filter(e => e.title.toLowerCase().includes(q) || e.venue?.name?.toLowerCase().includes(q) || e.venue?.city?.toLowerCase().includes(q));
     }
     if (filters.location) {
       const q = filters.location.toLowerCase();
-      result = result.filter(e => e.venue.toLowerCase().includes(q));
+      result = result.filter(e => e.venue?.name?.toLowerCase().includes(q) || e.venue?.city?.toLowerCase().includes(q));
     }
     if (!filters.access.public) result = result.filter(e => e.accessType !== 'public');
     if (!filters.access.private) result = result.filter(e => e.accessType !== 'private');
@@ -193,7 +203,7 @@ export const EventsSection: React.FC<EventsSectionProps> = ({
     <div id="events-section" className="min-h-screen bg-dark flex flex-col md:flex-row">
 
       {/* Left Navigation Sidebar (Category Profiles) */}
-      <div className="w-full md:w-64 lg:w-72 md:h-screen md:sticky md:top-20 bg-card border-b md:border-b-0 md:border-r rounded-xl border-white/5 shrink-0 z-20 relative flex flex-col">
+      <div className="w-full md:w-64 lg:w-72 md:h-screen md:sticky md:top-20 bg-secondary border-b md:border-b-0 md:border-r rounded-xl border-white/5 shrink-0 z-20 relative flex flex-col">
 
         {/* Fade Overlay for Mobile Scroll Hint */}
         <div className="absolute top-0 right-0 bottom-0 w-12 bg-gradient-to-l from-card to-transparent pointer-events-none md:hidden z-10" />
@@ -201,7 +211,7 @@ export const EventsSection: React.FC<EventsSectionProps> = ({
         <div className="w-full overflow-x-auto md:overflow-y-auto scrollbar-hide p-4 md:p-6">
 
           <div className="flex md:flex-col items-center md:items-stretch gap-4 md:gap-2">
-            <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest hidden md:block mb-4">Categories</h3>
+            <h3 className="text-xs font-bold text-text-muted uppercase tracking-widest hidden md:block mb-4">Categories</h3>
 
             {/* Mobile: Horizontal List, Desktop: Vertical List */}
             <div className="flex md:flex-col gap-2 pr-8 md:pr-0 min-w-max md:min-w-0">
@@ -212,7 +222,7 @@ export const EventsSection: React.FC<EventsSectionProps> = ({
                     onCategoryChange(profile.id);
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                   }}
-                  className={`flex items-center gap-2 md:gap-3 p-2 md:p-3 rounded-xl transition-all whitespace-nowrap ${filters.category === profile.id ? 'bg-primary text-black font-bold shadow-lg shadow-primary/20' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
+                  className={`flex items-center gap-2 md:gap-3 p-2 md:p-3 rounded-xl transition-all whitespace-nowrap ${activeProfileId === profile.id ? 'bg-primary text-black font-bold shadow-lg shadow-primary/20' : 'text-text-secondary hover:text-white hover:bg-white/5'}`}
                 >
                   <profile.icon size={18} className="md:w-5 md:h-5" />
                   <span className="text-sm md:text-base">{profile.label}</span>
@@ -257,7 +267,7 @@ export const EventsSection: React.FC<EventsSectionProps> = ({
               <button
                 key={tab}
                 onClick={() => setActiveSubTab(tab)}
-                className={`px-5 py-2 rounded-full text-sm font-bold whitespace-nowrap transition-all border ${activeSubTab === tab ? `bg-white text-black border-white` : 'bg-transparent text-gray-400 border-white/10 hover:text-white hover:border-white/30'}`}
+                className={`px-5 py-2 rounded-full text-sm font-bold whitespace-nowrap transition-all border ${activeSubTab === tab ? `bg-white text-black border-white` : 'bg-transparent text-text-secondary border-white/10 hover:text-white hover:border-white/30'}`}
               >
                 {tab}
               </button>
@@ -273,12 +283,12 @@ export const EventsSection: React.FC<EventsSectionProps> = ({
             <div className="mb-8 p-6 bg-card border border-white/10 rounded-2xl animate-in fade-in slide-in-from-top-4">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="font-bold text-white">Refine Search</h3>
-                <button onClick={() => setIsFilterOpen(false)}><X size={20} className="text-gray-500 hover:text-white" /></button>
+                <button onClick={() => setIsFilterOpen(false)}><X size={20} className="text-muted/80 hover:text-white" /></button>
               </div>
               <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {/* Simplified version of FilterSidebar just for context */}
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={16} />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted/80" size={16} />
                   <input
                     placeholder="Search keywords..."
                     className="w-full bg-black/40 border border-white/10 rounded-lg p-2 pl-9 text-white focus:border-primary/50 outline-none"
@@ -287,13 +297,17 @@ export const EventsSection: React.FC<EventsSectionProps> = ({
                   />
                 </div>
                 <div className="relative">
-                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={16} />
-                  <input
-                    placeholder="City or Venue..."
-                    className="w-full bg-black/40 border border-white/10 rounded-lg p-2 pl-9 text-white focus:border-primary/50 outline-none"
+                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-muted/80" size={16} />
+                  <select
+                    className="w-full bg-black/40 border border-white/10 rounded-lg p-2 pl-9 text-white focus:border-primary/50 outline-none appearance-none"
                     value={filters.location}
                     onChange={(e) => setFilters(prev => ({ ...prev, location: e.target.value }))}
-                  />
+                  >
+                    <option value="">All Locations</option>
+                    {availableLocations.map(loc => (
+                      <option key={loc} value={loc}>{loc}</option>
+                    ))}
+                  </select>
                 </div>
                 {/* Add more inputs if needed, or rely on side modal for mobile */}
               </div>

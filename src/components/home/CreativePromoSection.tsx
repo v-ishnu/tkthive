@@ -20,7 +20,7 @@ export const CreativePromoSection = () => {
                             <h2 className="text-4xl md:text-5xl font-bold text-white leading-tight">
                                 More Than Just a <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-purple-400">Ticket.</span>
                             </h2>
-                            <p className="text-gray-400 text-lg mt-4 max-w-md">
+                            <p className="text-text-secondary text-lg mt-4 max-w-md">
                                 Unlock exclusive backstage passes, meet & greets, and early bird access. The Hive Experience is designed for true fans.
                             </p>
                         </div>
@@ -29,12 +29,12 @@ export const CreativePromoSection = () => {
                             <div className="p-4 rounded-xl bg-white/5 border border-white/10 hover:border-primary/50 transition-colors">
                                 <Gem className="text-purple-400 mb-3" size={28} />
                                 <h3 className="text-white font-bold mb-1">VIP Access</h3>
-                                <p className="text-gray-500 text-sm">Skip lines and get premium seating.</p>
+                                <p className="text-text-muted text-sm">Skip lines and get premium seating.</p>
                             </div>
                             <div className="p-4 rounded-xl bg-white/5 border border-white/10 hover:border-primary/50 transition-colors">
                                 <Ticket className="text-blue-400 mb-3" size={28} />
                                 <h3 className="text-white font-bold mb-1">Group Booking</h3>
-                                <p className="text-gray-500 text-sm">Best rates for squads of 5+.</p>
+                                <p className="text-text-muted text-sm">Best rates for squads of 5+.</p>
                             </div>
                         </div>
 
@@ -58,7 +58,7 @@ export const CreativePromoSection = () => {
                             <div className="mt-auto">
                                 <div className="flex justify-between items-end">
                                     <div>
-                                        <div className="text-xs text-gray-500">Price</div>
+                                        <div className="text-xs text-text-muted">Price</div>
                                         <div className="text-xl font-bold text-white">₹2,499</div>
                                     </div>
                                     <div className="px-3 py-1 bg-white text-black text-xs font-bold rounded-full">BUY</div>

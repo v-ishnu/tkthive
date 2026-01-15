@@ -67,7 +67,7 @@ export default function TermsPage() {
                             </h2>
                             <div className="space-y-4 text-gray-400 leading-relaxed">
                                 <p>
-                                    Welcome to <strong>LOGO</strong>. By accessing our website, mobile application, or any other services (collectively, the "Service"), you agree to be bound by these Terms and Conditions ("Terms"). Please read them carefully.
+                                    Welcome to <strong>tkthive</strong>. By accessing our website, mobile application, or any other services (collectively, the "Service"), you agree to be bound by these Terms and Conditions ("Terms"). Please read them carefully.
                                 </p>
                                 <p>
                                     If you do not agree to these Terms, you may not use the Service. We reserve the right to modify these Terms at any time, and your continued use of the Service constitutes acceptance of such modifications.
@@ -98,7 +98,7 @@ export default function TermsPage() {
                             </h2>
                             <div className="space-y-4 text-gray-400 leading-relaxed">
                                 <p>
-                                    All ticket purchases are final. When you purchase a ticket, you are entering into a binding contract with the event organizer. <strong>LOGO</strong> acts as an agent for the organizer.
+                                    All ticket purchases are final. When you purchase a ticket, you are entering into a binding contract with the event organizer. <strong>tkthive</strong> acts as an agent for the organizer.
                                 </p>
                                 <p>
                                     Prices are set by the organizer and may include a booking fee. All fees are non-refundable unless otherwise stated.
@@ -132,7 +132,7 @@ export default function TermsPage() {
                             </h2>
                             <div className="space-y-4 text-gray-400 leading-relaxed">
                                 <p>
-                                    By posting reviews, photos, or other content ("User Content"), you grant <strong>LOGO</strong> a non-exclusive, royalty-free, perpetual, and worldwide license to use, display, and distribute such content.
+                                    By posting reviews, photos, or other content ("User Content"), you grant <strong>tkthive</strong> a non-exclusive, royalty-free, perpetual, and worldwide license to use, display, and distribute such content.
                                 </p>
                                 <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl flex items-start gap-3">
                                     <AlertCircle className="text-red-400 shrink-0 mt-1" />
@@ -149,7 +149,7 @@ export default function TermsPage() {
                             </h2>
                             <div className="space-y-4 text-gray-400 leading-relaxed">
                                 <p>
-                                    To the maximum extent permitted by law, <strong>LOGO</strong> shall not be liable for any indirect, incidental, special, consequential, or punitive damages, or any loss of profits or revenues.
+                                    To the maximum extent permitted by law, <strong>tkthive</strong> shall not be liable for any indirect, incidental, special, consequential, or punitive damages, or any loss of profits or revenues.
                                 </p>
                             </div>
                         </section>

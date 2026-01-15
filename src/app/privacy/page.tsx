@@ -25,7 +25,7 @@ export default function PrivacyPolicy() {
 
     return (
         <div className="min-h-screen bg-dark text-white pt-24 pb-12 relative">
-            <HivePattern className="opacity-20 fixed inset-0 pointer-events-none" />
+
 
             <div className="container mx-auto px-4 relative z-10">
 
@@ -162,7 +162,7 @@ export default function PrivacyPolicy() {
                             </h2>
                             <div className="space-y-4 text-gray-400 leading-relaxed">
                                 <p>
-                                    You have the right to request access to your personal data, correction of your personal data, or deletion of your account. Contact <a href="mailto:privacy@LOGO.com" className="text-primary hover:underline">privacy@LOGO.com</a> for requests.
+                                    You have the right to request access to your personal data, correction of your personal data, or deletion of your account. Contact <a href="mailto:privacy@tkthive.com" className="text-primary hover:underline">privacy@tkthive.com</a> for requests.
                                 </p>
                             </div>
                         </section>

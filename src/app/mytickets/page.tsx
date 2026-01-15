@@ -1,46 +1,53 @@
 'use client';
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Ticket, Search, CalendarClock, CheckCircle, AlertCircle, Clock } from 'lucide-react';
-import { User as UserType } from '@/types';
-import { TicketCard } from '@/components/TickectCard';
-
+import { TicketCard } from '@/components/TickectCard'; // Correct path
 import { useRouter } from 'next/navigation';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { fetchUserTickets, checkAuth } from '@/store/slices/authslice';
 
 type FilterStatus = 'all' | 'pending' | 'completed' | 'expired';
 
 export default function TicketsPage() {
-    const [user, setUser] = useState<UserType | null>(null);
-    const [loading, setLoading] = useState(true);
+    const dispatch = useAppDispatch();
     const router = useRouter();
+    const { user, tickets = [], isLoading: authLoading } = useAppSelector((state) => state.auth);
 
-    React.useEffect(() => {
-        const savedUser = localStorage.getItem('user_data');
-        if (savedUser) {
-            try {
-                setUser(JSON.parse(savedUser));
-            } catch (e) {
-                console.error("Failed to parse user", e);
+    // Local loading state for initial fetch
+    const [fetching, setFetching] = useState(true);
+
+    useEffect(() => {
+        const init = async () => {
+            if (!user) {
+                await dispatch(checkAuth());
             }
-        } else {
+            await dispatch(fetchUserTickets());
+            setFetching(false);
+        };
+        init();
+    }, [dispatch, user]);
+
+    useEffect(() => {
+        if (!fetching && !user && !authLoading) {
             router.push('/auth');
         }
-        setLoading(false);
-    }, []);
+    }, [user, fetching, router, authLoading]);
+
 
     const [searchTerm, setSearchTerm] = useState('');
     const [filterStatus, setFilterStatus] = useState<FilterStatus>('all');
 
     const filteredTickets = useMemo(() => {
-        if (!user) return [];
-        let tickets = user.tickets;
+        if (!tickets) return [];
+        let filtered = [...tickets];
 
         // Filter by search
         if (searchTerm) {
             const lower = searchTerm.toLowerCase();
-            tickets = tickets.filter(t =>
-                t.eventTitle.toLowerCase().includes(lower) ||
-                t.eventVenue.toLowerCase().includes(lower) ||
-                t.ticketType.toLowerCase().includes(lower)
+            filtered = filtered.filter(t =>
+                t.event.title.toLowerCase().includes(lower) ||
+                t.event.venue?.name?.toLowerCase().includes(lower) ||
+                t.event.ticket?.name.toLowerCase().includes(lower)
             );
         }
 
@@ -48,43 +55,38 @@ export default function TicketsPage() {
         const now = new Date();
 
         if (filterStatus !== 'all') {
-            tickets = tickets.filter(t => {
-                // Helper to parse custom date format "Fri, Nov 24, 2025, 20:00"
-                // Simple fallback logic if date parsing fails
-                let eventDate = new Date(t.eventDate);
-                if (isNaN(eventDate.getTime())) {
-                    // Try parsing manual string
-                    try {
-                        const parts = t.eventDate.split(', ');
-                        if (parts.length >= 3) {
-                            // "Nov 24, 2025 20:00"
-                            eventDate = new Date(`${parts[1]}, ${parts[2]}`);
-                        }
-                    } catch (e) { }
-                }
-                if (isNaN(eventDate.getTime())) return true; // Keep if cant parse
+            filtered = filtered.filter(t => {
+                const eventDate = new Date(t.event.startDate);
 
                 if (filterStatus === 'pending') { // Upcoming
-                    return eventDate >= now;
+                    return eventDate >= now && t.status === 'CONFIRMED';
                 }
-                if (filterStatus === 'completed' || filterStatus === 'expired') { // Past
-                    return eventDate < now;
+                if (filterStatus === 'completed') { // Past
+                    return eventDate < now && t.status === 'CONFIRMED';
+                }
+                if (filterStatus === 'expired') {
+                    // Could be based on date or explicit status
+                    return t.status !== 'CONFIRMED';
                 }
                 return true;
             });
         }
 
-        return tickets;
-    }, [user, searchTerm, filterStatus]);
+        return filtered;
+    }, [tickets, searchTerm, filterStatus]);
 
-    if (loading) {
-        return <div className="min-h-screen container mx-auto px-4 pt-24 text-white">Loading...</div>;
+    if (fetching || authLoading) {
+        return (
+            <div className="min-h-screen container mx-auto px-4 pt-24 flex justify-center items-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+            </div>
+        );
     }
 
-    if (!user || !user.tickets) return null; // Safe guard
+    if (!user) return null;
 
     return (
-        <div className="min-h-screen pt-12 pb-12 container mx-auto px-4">
+        <div className="min-h-screen pt-24 pb-12 container mx-auto px-4">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
                 <div>
                     <h1 className="text-3xl md:text-4xl font-bold text-white mb-2 flex items-center gap-3">
@@ -117,19 +119,13 @@ export default function TicketsPage() {
                     onClick={() => setFilterStatus('pending')}
                     className={`px-4 py-2 rounded-full text-sm font-bold border transition-all flex items-center gap-2 ${filterStatus === 'pending' ? 'bg-primary text-black border-primary' : 'bg-transparent text-gray-400 border-white/10 hover:text-white'}`}
                 >
-                    <Clock size={14} /> Pending (Upcoming)
+                    <Clock size={14} /> Upcoming
                 </button>
                 <button
                     onClick={() => setFilterStatus('completed')}
                     className={`px-4 py-2 rounded-full text-sm font-bold border transition-all flex items-center gap-2 ${filterStatus === 'completed' ? 'bg-green-500/20 text-green-400 border-green-500/50' : 'bg-transparent text-gray-400 border-white/10 hover:text-white'}`}
                 >
-                    <CheckCircle size={14} /> Attended
-                </button>
-                <button
-                    onClick={() => setFilterStatus('expired')}
-                    className={`px-4 py-2 rounded-full text-sm font-bold border transition-all flex items-center gap-2 ${filterStatus === 'expired' ? 'bg-red-500/20 text-red-400 border-red-500/50' : 'bg-transparent text-gray-400 border-white/10 hover:text-white'}`}
-                >
-                    <AlertCircle size={14} /> Expired
+                    <CheckCircle size={14} /> Past
                 </button>
             </div>
 
@@ -139,15 +135,17 @@ export default function TicketsPage() {
                         <CalendarClock className="text-gray-600" size={32} />
                     </div>
                     <h3 className="text-xl font-bold text-white mb-2">No tickets found</h3>
-                    <p className="text-gray-500 mb-6">No tickets match your current filters.</p>
-                    {filterStatus !== 'all' && (
-                        <button onClick={() => setFilterStatus('all')} className="text-primary hover:underline font-bold text-sm">
-                            View All Tickets
+                    <p className="text-gray-500 mb-6 font-medium">
+                        {searchTerm || filterStatus !== 'all' ? 'Try adjusting your filters.' : "You haven't booked any events yet."}
+                    </p>
+                    {filterStatus === 'all' && !searchTerm && (
+                        <button onClick={() => router.push('/')} className="px-6 py-2 bg-primary text-black font-bold rounded-full hover:bg-primary/90 transition-all">
+                            Browse Events
                         </button>
                     )}
                 </div>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-6">
                     {filteredTickets.map((ticket) => (
                         <TicketCard key={ticket.id} ticket={ticket} />
                     ))}

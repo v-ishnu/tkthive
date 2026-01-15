@@ -189,8 +189,8 @@ export default function ContactSupportPage() {
                                     <div>
                                         <h4 className="font-bold text-white">Email</h4>
                                         <p className="text-gray-400 text-sm mt-1">
-                                            support@LOGO.com<br />
-                                            partners@LOGO.com
+                                            support@tkthive.com<br />
+                                            partners@tkthive.com
                                         </p>
                                     </div>
                                 </div>

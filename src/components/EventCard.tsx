@@ -33,7 +33,7 @@ export const EventCard: React.FC<EventCardProps> = ({ event }) => {
   const attendeeCount = 10 + (seed * 5);
 
   // Check if event is online
-  const isOnline = event.venue.toLowerCase().includes('online') || event.venue.toLowerCase().includes('virtual');
+  const isOnline = event.venue?.name?.toLowerCase().includes('online') || event.venue?.name?.toLowerCase().includes('virtual');
 
   // Determine Event Status
   let eventStatus = 'upcoming';
@@ -60,7 +60,7 @@ export const EventCard: React.FC<EventCardProps> = ({ event }) => {
 
   return (
     <>
-      <Link href={`/events/${event.id}`}>
+      <Link href={`/events/${event.slug || event.id}`}>
         <div
           className="group bg-card hover:bg-card-hover border border-white/5 hover:border-white/10 rounded-3xl overflow-hidden cursor-pointer transition-all duration-300 hover:-translate-y-1 shadow-lg hover:shadow-2xl flex flex-col h-full relative"
 
@@ -124,7 +124,7 @@ export const EventCard: React.FC<EventCardProps> = ({ event }) => {
             <h3 className="text-xl font-bold text-white mb-1 leading-tight group-hover:text-primary transition-colors line-clamp-2">
               {event.title}
             </h3>
-            <p className="text-xs text-gray-500 font-medium uppercase tracking-wide mb-4">
+            <p className="text-xs text-text-muted font-medium uppercase tracking-wide mb-4">
               {event.category || 'General Event'}
             </p>
 
@@ -132,12 +132,12 @@ export const EventCard: React.FC<EventCardProps> = ({ event }) => {
 
             {/* Footer Info */}
             <div className="mt-auto flex items-center justify-between pt-4 border-t border-white/5">
-              <div className="flex items-center gap-1.5 text-gray-400 max-w-[60%]">
-                <MapPin size={14} className="shrink-0 text-gray-500" />
-                <span className="text-xs font-medium truncate">{event.venue}</span>
+              <div className="flex items-center gap-1.5 text-text-secondary max-w-[60%]">
+                <MapPin size={14} className="shrink-0 text-text-muted" />
+                <span className="text-xs font-medium truncate">{event.venue?.name}, {event.venue?.city}</span>
               </div>
 
-              <div className="text-sm font-bold text-white bg-white/5 px-2.5 py-1 rounded-lg border border-white/5 group-hover:border-primary/30 transition-colors">
+              <div className="text-xs font-bold text-white bg-white/5 px-2.5 py-1 rounded-lg border border-white/5 group-hover:border-primary/30 transition-colors">
                 {event.price}
               </div>
             </div>

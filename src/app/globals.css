@@ -6,7 +6,7 @@
 --------------------------------*/
 
 .cursor-bee {
-  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M8 12a4 4 0 1 1 8 0 4 4 0 0 1-8 0z' fill='%23FFD60A' stroke='black' stroke-width='1.5'/%3E%3Cpath d='M8 12h8' stroke='black' stroke-width='1.5'/%3E%3Cpath d='M12 8v8' stroke='black' stroke-width='1.5'/%3E%3Cpath d='M6 8c-2-3-1-6 2-6 2 0 3 2 4 4' stroke='white' stroke-width='1.5' stroke-linecap='round'/%3E%3Cpath d='M18 8c2-3 1-6-2-6-2 0-3 2-4 4' stroke='white' stroke-width='1.5' stroke-linecap='round'/%3E%3Cpath d='M12 16v3' stroke='black' stroke-width='1.5'/%3E%3C/svg%3E") 16 16, auto;
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M8 12a4 4 0 1 1 8 0 4 4 0 0 1-8 0z' fill='%23edb926' stroke='black' stroke-width='1.5'/%3E%3Cpath d='M8 12h8' stroke='black' stroke-width='1.5'/%3E%3Cpath d='M12 8v8' stroke='black' stroke-width='1.5'/%3E%3Cpath d='M6 8c-2-3-1-6 2-6 2 0 3 2 4 4' stroke='white' stroke-width='1.5' stroke-linecap='round'/%3E%3Cpath d='M18 8c2-3 1-6-2-6-2 0-3 2-4 4' stroke='white' stroke-width='1.5' stroke-linecap='round'/%3E%3Cpath d='M12 16v3' stroke='black' stroke-width='1.5'/%3E%3C/svg%3E") 16 16, auto;
 }
 
 /* Selection Color */
@@ -25,7 +25,7 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #333;
+  background: var(--bg-tertiary);
   border-radius: 4px;
 }
 
@@ -40,34 +40,86 @@ html {
 
 @theme inline {
   --font-sans: var(--font-space-grotesk);
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+
   --color-primary: var(--primary);
   --color-primary-hover: var(--primary-hover);
+
+  --color-secondary: var(--bg-secondary);
+  --color-tertiary: var(--bg-tertiary);
+  --color-elevated: var(--bg-elevated);
+  --color-muted: var(--bg-muted);
+
   --color-dark: var(--bg-dark);
   --color-card: var(--bg-card);
   --color-card-hover: var(--bg-card-hover);
 
-
+  --color-text-main: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
 }
-
 
 :root {
-  /* Your custom dark/yellow theme */
-  --primary: #FFD60A;
-  --primary-hover: #EBC300;
-    /* --primary: #d6a51f;
-  --primary-hover: #0079eb; */
-  --bg-dark: #070606;
-  --bg-card: #0F0F0F;
-  --bg-card-hover: #161616;
-  --text-main: #FFFFFF;
-  --text-muted: #A1A1AA;
+  /* -------------------------------
+     PURE DARK BACKGROUND SYSTEM
+  --------------------------------*/
+  --bg-primary: #000000;
+  /* Absolute black */
+  --bg-secondary: #050505;
+  /* Navbar / sections */
+  --bg-tertiary: #0b0b0b;
+  /* Cards */
+  --bg-elevated: #121212;
+  /* Hover / active */
+  --bg-muted: #1a1a1a;
+  /* Disabled / subtle */
 
-  /* Tailwind-mapped variables */
-  --background: var(--bg-dark);
-  --foreground: var(--text-main);
+  /* -------------------------------
+     TEXT COLORS (HIGH CONTRAST)
+  --------------------------------*/
+  --text-primary: #f5f5f5;
+  /* Main text */
+  --text-secondary: #cfcfcf;
+  /* Paragraphs */
+  --text-muted: #8f8f8f;
+  /* Labels / hints */
+  --text-footer: #9ca3af;
+  /* Tailwind gray-400 equivalent */
+
+  /* -------------------------------
+     ACCENT (UNCHANGED)
+  --------------------------------*/
+  --accent-primary: #ffa116;
+  /* Buttons, CTA */
+  --accent-secondary: #f1d217;
+  /* Hover */
+
+  /* -------------------------------
+     BORDERS & EFFECTS
+  --------------------------------*/
+  --border-color: #1f1f1f;
+  --hover-glow: rgba(255, 161, 22, 0.18);
+
+  /* -------------------------------
+     SYSTEM MAPPING
+  --------------------------------*/
+  --primary: var(--accent-primary);
+  --primary-hover: var(--accent-secondary);
+
+  --bg-dark: var(--bg-primary);
+  --bg-card: var(--bg-tertiary);
+  --bg-card-hover: var(--bg-elevated);
+
+  --text-main: var(--text-primary);
+  --text-muted: var(--text-muted);
+
+  --background: var(--bg-primary);
+  --foreground: var(--text-primary);
 }
+
+
 
 /* Auto Dark Mode Support */
 @media (prefers-color-scheme: dark) {
@@ -82,6 +134,18 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-space-grotesk);
+}
+
+.footer-global {
+  color: var(--text-footer);
+}
+
+.footer-global h1,
+.footer-global h2,
+.footer-global h3,
+.footer-global h4,
+.footer-global span.font-bold {
+  color: var(--text-primary);
 }
 
 /* Selection Color */
@@ -166,14 +230,67 @@ html {
 }
 
 .animate-vertical-marquee {
-  animation: vertical-marquee 40s linear infinite;
+  animation: vertical-marquee 30s linear infinite;
 }
 
 .animate-vertical-marquee-reverse {
-  animation: vertical-marquee-reverse 40s linear infinite;
+  animation: vertical-marquee-reverse 30s linear infinite;
 }
 
 .animate-vertical-marquee:hover,
 .animate-vertical-marquee-reverse:hover {
   animation-play-state: paused;
+}
+
+/* -------------------------------
+   TOAST ANIMATIONS
+--------------------------------*/
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOut {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+/* Countdown: Stroke dashoffset goes from 0 to circumference (2 * PI * 10 ~= 62.8318) */
+@keyframes countdown {
+  from {
+    stroke-dashoffset: 0;
+  }
+
+  to {
+    stroke-dashoffset: 62.8318;
+  }
+}
+
+.animate-slide-in {
+  animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-slide-out {
+  animation: slideOut 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-countdown {
+  /* Duration is controlled via inline style */
+  animation-name: countdown;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
 }

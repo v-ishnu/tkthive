@@ -67,7 +67,7 @@ export function StaggeredReviews() {
                 {/* Heading */}
                 <div className="text-center mb-16 max-w-2xl">
                     <h2 className="text-4xl md:text-5xl font-black text-white mb-6 uppercase tracking-tight">
-                        Fan <span className="text-amber-400">Favorites</span>
+                        Fan <span className="text-primary">Favorites</span>
                     </h2>
                     <p className="text-zinc-400 text-lg">
                         Hear from the community that drives the pulse of our platform.
@@ -90,7 +90,7 @@ export function StaggeredReviews() {
                                     relative flex-shrink-0 w-[280px] md:w-[320px] aspect-[4/5] p-8 flex flex-col justify-between cursor-pointer
                                     shadow-2xl transition-all duration-500 snap-center
                                     ${isActive
-                                        ? 'bg-amber-400 text-black scale-110 z-20 rotate-0 rounded-tr-[40px] rounded-bl-[40px] rounded-tl-md rounded-br-md shadow-amber-400/20'
+                                        ? 'bg-primary text-black scale-110 z-20 rotate-0 rounded-tr-[40px] rounded-bl-[40px] rounded-tl-md rounded-br-md shadow-lg shadow-primary/20'
                                         : `bg-zinc-900 text-zinc-400 ${review.rotation} hover:rotate-0 z-10 hover:bg-zinc-800 hover:text-zinc-200 hover:scale-105 rounded-sm border border-white/5`
                                     }
                                 `}
@@ -130,13 +130,13 @@ export function StaggeredReviews() {
                 <div className="flex items-center gap-4">
                     <button
                         onClick={() => scroll('left')}
-                        className="p-4 rounded-full bg-zinc-900 text-white hover:bg-amber-400 hover:text-black transition-colors border border-zinc-800"
+                        className="p-4 rounded-full bg-zinc-900 text-white hover:bg-primary hover:text-black transition-colors border border-zinc-800"
                     >
                         <ArrowLeft size={24} />
                     </button>
                     <button
                         onClick={() => scroll('right')}
-                        className="p-4 rounded-full bg-zinc-900 text-white hover:bg-amber-400 hover:text-black transition-colors border border-zinc-800"
+                        className="p-4 rounded-full bg-zinc-900 text-white hover:bg-primary hover:text-black transition-colors border border-zinc-800"
                     >
                         <ArrowRight size={24} />
                     </button>

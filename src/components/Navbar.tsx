@@ -1,10 +1,15 @@
 "use client";
-import React, { useState } from 'react';
-import { MapPin, Search, User, Menu, LogOut, Ticket, X, Home, Calendar, Info, ChevronDown, Cpu, Gamepad2, Music, Trophy, Palette } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { MapPin, Search, User, Menu, LogOut, Ticket, X, Home, Calendar, Info, ChevronDown, Cpu, Gamepad2, Music, Trophy, Palette, Bell, AlignRight } from 'lucide-react';
 import { LocationData, User as UserType } from '../types';
 import { LocationModal } from './LocationModel';
+import { NotificationPanel } from './NotificationPanel';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { useAppSelector, useAppDispatch } from '@/store/hooks';
+import { logoutUser } from '@/store/slices/authslice';
+import { fetchAllEvents } from '@/store/slices/eventSlice';
+import { fetchNotifications } from '@/store/slices/notificationSlice';
 
 
 
@@ -13,13 +18,31 @@ export const Navbar = () => {
     const [isCatDropdownOpen, setIsCatDropdownOpen] = useState(false);
     const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
     const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
+    const [isNotificationOpen, setIsNotificationOpen] = useState(false);
     const [location, setLocation] = useState<LocationData | null>(null);
-    const [user, setUser] = useState<UserType | null>(null);
+    const { user, isLoading: authLoading } = useAppSelector((state) => state.auth);
+    const { unreadCount } = useAppSelector((state) => state.notification);
+    const dispatch = useAppDispatch();
     const [searchQuery, setSearchQuery] = useState('');
-    const [loading, setLoading] = useState(false);
+    const [searchLoading, setSearchLoading] = useState(false);
+    const [isScrolled, setIsScrolled] = useState(false);
     const pathname = usePathname();
+    const router = useRouter();
 
     React.useEffect(() => {
+        const handleScroll = () => {
+            if (window.scrollY > 20) {
+                setIsScrolled(true);
+            } else {
+                setIsScrolled(false);
+            }
+        };
+
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
+    useEffect(() => {
         const savedLocation = localStorage.getItem('user_location');
         if (savedLocation) {
             try {
@@ -32,24 +55,18 @@ export const Navbar = () => {
             setIsLocationModalOpen(true);
         }
 
-        const savedUser = localStorage.getItem('user_data');
-        if (savedUser) {
-            try {
-                setUser(JSON.parse(savedUser));
-            } catch (e) {
-                console.error("Failed to parse user", e);
-            }
+        if (user) {
+            dispatch(fetchNotifications());
         }
-    }, []);
+    }, [user, dispatch]);
 
-    const handleLogout = () => {
-        setUser(null);
-        localStorage.removeItem('user_data');
-        window.location.reload(); // Refresh to clear state properly
+    const handleLogout = async () => {
+        await dispatch(logoutUser());
+        router.push('/');
     };
 
     const handleSearch = async (query: string) => {
-        setLoading(true);
+        setSearchLoading(true);
         setSearchQuery(query);
 
         try {
@@ -58,7 +75,7 @@ export const Navbar = () => {
         } catch (error) {
             console.error("Failed to fetch events:", error);
         } finally {
-            setLoading(false);
+            setSearchLoading(false);
         }
     };
 
@@ -66,28 +83,28 @@ export const Navbar = () => {
         setLocation(newLocation);
         localStorage.setItem('user_location', JSON.stringify(newLocation));
         setIsLocationModalOpen(false);
-        handleSearch(searchQuery || 'Popular events');
+        // handleSearch(searchQuery || 'Popular events'); // Replaced with direct fetch
+        dispatch(fetchAllEvents(newLocation.city));
     };
 
     return (
         <>
-            <nav className="fixed inset-x-0 top-0 w-full z-50 bg-dark/90 backdrop-blur-xl border-b border-white/5">
+            <nav
+                className={`fixed inset-x-0 top-0 w-full z-50 transition-all duration-300 ${isScrolled
+                    ? 'bg-dark/90 backdrop-blur-xl border-b border-white/5 py-0'
+                    : 'bg-transparent border-transparent py-4'
+                    }`}
+            >
                 <div className="container mx-auto px-4 h-20 flex items-center justify-between">
-                    {/* Logo */}
+                    {/* tkthive */}
                     <Link href='/' className="flex items-center gap-3 group cursor-pointer">
-                        <div
-
-                            className="flex items-center gap-3 group cursor-pointer"
-                        >
-                            <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center transform  transition-transform duration-300">
-                                <div className="w-4 h-4 bg-black rounded-full" />
-                            </div>
-                            <span className="text-2xl font-bold tracking-tight text-white group-hover:text-primary transition-colors">LOGO</span>
+                        <div className="flex items-center gap-3 group cursor-pointer">
+                            <img src="/logo/whitelogo.png" alt="tkthive" className="h-10 w-auto object-contain group-hover:opacity-80 transition-opacity" />
                         </div>
                     </Link>
                     {/* Center Links (Desktop) */}
-                    <div className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-400">
-                        <Link href='/' className={`  transition-colors ${pathname == '/' ? 'text-primary' : ''}`}>Home</Link>
+                    <div className="hidden md:flex items-center gap-8 text-sm font-medium text-text-secondary">
+                        <Link href='/' className={`  transition-colors ${pathname == '/' ? 'text-primary' : 'hover:text-primary'}`}>Home</Link>
                         <div className="relative group/cat">
                             <Link
                                 className={`flex items-center gap-1 hover:text-primary transition-colors ${pathname === '/events' ? 'text-primary' : ''}`}
@@ -112,18 +129,18 @@ export const Navbar = () => {
                                             key={cat.id}
                                             href={`/events?category=${cat.id}`}
 
-                                            className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/5 text-left text-gray-300 hover:text-primary transition-all group/item"
+                                            className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/5 text-left text-text-secondary hover:text-primary transition-all group/item"
                                         >
-                                            <cat.icon size={16} className="text-gray-500 group-hover/item:text-primary" />
+                                            <cat.icon size={16} className="text-text-muted group-hover/item:text-primary" />
                                             {cat.label}
                                         </Link>
                                     ))}
                                     <div className="h-px bg-white/5 my-1" />
-                                    <Link href='/events' className="text-center py-2 text-xs font-bold uppercase tracking-wider text-gray-500 hover:text-white">View All Events</Link>
+                                    <Link href='/events' className="text-center py-2 text-xs font-bold uppercase tracking-wider text-text-muted hover:text-text-main">View All Events</Link>
                                 </div>
                             </div>
                         </div>
-                        <Link href='/about' className={`${pathname === '/about' ? 'text-primary' : 'hover:text-primary transition-colors'}`}>About Us</Link>
+
                         <Link href='/support' className={`${pathname === '/support' ? 'text-primary' : 'hover:text-primary transition-colors'}`}>Support</Link>
                     </div>
 
@@ -136,46 +153,65 @@ export const Navbar = () => {
                             <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center">
                                 <MapPin size={12} className="text-primary" />
                             </div>
-                            <span className="text-sm font-medium text-gray-300 group-hover:text-white">{location ? location.city : 'Select Location'}</span>
+                            <span className="text-sm font-medium text-text-secondary group-hover:text-text-main">{location ? location.city : 'Select Location'}</span>
                         </div>
 
                         <div className="h-6 w-px bg-white/10 hidden sm:block" />
 
-                        {user ? (
+                        {authLoading ? (
+                            <div className="hidden md:flex items-center gap-4 animate-pulse">
+                                <div className="w-10 h-10 rounded-full bg-white/10"></div>
+                                <div className="w-20 h-4 rounded bg-white/10"></div>
+                            </div>
+                        ) : user ? (
                             <div className="flex items-center gap-3">
                                 {/* My Tickets Button - Desktop */}
                                 <Link href='/mytickets'
 
-                                    className="hidden md:flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 hover:bg-white/10 border border-white/5 hover:border-primary/30 transition-all text-sm font-medium text-gray-300 hover:text-white group"
+                                    className="hidden md:flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 hover:bg-white/10 border border-white/5 hover:border-primary/30 transition-all text-sm font-medium text-text-secondary hover:text-text-main group"
                                 >
                                     <Ticket size={16} className="text-primary group-hover:scale-110 transition-transform" />
                                     <span>My Tickets</span>
                                 </Link>
+
+                                {/* Notification Bell */}
+                                <button
+                                    onClick={() => setIsNotificationOpen(true)}
+                                    className="flex items-center justify-center w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 border border-white/5 hover:border-primary/30 transition-all text-text-secondary hover:text-text-main relative group"
+                                >
+                                    <Bell size={18} className="group-hover:text-primary transition-colors" />
+                                    {/* Unread Badge */}
+                                    {unreadCount > 0 && (
+                                        <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-red-500 rounded-full border border-card"></span>
+                                    )}
+                                </button>
 
                                 <div className="relative group hidden md:block">
                                     <Link href='/profile'
 
                                         className="flex items-center gap-3 pl-2 pr-4 py-1.5 rounded-full hover:bg-white/5 border border-transparent hover:border-white/10 transition-all"
                                     >
-                                        <img src={user.avatar} alt="User" className="w-8 h-8 rounded-full border border-white/20" />
-                                        <span className="text-sm font-bold text-white hidden sm:block">{user.name.split(' ')[0]}</span>
+                                        <img src={user.avatar || "/default-avatar.svg"} alt="User" className="w-8 h-8 rounded-full border border-white/20 object-cover" />
+                                        <span className="text-sm font-bold text-text-main hidden sm:block">{user.name ? user.name.split(' ')[0] : 'User'}</span>
                                     </Link>
 
                                     {/* Dropdown */}
-                                    <div className="absolute right-0 top-full mt-2 w-48 bg-card border border-white/10 rounded-xl shadow-2xl p-2 hidden group-hover:block hover:block">
-                                        <button
-
-                                            className="w-full text-left px-4 py-2 rounded-lg text-sm text-gray-300 hover:text-white hover:bg-white/5 flex items-center gap-2"
-                                        >
-                                            <User size={16} /> My Profile
-                                        </button>
-                                        <div className="h-px bg-white/10 my-1" />
-                                        <button
-                                            onClick={handleLogout}
-                                            className="w-full text-left px-4 py-2 rounded-lg text-sm text-red-400 hover:bg-red-500/10 flex items-center gap-2"
-                                        >
-                                            <LogOut size={16} /> Log Out
-                                        </button>
+                                    <div className="absolute right-0 top-full pt-2 w-48 hidden group-hover:block hover:block">
+                                        <div className="bg-card border border-white/10 rounded-xl shadow-2xl p-2">
+                                            <Link
+                                                href="/profile"
+                                                className="w-full text-left px-4 py-2 rounded-lg text-sm text-text-secondary hover:text-text-main hover:bg-white/5 flex items-center gap-2"
+                                            >
+                                                <User size={16} /> My Profile
+                                            </Link>
+                                            <div className="h-px bg-white/10 my-1" />
+                                            <button
+                                                onClick={handleLogout}
+                                                className="w-full text-left px-4 py-2 rounded-lg text-sm text-red-400 hover:bg-red-500/10 flex items-center gap-2"
+                                            >
+                                                <LogOut size={16} /> Log Out
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -198,10 +234,10 @@ export const Navbar = () => {
                         )}
 
                         <button
-                            className="md:hidden text-white p-2 hover:bg-white/10 rounded-lg transition-colors"
+                            className="md:hidden text-white p-2 hover:bg-white/10 rounded-lg transition-colors group"
                             onClick={() => setIsMenuOpen(true)}
                         >
-                            <Menu size={24} />
+                            <AlignRight size={28} className="text-white group-hover:text-primary transition-colors" />
                         </button>
                     </div>
                 </div>
@@ -219,7 +255,7 @@ export const Navbar = () => {
 
                     {user && (
                         <div className="flex items-center gap-4 mb-8 p-4 bg-white/5 rounded-2xl border border-white/5">
-                            <img src={user.avatar} alt="User" className="w-12 h-12 rounded-full border border-white/10" />
+                            <img src={user.avatar || "/default-avatar.svg"} alt="User" className="w-12 h-12 rounded-full border border-white/10 object-cover" />
                             <div>
                                 <div className="font-bold text-white text-lg">{user.name}</div>
                                 <div className="text-xs text-gray-400">{user.email}</div>
@@ -246,6 +282,9 @@ export const Navbar = () => {
                         )}
                         <Link href='/about' onClick={() => setIsMenuOpen(false)} className="w-full p-4 rounded-xl text-left text-lg font-medium hover:bg-white/5 text-white flex items-center gap-4">
                             <Info size={20} className="text-primary" /> About Us
+                        </Link>
+                        <Link href='/support' onClick={() => setIsMenuOpen(false)} className="w-full p-4 rounded-xl text-left text-lg font-medium hover:bg-white/5 text-white flex items-center gap-4">
+                            <Info size={20} className="text-primary" /> Support
                         </Link>
                     </div>
 
@@ -289,6 +328,10 @@ export const Navbar = () => {
                 onClose={() => setIsLocationModalOpen(false)}
                 onSelect={handleLocationSelect}
                 canClose={!!location}
+            />
+            <NotificationPanel
+                isOpen={isNotificationOpen}
+                onClose={() => setIsNotificationOpen(false)}
             />
         </>
     );

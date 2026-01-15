@@ -10,7 +10,7 @@ export const MOCK_EVENTS: EventData[] = [
         id: 'global-innovators-2026',
         title: 'Global Innovators Summit 2026',
         date: 'Fri, May 15, 2026, 10:00',
-        venue: 'Online & Multiple Hubs (London, NY, BLR)',
+        venue: { name: 'Online & Multiple Hubs', city: 'Multiple' },
         description: 'The world\'s premier hybrid conference for creators, builders, and dreamers. Join 50,000+ attendees globally for keynotes, workshops, and immersive networking.',
         imageUrl: 'https://images.unsplash.com/photo-1544531586-fde5298cdd40?q=80&w=2070&auto=format&fit=crop',
         price: '₹1,500 - ₹25,000',
@@ -18,23 +18,46 @@ export const MOCK_EVENTS: EventData[] = [
         subCategory: 'Hybrid Summit',
         accessType: 'public',
         featured: true,
+        allowSubmissions: true,
         organizer: {
             name: "Future World Alliance",
             imageUrl: "https://ui-avatars.com/api/?name=Future+World&background=7c3aed&color=fff",
             description: "Connecting minds across borders."
         },
         subEvents: [
-            { id: 'se1', title: 'Global Keynote', time: '10:00 AM (GMT)', description: 'Broadcast live from London HQ.' },
-            { id: 'se2', title: 'Regional Breakouts', time: '02:00 PM (Local)', description: 'Networking in your selected hub.' },
-            { id: 'se3', title: 'Virtual Metaverse Party', time: '08:00 PM (GMT)', description: 'Join via VR or WebGL.' }
+            { id: 'se1', title: 'Global Keynote', time: '10:00 AM (GMT)', date: '2026-05-15', description: 'Broadcast live from London HQ.' },
+            { id: 'se2', title: 'Regional Breakouts', time: '02:00 PM (Local)', date: '2026-05-15', description: 'Networking in your selected hub.' },
+            { id: 'se3', title: 'Virtual Metaverse Party', time: '08:00 PM (GMT)', date: '2026-05-15', description: 'Join via VR or WebGL.' }
+        ],
+        documents: [
+            { id: 'doc1', title: 'Event Agenda', url: 'https://example.com/agenda.pdf', type: 'pdf', description: 'Detailed schedule of all sessions.' },
+            { id: 'doc2', title: 'Code of Conduct', url: 'https://example.com/coc', type: 'link', description: 'Community guidelines.' }
+        ],
+        submissions: [
+            {
+                id: 'sub1',
+                title: 'Project Alpha',
+                description: 'An AI-driven sustainability platform.',
+                links: [{ label: 'Demo', url: 'https://demo.com' }, { label: 'GitHub', url: 'https://github.com' }],
+                submittedBy: { name: 'Alice Chen', avatar: 'https://ui-avatars.com/api/?name=Alice+Chen' },
+                submittedAt: '2026-05-10'
+            },
+            {
+                id: 'sub2',
+                title: 'Urban Flow',
+                description: 'Smart city traffic management solution.',
+                links: [{ label: 'Pitch Deck', url: 'https://slides.com' }],
+                submittedBy: { name: 'Bob Smith', avatar: 'https://ui-avatars.com/api/?name=Bob+Smith' },
+                submittedAt: '2026-05-12'
+            }
         ],
         guests: [
             { name: "Elon Musk", role: "Visionary", imageUrl: "https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=400&auto=format&fit=crop" },
             { name: "Sam Altman", role: "AI Lead", imageUrl: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=400&auto=format&fit=crop" }
         ],
         sponsors: [
-            { name: "OpenAI", logoUrl: "", tier: "Platinum" },
-            { name: "Meta", logoUrl: "", tier: "Gold" }
+            { name: "OpenAI", tkthiveUrl: "", tier: "Platinum" },
+            { name: "Meta", tkthiveUrl: "", tier: "Gold" }
         ],
         ticketTiers: [
             {
@@ -83,8 +106,8 @@ export const MOCK_EVENTS: EventData[] = [
     {
         id: 'cosmos-tech-2025',
         title: 'Cosmos TechFest 2025',
-        date: 'Fri, Nov 24, 2025, 09:00',
-        venue: 'IIT Delhi, New Delhi',
+        date: 'Fri, Nov 24, 2026, 09:00',
+        venue: { name: 'IIT Delhi', city: 'New Delhi' },
         description: 'The ultimate collegiate technical festival. 48 hours of code, design, and innovation.',
         imageUrl: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=2070&auto=format&fit=crop',
         price: '₹500 - ₹2000',
@@ -98,8 +121,8 @@ export const MOCK_EVENTS: EventData[] = [
             description: "Fostering innovation since 2010."
         },
         subEvents: [
-            { id: 's1', title: 'Opening Ceremony', time: '09:00 AM', description: 'Inauguration by Minister of IT.' },
-            { id: 's2', title: 'Hackathon Begins', time: '11:00 AM', description: 'Problem statements released.' }
+            { id: 's1', title: 'Opening Ceremony', time: '09:00 AM', date: '2026-11-24', description: 'Inauguration by Minister of IT.' },
+            { id: 's2', title: 'Hackathon Begins', time: '11:00 AM', date: '2026-11-24', description: 'Problem statements released.' }
         ],
         ticketTiers: [
             {
@@ -139,8 +162,8 @@ export const MOCK_EVENTS: EventData[] = [
     {
         id: 'blr-tech-1',
         title: 'India Dev Summit 2025',
-        date: 'Fri, Nov 14, 2025, 09:00',
-        venue: 'Bangalore International Exhibition Centre, Bengaluru',
+        date: 'Fri, Nov 14, 2026, 09:00',
+        venue: { name: 'Bangalore International Exhibition Centre', city: 'Bengaluru' },
         description: 'The largest gathering of developers, startups, and tech giants in South Asia. Join 10,000+ engineers for 3 days of innovation.',
         imageUrl: 'https://images.unsplash.com/photo-1544531586-fde5298cdd40?q=80&w=2070&auto=format&fit=crop',
         price: '₹2,999',
@@ -154,10 +177,10 @@ export const MOCK_EVENTS: EventData[] = [
             description: "Empowering India's digital future."
         },
         subEvents: [
-            { id: 's1', title: 'Keynote: Future of AI', time: '09:00 AM', description: 'Sundar Pichai on the next wave of Generative AI.' },
-            { id: 's2', title: 'Panel: Web3 in 2026', time: '11:30 AM', description: 'Is the hype real? Industry experts debate.' },
-            { id: 's3', title: 'Networking Lunch', time: '01:00 PM', description: 'Meet potential co-founders and investors.' },
-            { id: 's4', title: 'Workshop: Rust for JS Devs', time: '02:30 PM', description: 'Hands-on session with principal engineers.' }
+            { id: 's1', title: 'Keynote: Future of AI', time: '09:00 AM', date: '2026-11-14', description: 'Sundar Pichai on the next wave of Generative AI.' },
+            { id: 's2', title: 'Panel: Web3 in 2026', time: '11:30 AM', date: '2026-11-14', description: 'Is the hype real? Industry experts debate.' },
+            { id: 's3', title: 'Networking Lunch', time: '01:00 PM', date: '2026-11-14', description: 'Meet potential co-founders and investors.' },
+            { id: 's4', title: 'Workshop: Rust for JS Devs', time: '02:30 PM', date: '2026-11-14', description: 'Hands-on session with principal engineers.' }
         ],
         guests: [
             { name: "Satya Nadella", role: "Keynote Speaker", imageUrl: "https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=400&auto=format&fit=crop" },
@@ -165,9 +188,9 @@ export const MOCK_EVENTS: EventData[] = [
             { name: "Nithin Kamath", role: "Fintech Pioneer", imageUrl: "https://images.unsplash.com/photo-1556157382-97eda2d62296?q=80&w=400&auto=format&fit=crop" }
         ],
         sponsors: [
-            { name: "Google Cloud", logoUrl: "", tier: "Platinum" },
-            { name: "AWS", logoUrl: "", tier: "Platinum" },
-            { name: "Postman", logoUrl: "", tier: "Gold" }
+            { name: "Google Cloud", tkthiveUrl: "", tier: "Platinum" },
+            { name: "AWS", tkthiveUrl: "", tier: "Platinum" },
+            { name: "Postman", tkthiveUrl: "", tier: "Gold" }
         ],
         ticketTiers: [
             {
@@ -202,8 +225,8 @@ export const MOCK_EVENTS: EventData[] = [
     {
         id: 'hyd-hack-1',
         title: 'CyberHack 2025',
-        date: 'Sat, Dec 10, 2025, 08:00',
-        venue: 'T-Hub, Hyderabad',
+        date: 'Sat, Dec 10, 2026, 08:00',
+        venue: { name: 'T-Hub', city: 'Hyderabad' },
         description: '36-hour non-stop hackathon building solutions for Cyber Security and Blockchain.',
         imageUrl: 'https://images.unsplash.com/photo-1504384308090-c54be3852f33?q=80&w=2070&auto=format&fit=crop',
         price: '₹500',
@@ -246,7 +269,7 @@ export const MOCK_EVENTS: EventData[] = [
         id: 'mum-esports-1',
         title: 'Valorant Challengers League: South Asia Split',
         date: 'Sun, Oct 25, 2025, 16:00',
-        venue: 'NSCI Dome, Mumbai',
+        venue: { name: 'NSCI Dome', city: 'Mumbai' },
         description: 'Witness the top teams in India battle for a slot in the Pacific Ascension.',
         imageUrl: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=2070&auto=format&fit=crop',
         price: '₹499',
@@ -256,9 +279,9 @@ export const MOCK_EVENTS: EventData[] = [
         featured: true,
         organizer: { name: "Nodwin Gaming", imageUrl: "https://ui-avatars.com/api/?name=Nodwin&background=FF0000&color=fff" },
         subEvents: [
-            { id: 'match1', title: 'Semi Final 1', time: '04:00 PM', description: 'Global Esports vs Enigma Gaming' },
-            { id: 'match2', title: 'Semi Final 2', time: '07:00 PM', description: 'GodLike vs Revenant' },
-            { id: 'showmatch', title: 'Influencer Showmatch', time: '09:00 PM', description: 'Mortal & Scout Team Battle' }
+            { id: 'match1', title: 'Semi Final 1', time: '04:00 PM', date: '2025-10-25', description: 'Global Esports vs Enigma Gaming' },
+            { id: 'match2', title: 'Semi Final 2', time: '07:00 PM', date: '2025-10-25', description: 'GodLike vs Revenant' },
+            { id: 'showmatch', title: 'Influencer Showmatch', time: '09:00 PM', date: '2025-10-25', description: 'Mortal & Scout Team Battle' }
         ],
         ticketTiers: [
             { id: 'ga', name: 'General Admission', price: '₹499', type: 'individual', description: 'Gallery seating.', requiredFields: [] },
@@ -272,7 +295,7 @@ export const MOCK_EVENTS: EventData[] = [
         id: 'online-scrim-1',
         title: 'BGMI Weekend Scrims - Tier 1',
         date: 'Today, 20:00',
-        venue: 'Online',
+        venue: { name: 'Online', city: 'Online' },
         description: 'High-level practice matches for invited underdog teams.',
         imageUrl: 'https://images.unsplash.com/photo-1593305841991-05c29736ce87?q=80&w=2070&auto=format&fit=crop',
         price: 'Free',
@@ -304,8 +327,8 @@ export const MOCK_EVENTS: EventData[] = [
     {
         id: 'goa-sunburn-1',
         title: 'Sunburn Goa 2025',
-        date: 'Dec 27 - 30, 2025',
-        venue: 'Vagator Beach, Goa',
+        date: 'Dec 27 - 30, 2026',
+        venue: { name: 'Vagator Beach', city: 'Goa' },
         description: 'Asia’s biggest electronic dance music festival. 4 Days of madness, music, and magic.',
         imageUrl: 'https://images.unsplash.com/photo-1459749411177-d2841fbd74e0?q=80&w=2070&auto=format&fit=crop',
         price: '₹8,000',
@@ -319,9 +342,9 @@ export const MOCK_EVENTS: EventData[] = [
             { name: "KSHMR", role: "Special Act", imageUrl: "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?q=80&w=400&auto=format&fit=crop" }
         ],
         subEvents: [
-            { id: 'd1', title: 'Day 1: The Awakening', time: '02:00 PM', description: 'Techno Stage opening.' },
-            { id: 'd2', title: 'Day 2: Solar Power', time: '02:00 PM', description: 'Trance specials.' },
-            { id: 'd3', title: 'Day 3: The Big Bang', time: '02:00 PM', description: 'Mainstage headliners.' }
+            { id: 'd1', title: 'Day 1: The Awakening', time: '02:00 PM', date: '2026-12-27', description: 'Techno Stage opening.' },
+            { id: 'd2', title: 'Day 2: Solar Power', time: '02:00 PM', date: '2026-12-28', description: 'Trance specials.' },
+            { id: 'd3', title: 'Day 3: The Big Bang', time: '02:00 PM', date: '2026-12-29', description: 'Mainstage headliners.' }
         ],
         ticketTiers: [
             { id: 'ga_season', name: 'GA Season Pass (4 Days)', price: '₹8,000', type: 'individual', description: 'Access to all stages.', requiredFields: [{ id: 'age', label: 'Age Confirmation', type: 'select', options: ['I am 18+'], required: true, scope: 'booking' }] },
@@ -335,8 +358,8 @@ export const MOCK_EVENTS: EventData[] = [
     {
         id: 'delhi-food-1',
         title: 'The Great Indian Food Festival',
-        date: 'Sat, Nov 08, 2025, 11:00',
-        venue: 'Jawaharlal Nehru Stadium, Delhi',
+        date: 'Sat, Nov 08, 2026, 11:00',
+        venue: { name: 'Jawaharlal Nehru Stadium', city: 'Delhi' },
         description: 'A culinary journey through India’s states. 500+ Dishes, 50+ Stalls.',
         imageUrl: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?q=80&w=1974&auto=format&fit=crop',
         price: '₹299',
@@ -359,7 +382,7 @@ export const MOCK_EVENTS: EventData[] = [
         id: 'mum-cricket-1',
         title: 'IPL 2026: Mumbai Indians vs CSK',
         date: 'Wed, Apr 15, 2026, 19:30',
-        venue: 'Wankhede Stadium, Mumbai',
+        venue: { name: 'Wankhede Stadium', city: 'Mumbai' },
         description: 'The El Clasico of IPL. Rohit vs Dhoni (Legacy match).',
         imageUrl: 'https://images.unsplash.com/photo-1531415074968-036ba1b575da?q=80&w=2067&auto=format&fit=crop',
         price: '₹1,500',
@@ -382,7 +405,7 @@ export const MOCK_EVENTS: EventData[] = [
         id: 'kol-football-1',
         title: 'Kolkata Derby: Mohun Bagan vs East Bengal',
         date: 'Sun, Sep 20, 2025, 17:00',
-        venue: 'Salt Lake Stadium, Kolkata',
+        venue: { name: 'Salt Lake Stadium', city: 'Kolkata' },
         description: 'Asia’s oldest football rivalry. 80,000 fans, one passion.',
         imageUrl: 'https://images.unsplash.com/photo-1624880357913-a8539238245b?q=80&w=2070&auto=format&fit=crop',
         price: '₹200',
@@ -402,7 +425,7 @@ export const MOCK_EVENTS: EventData[] = [
         id: 'del-art-1',
         title: 'India Art Fair 2025',
         date: 'Thu, Feb 05, 2025, 10:00',
-        venue: 'NSIC Exhibition Grounds, Delhi',
+        venue: { name: 'NSIC Exhibition Grounds', city: 'Delhi' },
         description: 'Discover modern and contemporary art from South Asia.',
         imageUrl: 'https://images.unsplash.com/photo-1518998053901-5348d3969104?q=80&w=1974&auto=format&fit=crop',
         price: '₹600',
@@ -410,8 +433,8 @@ export const MOCK_EVENTS: EventData[] = [
         subCategory: 'Exhibition',
         organizer: { name: "India Art Fair" },
         subEvents: [
-            { id: 'talk1', title: 'Curator Walkthrough', time: '11:00 AM', description: 'Guided tour of highlights.' },
-            { id: 'perf', title: 'Live Performance Art', time: '04:00 PM', description: 'Interactive installation.' }
+            { id: 'talk1', title: 'Curator Walkthrough', time: '11:00 AM', date: '2025-02-05', description: 'Guided tour of highlights.' },
+            { id: 'perf', title: 'Live Performance Art', time: '04:00 PM', date: '2025-02-05', description: 'Interactive installation.' }
         ],
         ticketTiers: [
             { id: 'day', name: 'Day Pass', price: '₹600', type: 'individual', requiredFields: [] },
@@ -425,7 +448,7 @@ export const MOCK_EVENTS: EventData[] = [
         id: 'college-fest-1',
         title: 'Mood Indigo 2025',
         date: 'Dec 18 - 21, 2025',
-        venue: 'IIT Bombay, Mumbai',
+        venue: { name: 'IIT Bombay', city: 'Mumbai' },
         description: 'Asia’s largest college cultural festival. Competitions, concerts, and chaos.',
         imageUrl: 'https://images.unsplash.com/photo-1506157786151-b8491531f063?q=80&w=2070&auto=format&fit=crop',
         price: '₹500',
@@ -465,7 +488,7 @@ export const MOCK_EVENTS: EventData[] = [
         id: 'pune-comedy-1',
         title: 'Zakir Khan: Live in Pune',
         date: 'Sat, Nov 22, 2025, 19:00',
-        venue: 'Liberty Square, Pune',
+        venue: { name: 'Liberty Square', city: 'Pune' },
         description: 'The Sakht Launda returns with his new special "Mann Pasand".',
         imageUrl: 'https://images.unsplash.com/photo-1585699324551-f6c309eedeca?q=80&w=2070&auto=format&fit=crop',
         price: '₹999',
@@ -486,7 +509,7 @@ export const MOCK_EVENTS: EventData[] = [
         id: 'past-hack-1',
         title: 'Smart India Hackathon 2024 (Grand Finale)',
         date: 'Aug 20, 2024',
-        venue: 'IIT Madras, Chennai',
+        venue: { name: 'IIT Madras', city: 'Chennai' },
         description: 'National level hackathon for smart innovation.',
         imageUrl: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=2070&auto=format&fit=crop',
         price: 'Closed',
@@ -503,7 +526,7 @@ export const MOCK_EVENTS: EventData[] = [
         id: 'past-esports-1',
         title: 'Skyesports Championship 5.0',
         date: 'Jul 15, 2024',
-        venue: 'Mumbai',
+        venue: { name: 'Mumbai', city: 'Mumbai' },
         description: 'CS2 LAN Finals.',
         imageUrl: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=2071&auto=format&fit=crop',
         price: 'Closed',

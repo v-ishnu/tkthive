@@ -17,7 +17,7 @@ export default function AboutUsPage() {
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-yellow-200">One Event at a Time</span>
                     </h1>
                     <p className="text-xl text-gray-400 leading-relaxed max-w-2xl mx-auto">
-                        LOGO is more than a booking platform. We are a community-driven ecosystem designed to bring people together through shared experiences, from underground raves to global tech summits.
+                        tkthive is more than a booking platform. We are a community-driven ecosystem designed to bring people together through shared experiences, from underground raves to global tech summits.
                     </p>
                 </div>
             </div>
@@ -71,7 +71,7 @@ export default function AboutUsPage() {
             <div className="bg-card border-y border-white/5 py-24">
                 <div className="container mx-auto px-4">
                     <div className="text-center mb-16">
-                        <h2 className="text-3xl md:text-4xl font-bold mb-4">Why Choose LOGO?</h2>
+                        <h2 className="text-3xl md:text-4xl font-bold mb-4">Why Choose tkthive?</h2>
                         <p className="text-gray-400">Built for organizers, loved by attendees.</p>
                     </div>
 
@@ -134,7 +134,7 @@ export default function AboutUsPage() {
                     <div className="relative z-10">
                         <h2 className="text-3xl md:text-4xl font-bold text-black mb-6">Ready to Join the Hive?</h2>
                         <p className="text-black/80 text-lg mb-8 max-w-xl mx-auto">
-                            Whether you are an organizer looking to host your next big event or an attendee seeking adventure, LOGO is your home.
+                            Whether you are an organizer looking to host your next big event or an attendee seeking adventure, tkthive is your home.
                         </p>
                         <div className="flex justify-center gap-4">
                             <button className="px-8 py-3 bg-black text-white font-bold rounded-full hover:bg-gray-800 transition-colors">

@@ -8,31 +8,35 @@ import { TicketCard } from '@/components/TickectCard';
 
 import { useRouter } from 'next/navigation';
 
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { checkAuth, fetchUserTickets } from '@/store/slices/authslice';
+import { RootState } from '@/store/store';
+
 export default function ProfilePage() {
-    const [user, setUser] = useState<UserType | null>(null);
-    const [loading, setLoading] = useState(true);
+    const dispatch = useAppDispatch();
+    const { user, tickets, isLoading: loading } = useAppSelector((state: RootState) => state.auth);
     const router = useRouter();
 
     React.useEffect(() => {
-        const savedUser = localStorage.getItem('user_data');
-        if (savedUser) {
-            try {
-                setUser(JSON.parse(savedUser));
-            } catch (e) {
-                console.error("Failed to parse user", e);
-            }
-        } else {
+        dispatch(checkAuth());
+        dispatch(fetchUserTickets());
+    }, [dispatch]);
+
+    React.useEffect(() => {
+        if (!loading && !user) {
             router.push('/auth');
         }
-        setLoading(false);
-    }, []);
+    }, [user, loading, router]);
     const [activeTab, setActiveTab] = useState<'attended' | 'saved' | 'reviews'>('attended');
 
     // Filter attended tickets
     const attendedTickets = React.useMemo(() => {
-        if (!user) return [];
+        const ticketSource = tickets && tickets.length > 0 ? tickets : (user?.tickets || []);
+        if (!ticketSource) return [];
+
         const now = new Date();
-        return user.tickets.filter(t => {
+        return ticketSource.filter(t => {
+            if (!t) return false;
             let eventDate = new Date(t.eventDate);
             if (isNaN(eventDate.getTime())) {
                 try {
@@ -45,7 +49,7 @@ export default function ProfilePage() {
             if (isNaN(eventDate.getTime())) return false;
             return eventDate < now;
         });
-    }, [user]);
+    }, [user, tickets]);
 
     if (loading) {
         return <div className="min-h-screen bg-dark text-white flex items-center justify-center">Loading...</div>;
@@ -54,30 +58,20 @@ export default function ProfilePage() {
     if (!user) return null;
 
     return (
-        <div className="min-h-screen bg-dark text-white pb-20 relative">
+        <div className="min-h-screen bg-dark text-white pt-28 pb-20 relative">
             {/* Background Pattern */}
 
 
-            {/* Hero Banner Section */}
-            <div className="relative h-80 w-full overflow-hidden">
-                <div className="absolute inset-0">
-                    <img
-                        src={user?.coverImage || "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070&auto=format&fit=crop"}
-                        alt="Cover"
-                        className="w-full h-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-dark via-transparent to-black/30" />
-                </div>
-            </div>
 
-            <div className="container mx-auto px-4 relative z-10 -mt-24">
+
+            <div className="container mx-auto px-4 relative z-10">
                 <div className="flex flex-col md:flex-row items-end md:items-center gap-8 mb-12">
 
                     {/* Profile Avatar */}
                     <div className="relative group shrink-0">
                         <div className="w-40 h-40 rounded-[2rem] border-4 border-dark bg-dark overflow-hidden shadow-2xl relative z-10">
                             <img
-                                src={user?.avatar}
+                                src={user?.avatar || "/default-avatar.svg"}
                                 alt={user?.name}
                                 className="w-full h-full object-cover transition-transform group-hover:scale-110"
                             />
@@ -129,7 +123,7 @@ export default function ProfilePage() {
                         </div>
                         <div className="w-px h-8 bg-white/10" />
                         <div className="text-center">
-                            <div className="text-2xl font-black text-white">{user?.tickets.length}</div>
+                            <div className="text-2xl font-black text-white">{tickets?.length || 0}</div>
                             <div className="text-xs text-gray-400 font-bold uppercase tracking-wider">Events</div>
                         </div>
                     </div>

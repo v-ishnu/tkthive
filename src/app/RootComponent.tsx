@@ -3,6 +3,10 @@
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { usePathname } from "next/navigation";
+import { Provider } from "react-redux";
+import { store } from "@/store/store";
+import AuthInitializer from "@/components/AuthInitializer";
+import { ToastProvider } from "@/context/ToastContext";
 
 export default function RootComponent({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
@@ -13,11 +17,16 @@ export default function RootComponent({ children }: { children: React.ReactNode 
     const isTransparentNavPage = pathname === '/' || /^\/events\/[^/]+$/.test(pathname || '');
 
     return (
-        <div className="">
-            {!isLoginPage && <Navbar />}
-            <main className={!isLoginPage && !isTransparentNavPage ? "pt-20" : ""}>{children}</main>
-            {!isLoginPage && <Footer />}
+        <Provider store={store}>
+            <ToastProvider>
+                <AuthInitializer />
+                <div className="">
+                    {!isLoginPage && <Navbar />}
+                    <main className={!isLoginPage && !isTransparentNavPage ? "pt-20" : ""}>{children}</main>
+                    {!isLoginPage && <Footer />}
 
-        </div>
+                </div>
+            </ToastProvider>
+        </Provider>
     );
 }

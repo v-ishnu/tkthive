@@ -34,7 +34,7 @@ export const SponsorsSection = () => {
     return (
         <section className="mx-auto container py-20 border-t border-white/5">
             <div className="container mx-auto px-4 text-center">
-                <p className="text-gray-500 uppercase tracking-widest text-xs font-bold mb-10">Trusted by Global Event Partners</p>
+                <p className="text-text-muted uppercase tracking-widest text-xs font-bold mb-10">Trusted by Global Event Partners</p>
                 <div className="flex flex-wrap justify-center items-center gap-12 md:gap-20 opacity-50 grayscale hover:grayscale-0 transition-all duration-500">
                     {sponsors.map((sponsor, idx) => (
                         <div key={idx} className="flex flex-col items-center gap-3 group">

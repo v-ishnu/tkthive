@@ -3,51 +3,73 @@ import { useState, useEffect } from "react";
 import Hero from "@/components/home/Hero";
 import { FeaturedEvents } from "@/components/home/FeaturedEvents";
 import MarqueeSection from "@/components/home/MarqueeSection";
+import { CategoryButtons } from "@/components/home/CategoryButtons";
 
 import { CreativePromoSection } from "@/components/home/CreativePromoSection";
-import { MOCK_EVENTS } from '../constants';
+// import { MOCK_EVENTS } from '../constants'; // Removed Mock
 import { EventData } from "../types";
 import { AdSection } from "@/components/home/Adsection";
 import { HomeUpcomingSection } from "@/components/home/UpcomingEvents";
 import { CalendarSection } from "@/components/home/CalendarSection";
 import { StaggeredReviews } from "@/components/home/StaggeredReviews";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { fetchAllEvents } from "@/store/slices/eventSlice";
+import { RootState } from "@/store/store";
 
 export default function Home() {
 
-  const [events, setEvents] = useState<EventData[]>(MOCK_EVENTS);
+  const dispatch = useAppDispatch();
+  const { events, loading } = useAppSelector((state: RootState) => state.event);
+
+  useEffect(() => {
+    dispatch(fetchAllEvents());
+  }, [dispatch]);
+
   return (
-
     <>
-      <section>
-        {<Hero />}
+      <section className="bg-background">
+        <Hero />
       </section>
+
       <MarqueeSection />
-      <section>
-        <div className="  py-12 space-y-20">
-          <FeaturedEvents
-            events={events}
-          />
 
-        <div className="container mx-auto">
+      <section className="bg-background py-20 pb-0">
+        <FeaturedEvents
+          events={events}
+        />
+      </section>
 
-        
+      <section className="bg-background py-10">
+        <CategoryButtons />
+      </section>
+
+      {/* <section className="bg-secondary py-16">
+        <div className="container mx-auto px-4">
           <AdSection
             title="Become a Pro Organizer"
             description="Create, manage, and sell tickets for your events with our premium tools."
             cta="Get Started"
             align="right"
           />
-</div>
-          <HomeUpcomingSection
-            events={events}
-            onEventClick={() => { }}
-            onViewAll={() => { }}
-          />
-          {/* <CreativePromoSection /> */}
-          <CalendarSection events={events} />
+        </div>
+      </section> */}
 
+      <section className="bg-background ">
+        <HomeUpcomingSection
+          events={events}
+          onEventClick={() => { }}
+          onViewAll={() => { }}
+        />
+      </section>
 
-        <div className="container mx-auto">
+      {/* <CreativePromoSection /> */}
+
+      {/* <section className="bg-secondary">
+        <CalendarSection events={events} />
+      </section> */}
+
+      {/* <section className="bg-background py-16">
+        <div className="container mx-auto px-4">
           <AdSection
             title="Winter Gaming League 2025"
             description="Register now for the biggest online tournament of the season. ₹50 Lakhs Prize Pool."
@@ -61,16 +83,13 @@ export default function Home() {
               isGaming: false
             }}
           />
-          </div>
-          <StaggeredReviews />
         </div>
-      </section>
+      </section> */}
 
-
+      {/* <section className="bg-secondary py-20">
+        <StaggeredReviews />
+      </section> */}
     </>
-
   );
 };
-
-
 

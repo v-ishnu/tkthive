@@ -34,7 +34,7 @@ const SingleAdBlock: React.FC<AdProps & { fullWidth?: boolean }> = ({
       <div className={`relative z-10 p-6 md:p-12 w-full ${fullWidth ? 'md:w-1/2' : ''} flex flex-col ${align === 'right' ? 'md:ml-auto md:items-end md:text-right' : 'items-start text-left'}`}>
         <span className="text-primary font-bold tracking-widest text-xs mb-2 uppercase border border-primary/20 bg-primary/10 px-2 py-1 rounded">Sponsored</span>
         <h2 className="text-2xl md:text-4xl font-black text-white mb-4 leading-tight">{title}</h2>
-        <p className="text-gray-300 text-sm md:text-base mb-8 max-w-sm font-medium leading-relaxed">{description}</p>
+        <p className="text-text-secondary text-sm md:text-base mb-8 max-w-sm font-medium leading-relaxed">{description}</p>
 
         <button className="px-6 py-3 bg-white text-black font-bold rounded-xl hover:bg-primary transition-colors duration-300 flex items-center gap-2 shadow-lg hover:shadow-primary/20">
           {cta}
