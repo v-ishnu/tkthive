@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Space_Grotesk } from "next/font/google";
 import "./globals.css";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 import RootComponent from "./RootComponent";
 
@@ -56,6 +57,7 @@ export default function RootLayout({
         className={`${spaceGrotesk.variable} `}
       >
         <RootComponent>{children}</RootComponent>
+        <SpeedInsights />
       </body>
     </html>
   );
