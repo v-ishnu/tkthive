@@ -40,7 +40,7 @@ export const initiateBooking = async (req, res) => {
                     }
                 }
             },
-            bookingStatus: { in: ["CONFIRMED", "PENDING"] }
+            bookingStatus: { in: ["CONFIRMED"] }
         }
     });
 
