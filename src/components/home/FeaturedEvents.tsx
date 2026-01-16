@@ -6,10 +6,10 @@ import { EventData } from '../../types';
 
 interface FeaturedEventsProps {
     events: EventData[];
-
+    isLoading?: boolean;
 }
 
-export const FeaturedEvents: React.FC<FeaturedEventsProps> = ({ events }) => {
+export const FeaturedEvents: React.FC<FeaturedEventsProps> = ({ events, isLoading }) => {
     const [activeIndex, setActiveIndex] = useState(0);
 
     // Filter for featured events, fallback to first 4 if none found
@@ -34,6 +34,28 @@ export const FeaturedEvents: React.FC<FeaturedEventsProps> = ({ events }) => {
             default: return 'bg-white/10 backdrop-blur-md text-white border border-white/10';
         }
     };
+
+    if (isLoading) {
+        return (
+            <div className="container mx-auto w-full px-4">
+                <div className="flex items-center justify-between mb-8">
+                    <div>
+                        <div className="h-8 w-64 bg-white/10 animate-pulse rounded-lg mb-2" />
+                        <div className="h-4 w-48 bg-white/10 animate-pulse rounded-lg" />
+                    </div>
+                </div>
+                <div className="flex flex-col md:flex-row gap-4 h-auto md:h-[450px]">
+                    {[1, 2, 3, 4].map((i) => (
+                        <div key={i} className={`
+                            relative rounded-3xl overflow-hidden border border-white/5 bg-white/5
+                            ${i === 1 ? 'flex-[2] md:flex-[3]' : 'flex-[1] md:flex-[1] md:flex-[0.5]'}
+                            min-h-[150px] md:min-h-0 animate-pulse
+                        `} />
+                    ))}
+                </div>
+            </div>
+        );
+    }
 
     if (featuredEvents.length === 0) {
         return (

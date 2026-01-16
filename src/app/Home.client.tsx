@@ -36,6 +36,7 @@ export default function Home() {
       <section className="bg-background py-20 pb-0">
         <FeaturedEvents
           events={events}
+          isLoading={loading}
         />
       </section>
 
@@ -50,6 +51,7 @@ export default function Home() {
             description="Create, manage, and sell tickets for your events with our premium tools."
             cta="Get Started"
             align="right"
+            align="right"
           />
         </div>
       </section> */}
@@ -59,6 +61,7 @@ export default function Home() {
           events={events}
           onEventClick={() => { }}
           onViewAll={() => { }}
+          isLoading={loading}
         />
       </section>
 

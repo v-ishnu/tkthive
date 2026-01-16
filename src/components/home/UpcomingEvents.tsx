@@ -9,9 +9,10 @@ interface HomeUpcomingSectionProps {
   events: EventData[];
   onEventClick: (event: EventData) => void;
   onViewAll: () => void;
+  isLoading?: boolean;
 }
 
-export const HomeUpcomingSection: React.FC<HomeUpcomingSectionProps> = ({ events }) => {
+export const HomeUpcomingSection: React.FC<HomeUpcomingSectionProps> = ({ events, isLoading }) => {
   // Filter for upcoming events and limit to 8
   const upcomingEvents = useMemo(() => {
     return events
@@ -42,7 +43,22 @@ export const HomeUpcomingSection: React.FC<HomeUpcomingSectionProps> = ({ events
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {upcomingEvents.length > 0 ? (
+        {isLoading ? (
+          Array.from({ length: 8 }).map((_, index) => (
+            <div key={index} className="flex flex-col h-[380px] bg-white/5 rounded-2xl border border-white/5 overflow-hidden animate-pulse">
+              <div className="h-48 bg-white/10 w-full" />
+              <div className="p-4 flex-1 space-y-3">
+                <div className="flex justify-between">
+                  <div className="h-4 w-20 bg-white/10 rounded" />
+                  <div className="h-4 w-16 bg-white/10 rounded" />
+                </div>
+                <div className="h-6 w-3/4 bg-white/10 rounded" />
+                <div className="h-4 w-1/2 bg-white/10 rounded" />
+                <div className="mt-auto h-10 w-full bg-white/10 rounded-lg" />
+              </div>
+            </div>
+          ))
+        ) : upcomingEvents.length > 0 ? (
           upcomingEvents.map(event => (
             <EventCard key={event.id} event={event} />
           ))
@@ -55,7 +71,7 @@ export const HomeUpcomingSection: React.FC<HomeUpcomingSectionProps> = ({ events
 
       <div className="mt-12 flex justify-center md:hidden">
         <Link href="/events"
-           
+
           className="px-8 py-3 bg-white/5 border border-white/10 hover:bg-primary hover:text-black rounded-full text-white font-bold transition-all w-full sm:w-auto"
         >
           Explore All Events
