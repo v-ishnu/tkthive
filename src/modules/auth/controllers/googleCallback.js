@@ -19,7 +19,7 @@ const googleCallbackController = async (req, res) => {
 
         const refreshToken = generateRefreshToken(payload);
 
-        await storeRefreshTokenInLocalRedis(refreshToken, user.id);
+        // await storeRefreshTokenInLocalRedis(refreshToken, user.id);
 
         // Redirect to frontend with success, or set cookie and redirect
         res.cookie("rToken", refreshToken, refreshTokenCookieOptions);
@@ -32,7 +32,7 @@ const googleCallbackController = async (req, res) => {
         console.error("Google callback error:", error);
         // return res.status(500).json({ message: "Internal server error" });
         const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
-        return res.redirect(`${frontendUrl}/auth?error=Server Error`);
+        return res.redirect(`${frontendUrl}/auth`);
     }
 };
 
