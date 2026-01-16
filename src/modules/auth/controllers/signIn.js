@@ -45,7 +45,7 @@ const signInController = async (req, res) => {
     // const accessToken = generateAccessToken(payload);
     const refreshToken = generateRefreshToken(payload);
 
-    await storeRefreshTokenInLocalRedis(refreshToken, user.id);
+    // await storeRefreshTokenInLocalRedis(refreshToken, user.id);
 
     return res
       // .cookie("aToken", accessToken, accessTokenCookieOptions)
