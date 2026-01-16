@@ -110,12 +110,6 @@ export default function Hero() {
 
             </div>
 
-            {/* Mascot Image */}
-            <img
-                src="/mascot_fox_bee.png"
-                alt="Fox and Bee Mascot"
-                className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[300px] md:w-[400px] lg:w-[500px] z-20 pointer-events-none"
-            />
         </div>
     );
 }
