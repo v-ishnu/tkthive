@@ -7,7 +7,7 @@ type Props = {
 
 async function getEvent(id: string) {
     try {
-        const res = await fetch(`http://localhost:5051/api/user/event/get/${id}`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/event/get/${id}`, {
             next: { revalidate: 60 } // Revalidate every minute
         });
 
@@ -30,13 +30,13 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 
     if (!event) {
         return {
-            title: 'Event Not Found | TktHive',
+            title: 'Event Not Found | tkthive',
             description: 'The requested event could not be found.',
         }
     }
 
     const title = `${event.title} `;
-    const description = event.description || `Join us for ${event.title}. Book your tickets now on TktHive.`;
+    const description = event.description || `Join us for ${event.title}. Book your tickets now on tkthive.`;
     const imageUrl = event.imageUrl || '/og-image.jpg';
 
     return {

@@ -3,7 +3,8 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { EventData } from '../../types';
 
 // Updated base URL pattern
-const API_BASE_URL = "http://localhost:5051/api/";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5051/api/";
+
 
 interface BookingResponse {
     message: string;

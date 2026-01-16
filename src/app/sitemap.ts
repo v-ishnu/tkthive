@@ -3,7 +3,7 @@ import { MetadataRoute } from 'next';
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // Base URL
     const baseUrl = 'https://tkthive.com'; // Replace with actual domain
-    const backendUrl = 'http://localhost:5051/api';
+    const backendUrl = `${process.env.NEXT_PUBLIC_API_URL}/api`;
 
     // Static routes
     const routes = [

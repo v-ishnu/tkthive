@@ -120,7 +120,7 @@ export const TicketCard: React.FC<TicketCardProps> = ({ ticket }) => {
                     {/* Backgrounds */}
                     <div className={`absolute inset-0 bg-gradient-to-br ${theme.bg} opacity-50`} />
 
-                    {/* TktHive Watermark */}
+                    {/* tkthive Watermark */}
                     <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none select-none overflow-hidden">
                         <img
                             src="/logo/whitelogo.png"
@@ -143,7 +143,7 @@ export const TicketCard: React.FC<TicketCardProps> = ({ ticket }) => {
                             <div className="flex justify-between items-start">
                                 <div>
                                     <div className="flex items-center gap-2 mb-2">
-                                        <img src="/logo/whitelogo.png" alt="TktHive" className="h-4 opacity-70" />
+                                        <img src="/logo/whitelogo.png" alt="tkthive" className="h-4 opacity-70" />
                                         <div className="h-3 w-px bg-white/20"></div>
                                         <p className={`text-[10px] font-bold uppercase tracking-widest ${theme.color}`}>Event Ticket</p>
                                     </div>

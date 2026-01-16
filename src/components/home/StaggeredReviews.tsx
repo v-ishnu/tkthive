@@ -12,7 +12,7 @@ const REVIEWS = [
     {
         id: 2,
         user: { name: "Sarah Jenkins", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=200&auto=format&fit=crop" },
-        text: "Took some convincing, but now that we're on TktHive we're never going back.",
+        text: "Took some convincing, but now that we're on tkthive we're never going back.",
         event: "Sunburn Goa",
         rotation: "rotate-[1deg]",
     },

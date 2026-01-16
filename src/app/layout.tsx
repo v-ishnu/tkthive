@@ -13,16 +13,16 @@ const spaceGrotesk = Space_Grotesk({
 
 export const metadata: Metadata = {
   title: {
-    default: "TktHive - Discover & Book Events",
-    template: "%s | TktHive"
+    default: "tkthive - Discover & Book Events",
+    template: "%s | tkthive"
   },
   description: "Your premier destination for discovering and booking the best events. fast, secure, and easy.",
   keywords: ["events", "tickets", "booking", "concerts", "workshops", "seminars", "tkthive"],
   openGraph: {
-    title: "TktHive - Discover & Book Events",
+    title: "tkthive - Discover & Book Events",
     description: "Your premier destination for discovering and booking the best events.",
     url: "https://tkthive.com", // Replace with actual domain when live
-    siteName: "TktHive",
+    siteName: "tkthive",
     images: [
       {
         url: "/og-image.jpg", // Make sure to add an og-image
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "TktHive - Discover & Book Events",
+    title: "tkthive - Discover & Book Events",
     description: "Your premier destination for discovering and booking the best events.",
     images: ["/og-image.jpg"],
   },

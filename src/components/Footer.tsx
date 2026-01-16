@@ -76,7 +76,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
                             <img src="/logo/whitelogo.png" alt="tkthive" className="h-12 w-auto object-contain group-hover/brand:opacity-80 transition-opacity" />
                         </div>
                         <p className="leading-relaxed opacity-90 text-lg max-w-sm">
-                            TktHive connects you with the vibrant world of live events. Discover and secure your spot at the biggest concerts, thrilling sports matches, and cultural festivals.
+                            tkthive connects you with the vibrant world of live events. Discover and secure your spot at the biggest concerts, thrilling sports matches, and cultural festivals.
                         </p>
                         <div className="flex gap-4">
                             <Twitter size={20} className="hover:text-primary cursor-pointer transition-colors opacity-70 hover:opacity-100" />

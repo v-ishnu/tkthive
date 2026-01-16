@@ -9,7 +9,7 @@ export default function FAQPage() {
             icon: <Ticket className="text-primary" />,
             items: [
                 { q: "How do I receive my tickets?", a: "Tickets are emailed to you instantly after purchase. You can also view and download them from the 'My Tickets' section in your profile." },
-                { q: "Do I need to print my ticket?", a: "No! TktHive tickets are mobile-friendly. You can simply show the QR code on your phone at the venue." },
+                { q: "Do I need to print my ticket?", a: "No! tkthive tickets are mobile-friendly. You can simply show the QR code on your phone at the venue." },
                 { q: "Can I transfer my ticket to someone else?", a: "Yes, you can transfer tickets from your dashboard. The recipient will receive a new QR code." }
             ]
         },
@@ -40,7 +40,7 @@ export default function FAQPage() {
                         <HelpCircle className="text-primary" size={32} />
                     </div>
                     <h1 className="text-4xl md:text-6xl font-bold mb-4">Frequently Asked Questions</h1>
-                    <p className="text-gray-400">Find answers to common questions about TktHive.</p>
+                    <p className="text-gray-400">Find answers to common questions about tkthive.</p>
                 </div>
 
                 <div className="max-w-4xl mx-auto space-y-12">

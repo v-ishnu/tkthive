@@ -36,9 +36,9 @@ export default function WhyUsPage() {
 
                 {/* Header */}
                 <div className="text-center mb-20 max-w-4xl mx-auto">
-                    <span className="text-primary font-bold tracking-widest uppercase text-sm mb-4 block">The TktHive Promise</span>
+                    <span className="text-primary font-bold tracking-widest uppercase text-sm mb-4 block">The tkthive Promise</span>
                     <h1 className="text-4xl md:text-7xl font-black mb-6 leading-tight">
-                        Why Choose <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-amber-200">TktHive?</span>
+                        Why Choose <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-amber-200">tkthive?</span>
                     </h1>
                     <p className="text-xl text-gray-400 max-w-2xl mx-auto">
                         We're not just a ticketing platform. We're your gateway to the moments that matter.
