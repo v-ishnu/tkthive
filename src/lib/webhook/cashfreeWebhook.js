@@ -1,6 +1,11 @@
-import { prisma } from "../../../config/prisma.js";
+
 import { verifyCashfreeSignature } from "../payment/verifyCashfreeSignature.js";
-import { BookingStatus, PaymentStatus } from "@prisma/client";
+import pkg from "@prisma/client";
+
+const { PrismaClient, BookingStatus, PaymentStatus } = pkg;
+
+const prisma = new PrismaClient();
+
 
 export const cashfreeWebhook = async (req, res) => {
   const signature = req.headers["x-webhook-signature"];
