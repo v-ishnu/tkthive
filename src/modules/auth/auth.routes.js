@@ -1,16 +1,16 @@
 import { Router } from "express";
 import protect from "../../lib/middleware/protect.middleware.js";
-import signInController from "./controller/signIn.js";
-import signUpController from "./controller/signUp.js";
-import { authenticateMe } from "./controller/authMe.js";
+import signInController from "./controllers/signIn.js";
+import signUpController from "./controllers/signUp.js";
+import { authenticateMe } from "./controllers/authMe.js";
 
-import { signOutController } from "./controller/signOut.js";
-import { verifyEmailController } from "./controller/verifyEmail.js";
-import { resendOtpController } from "./controller/resendOtp.js";
+import { signOutController } from "./controllers/signOut.js";
+import { verifyEmailController } from "./controllers/verifyEmail.js";
+import { resendOtpController } from "./controllers/resendOtp.js";
 import passport from "passport";
-import googleCallbackController from "./controller/googleCallback.js";
-import { forgotPasswordController } from "./controller/forgotPassword.js";
-import { resetPasswordController } from "./controller/resetPassword.js";
+import googleCallbackController from "./controllers/googleCallback.js";
+import { forgotPasswordController } from "./controllers/forgotPassword.js";
+import { resetPasswordController } from "./controllers/resetPassword.js";
 
 
 const authRouter = Router();

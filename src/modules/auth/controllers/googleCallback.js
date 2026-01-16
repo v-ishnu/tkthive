@@ -32,7 +32,7 @@ const googleCallbackController = async (req, res) => {
         console.error("Google callback error:", error);
         // return res.status(500).json({ message: "Internal server error" });
         const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
-        return res.redirect(`${frontendUrl}/login?error=Server Error`);
+        return res.redirect(`${frontendUrl}/auth?error=Server Error`);
     }
 };
 
