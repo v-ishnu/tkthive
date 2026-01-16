@@ -30,7 +30,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
                     </div>
 
                     {/* Content Container (Overflow visible for pop-out image) - Removed relative to let image anchor to parent */}
-                    <div className="p-8 md:p-16 flex flex-col md:flex-row items-center justify-between gap-8 md:gap-16">
+                    <div className="p-8 pb-0 md:p-16 flex flex-col md:flex-row items-center justify-between gap-8 md:gap-16">
                         <div className="text-left max-w-2xl relative z-20">
                             <h2 className="text-3xl md:text-5xl font-bold mb-6 tracking-tight leading-tight">
                                 Your gateway to <br />
@@ -53,7 +53,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
                         {/* Mobile: Static/Relative. Desktop: Absolute (static wrapper) to anchor to main card */}
 
                         <div className="relative w-full md:static md:w-auto flex justify-center md:block">
-                            <div className="md:absolute md:bottom-0 md:right-0 lg:right-12 w-72 md:w-[28rem] lg:w-[32rem] z-30 pointer-events-none">
+                            <div className="md:absolute bottom-0 md:right-0 lg:right-12 w-72 md:w-[28rem] lg:w-[32rem] z-30 pointer-events-none">
                                 <img
                                     src="/moscouttog.png"
                                     alt="Mascot"

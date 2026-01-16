@@ -76,7 +76,8 @@ export default function Hero() {
                     </div>
 
                     {/* Main Headline - Single Line Optimization */}
-                    <h1 className="text-[9vw] sm:text-[vw] lg:text-[5em] xl:text-[6em] font-black leading-[0.9] tracking-tight whitespace-nowrap">
+                    <h1 className="text-[9vw] sm:text-[7vw] lg:text-[4em] xl:text-[5em] font-black leading-[0.9] tracking-tight">
+
                         CRAFT YOUR <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-amber-500 relative inline-block">
                             STORY
                             <svg className="absolute -bottom-2 md:-bottom-6 left-0 w-full h-3 md:h-6 text-amber-400/20" viewBox="0 0 100 10" preserveAspectRatio="none">
@@ -108,6 +109,13 @@ export default function Hero() {
                 </div>
 
             </div>
+
+            {/* Mascot Image */}
+            <img
+                src="/mascot_fox_bee.png"
+                alt="Fox and Bee Mascot"
+                className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[300px] md:w-[400px] lg:w-[500px] z-20 pointer-events-none"
+            />
         </div>
     );
 }
