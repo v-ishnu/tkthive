@@ -273,7 +273,7 @@ export default function RegistrationPage() {
                 })).unwrap();
 
                 // @ts-ignore
-                const cashfree = await load({ mode: "sandbox" });
+                const cashfree = await load({ mode: "production" });
 
                 await cashfree.checkout({
                     paymentSessionId: sessionRes.session,
