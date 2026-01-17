@@ -123,14 +123,14 @@ export const eventCreate = async (req, res) => {
                 title,
                 description,
                 venue: venue ? {
-                    name: venue.name,
-                    city: venue.city,
-                    state: venue.state,
-                    country: venue.country,
-                    pincode: venue.pincode,
-                    latitude: venue.latitude,
-                    longitude: venue.longitude
-                } : undefined,
+                  name: venue.name,
+          city: venue.city,
+          state: venue.state,
+          country: venue.country,
+          pincode: venue.pincode,
+          latitude: venue.latitude ?? null,
+          longitude: venue.longitude ?? null
+                } : null,
                 imageUrl, // ✅ Added
                 slug,     // ✅ Added
                 startDate,
