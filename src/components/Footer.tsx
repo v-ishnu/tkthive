@@ -1,6 +1,6 @@
 "use client"
 import React from 'react';
-import { Twitter, Instagram, Facebook, Cpu, Gamepad2, Music, Trophy, Palette } from 'lucide-react';
+import { Twitter, Instagram, Facebook, Linkedin, Cpu, Gamepad2, Music, Trophy, Palette } from 'lucide-react';
 import { HivePattern } from './HivePattern';
 import Link from 'next/link';
 
@@ -79,9 +79,15 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
                             tkthive connects you with the vibrant world of live events. Discover and secure your spot at the biggest concerts, thrilling sports matches, and cultural festivals.
                         </p>
                         <div className="flex gap-4">
-                            <Twitter size={20} className="hover:text-primary cursor-pointer transition-colors opacity-70 hover:opacity-100" />
-                            <Instagram size={20} className="hover:text-primary cursor-pointer transition-colors opacity-70 hover:opacity-100" />
-                            <Facebook size={20} className="hover:text-primary cursor-pointer transition-colors opacity-70 hover:opacity-100" />
+                            <a href="https://instagram.com/tkt.hive" target="_blank" rel="noopener noreferrer">
+                                <Instagram size={20} className="hover:text-primary cursor-pointer transition-colors opacity-70 hover:opacity-100" />
+                            </a>
+                            <a href="https://facebook.com" target="_blank" rel="noopener noreferrer">
+                                <Facebook size={20} className="hover:text-primary cursor-pointer transition-colors opacity-70 hover:opacity-100" />
+                            </a>
+                            <a href="https://www.linkedin.com/company/tkthive" target="_blank" rel="noopener noreferrer">
+                                <Linkedin size={20} className="hover:text-primary cursor-pointer transition-colors opacity-70 hover:opacity-100" />
+                            </a>
                         </div>
                     </div>
 

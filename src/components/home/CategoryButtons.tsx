@@ -60,12 +60,12 @@ export const CategoryButtons = () => {
             <h3 className="text-2xl font-bold text-white mb-8 flex items-center gap-2">
                 Browse by Category <span className="text-primary text-4xl">.</span>
             </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
                 {categories.map((cat) => (
                     <Link
                         key={cat.id}
                         href={cat.id === 'All' ? '/events' : `/events?category=${cat.id}`}
-                        className="group relative h-40 rounded-[2rem] overflow-hidden border border-white/10 hover:border-primary/50 transition-all duration-500 hover:shadow-[0_0_30px_rgba(255,165,0,0.15)] hover:-translate-y-1 block"
+                        className="group relative h-36 sm:h-48 rounded-3xl sm:rounded-4xl overflow-hidden border border-white/10 hover:border-primary/50 transition-all duration-500 hover:shadow-[0_0_30px_rgba(255,165,0,0.15)] hover:-translate-y-1 block"
                     >
                         {/* Background Image */}
                         <div className="absolute inset-0">
@@ -76,17 +76,17 @@ export const CategoryButtons = () => {
                         <div className={`absolute inset-0 bg-gradient-to-r ${cat.gradient} opacity-90 transition-opacity duration-300`} />
 
                         {/* Content */}
-                        <div className="absolute inset-0 p-6 flex items-center justify-between">
+                        <div className="absolute inset-0 p-4 sm:p-6 flex items-center justify-between">
                             <div className="flex flex-col h-full justify-center">
-                                <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
-                                    <cat.icon size={24} className="text-white" />
+                                <div className="w-8 h-8 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center mb-2 sm:mb-3 group-hover:scale-110 transition-transform duration-300">
+                                    <cat.icon className="text-white w-4 h-4 sm:w-6 sm:h-6" />
                                 </div>
-                                <h4 className="text-xl font-bold text-white mb-1 group-hover:translate-x-1 transition-transform text-shadow">{cat.label}</h4>
-                                <p className="text-white/80 text-sm font-medium">{cat.sub}</p>
+                                <h4 className="text-sm sm:text-xl font-bold text-white mb-0.5 sm:mb-1 group-hover:translate-x-1 transition-transform text-shadow leading-tight">{cat.label}</h4>
+                                <p className="text-white/80 text-[10px] sm:text-sm font-medium leading-tight">{cat.sub}</p>
                             </div>
 
                             {/* Arrow Decoration */}
-                            <div className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center opacity-0 group-hover:opacity-100 -translate-x-4 group-hover:translate-x-0 transition-all duration-300">
+                            <div className="hidden sm:flex w-10 h-10 rounded-full border border-white/20 items-center justify-center opacity-0 group-hover:opacity-100 -translate-x-4 group-hover:translate-x-0 transition-all duration-300">
                                 <LayoutGrid size={20} className="text-white" />
                             </div>
                         </div>

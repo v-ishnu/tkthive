@@ -71,6 +71,7 @@ export interface TicketTier {
   price: string;
   type: 'individual' | 'group';
   maxMembers?: number; // e.g., 5 for a team
+  minMembers?: number; // e.g., 2 for a team
   description?: string;
   validDate?: string; // Specific date validity
   validTime?: string; // Specific time validity
@@ -165,6 +166,7 @@ export interface EventData {
   isRegistrationOpen?: boolean;
   totalBooked?: number;
   totalTickets?: number;
+  showevent?: boolean; // ✅ Added
 }
 
 export interface LocationData {

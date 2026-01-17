@@ -95,6 +95,7 @@ export const fetchEventById = createAsyncThunk(
                         price: `₹${t.price}`,
                         type: t.type?.toLowerCase() || 'paid',
                         maxMembers: t.maxMembers,
+                        minMembers: t.minMembers,
                         description: t.description || '',
                         requiredFields: t.customFields?.map((f: any) => ({
                             id: f.id,

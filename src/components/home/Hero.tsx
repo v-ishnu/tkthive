@@ -92,7 +92,7 @@ export default function Hero() {
 
                     {/* Buttons */}
                     <div className="flex flex-col sm:flex-row items-center gap-4 mt-6 justify-center lg:justify-start">
-                        <Link href="/events" className="px-6 py-3 md:px-8 md:py-4 bg-amber-400 hover:bg-amber-300 text-black font-bold text-base md:text-lg rounded-full transition-all hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(251,191,36,0.4)] flex items-center gap-2">
+                        <Link href="/events" className="px-6 py-3 md:px-8 md:py-4 bg-primary hover:bg-primary/80 text-black font-bold text-base md:text-lg rounded-full transition-all hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(251,191,36,0.4)] flex items-center gap-2">
                             Browse Tickets
                             <ArrowUpRight size={20} />
                         </Link>

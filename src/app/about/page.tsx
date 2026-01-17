@@ -26,10 +26,10 @@ export default function AboutUsPage() {
             <div className="container mx-auto px-4 mb-24">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     {[
-                        { label: 'Events Hosted', value: '10K+' },
-                        { label: 'Active Users', value: '2M+' },
-                        { label: 'Countries', value: '120+' },
-                        { label: 'Partner Organizers', value: '500+' },
+                        { label: 'Events Hosted', value: '10' },
+                        { label: 'Active Users', value: '100' },
+                        { label: 'Countries', value: '1' },
+                        { label: 'Partner Organizers', value: '10+' },
                     ].map((stat, idx) => (
                         <div key={idx} className="bg-card border border-white/5 p-8 rounded-2xl text-center hover:border-primary/30 transition-colors group">
                             <div className="text-4xl md:text-5xl font-bold text-white mb-2 group-hover:text-primary transition-colors">{stat.value}</div>
@@ -68,7 +68,7 @@ export default function AboutUsPage() {
             </div>
 
             {/* Core Values */}
-            <div className="bg-card border-y border-white/5 py-24">
+            <div className=" border-y border-white/5 py-24">
                 <div className="container mx-auto px-4">
                     <div className="text-center mb-16">
                         <h2 className="text-3xl md:text-4xl font-bold mb-4">Why Choose tkthive?</h2>
@@ -107,26 +107,7 @@ export default function AboutUsPage() {
                 </div>
             </div>
 
-            {/* Team Section */}
-            <div className="container mx-auto px-4 py-24">
-                <h2 className="text-3xl md:text-4xl font-bold mb-16 text-center">Meet the Creators</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
-                    {[
-                        { name: 'Alex Chen', role: 'CEO & Founder', img: 'https://randomuser.me/api/portraits/men/32.jpg' },
-                        { name: 'Sarah Miller', role: 'Head of Product', img: 'https://randomuser.me/api/portraits/women/44.jpg' },
-                        { name: 'James Wilson', role: 'Lead Engineer', img: 'https://randomuser.me/api/portraits/men/86.jpg' },
-                        { name: 'Maya Patel', role: 'Community Manager', img: 'https://randomuser.me/api/portraits/women/65.jpg' },
-                    ].map((member, idx) => (
-                        <div key={idx} className="text-center group">
-                            <div className="w-32 h-32 mx-auto rounded-full overflow-hidden border-2 border-white/10 group-hover:border-primary transition-colors mb-6">
-                                <img src={member.img} alt={member.name} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" />
-                            </div>
-                            <h3 className="text-lg font-bold text-white">{member.name}</h3>
-                            <p className="text-primary text-sm">{member.role}</p>
-                        </div>
-                    ))}
-                </div>
-            </div>
+      
 
             {/* CTA */}
             <div className="container mx-auto px-4 pb-24">

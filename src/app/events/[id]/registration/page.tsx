@@ -163,6 +163,13 @@ export default function RegistrationPage() {
 
     const handleDetailsSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+
+        // Validation: Min Members for Group Tickets
+        if (selectedTier?.type === 'group' && selectedTier.minMembers && attendeeDetails.length < selectedTier.minMembers) {
+            toast.error(`This ticket requires at least ${selectedTier.minMembers} attendees.`);
+            return;
+        }
+
         if (hasAddOns) setStep(3);
         else {
             const price = selectedTier ? getPriceValue(selectedTier.price) : 0;
@@ -403,7 +410,11 @@ export default function RegistrationPage() {
                                             <h3 className="font-bold text-lg group-hover:text-primary transition-colors">{tier.name}</h3>
                                             <p className="text-gray-400 text-sm mb-2">{tier.description}</p>
                                             <div className="flex flex-wrap gap-2">
-                                                <span className="text-xs bg-white/5 px-2 py-1 rounded border border-white/10 uppercase tracking-wide text-gray-400">{tier.type === 'group' ? `Up to ${tier.maxMembers} Members` : 'Individual Entry'}</span>
+                                                <span className="text-xs bg-white/5 px-2 py-1 rounded border border-white/10 uppercase tracking-wide text-gray-400">
+                                                    {tier.type === 'group'
+                                                        ? `${tier.minMembers ? `Min ${tier.minMembers} - ` : ''}Up to ${tier.maxMembers} Members`
+                                                        : 'Individual Entry'}
+                                                </span>
                                             </div>
                                         </div>
                                     </div>

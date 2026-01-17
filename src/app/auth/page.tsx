@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Mail, Lock, User, PartyPopper, Phone, RefreshCw, Eye, EyeOff } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { loginUser, googleLogin, signupUser, verifyEmail, resendOtp, forgotPassword, resetPassword } from '@/store/slices/authslice';
 
@@ -30,6 +30,8 @@ const EVENT_IMAGES_COL_3 = [
 
 export default function AuthPage() {
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const redirectPath = searchParams.get('redirect') || '/';
     const dispatch = useAppDispatch();
     const { isLoading } = useAppSelector((state) => state.auth);
     const { showToast } = useToast();
@@ -48,6 +50,7 @@ export default function AuthPage() {
     const [showPassword, setShowPassword] = useState(false);
     const [showNewPassword, setShowNewPassword] = useState(false);
     const [timer, setTimer] = useState(0);
+    const [isGoogleAuthLoading, setIsGoogleAuthLoading] = useState(false);
 
 
     useEffect(() => {
@@ -73,7 +76,7 @@ export default function AuthPage() {
                         setTimer(30);
                     } else {
                         showToast("Login successful! Welcome back.", "success");
-                        router.push('/');
+                        router.push(redirectPath);
                     }
                 } else {
                     const msg = resultAction.payload as string || "Login failed";
@@ -92,7 +95,7 @@ export default function AuthPage() {
                         setTimer(30); // Start 30s timer
                     } else {
                         showToast("Signup successful!", "success");
-                        router.push('/');
+                        router.push(redirectPath);
                     }
                 } else {
                     const msg = resultAction.payload as string || "Signup failed";
@@ -110,7 +113,7 @@ export default function AuthPage() {
             const resultAction = await dispatch(verifyEmail({ otp, email }));
             if (verifyEmail.fulfilled.match(resultAction)) {
                 showToast("Email verified successfully!", "success");
-                router.push('/');
+                router.push(redirectPath);
             } else {
                 const msg = resultAction.payload as string || "Verification failed";
                 showToast(msg, "error");
@@ -132,7 +135,8 @@ export default function AuthPage() {
     }
 
     const handleGoogleLogin = () => {
-        dispatch(googleLogin());
+        setIsGoogleAuthLoading(true);
+        dispatch(googleLogin(redirectPath));
     };
 
     return (
@@ -516,14 +520,24 @@ export default function AuthPage() {
                     {!showOtpInput && !showForgotPassword && (
                         <button
                             onClick={handleGoogleLogin}
-                            className="w-full bg-white text-black font-bold py-4 rounded-xl hover:bg-gray-200 transition-colors flex items-center justify-center gap-3">
-                            <svg className="w-5 h-5" viewBox="0 0 24 24">
-                                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
-                                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
-                                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
-                                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
-                            </svg>
-                            {mode === 'login' ? 'Login with Google' : 'Sign up with Google'}
+                            disabled={isLoading || isGoogleAuthLoading}
+                            className="w-full bg-white text-black font-bold py-4 rounded-xl hover:bg-gray-200 transition-colors flex items-center justify-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed">
+                            {isGoogleAuthLoading ? (
+                                <>
+                                    <RefreshCw size={20} className="animate-spin" />
+                                    Redirecting...
+                                </>
+                            ) : (
+                                <>
+                                    <svg className="w-5 h-5" viewBox="0 0 24 24">
+                                        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
+                                        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
+                                        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
+                                        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
+                                    </svg>
+                                    {mode === 'login' ? 'Login with Google' : 'Sign up with Google'}
+                                </>
+                            )}
                         </button>
                     )}
 

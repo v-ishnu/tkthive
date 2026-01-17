@@ -20,24 +20,27 @@ export default function ContactSupportPage() {
     const supportCards = [
         {
             icon: <HelpCircle size={32} />,
-            title: "Customer Support",
-            desc: "Need help with your ticket? We are here 24/7.",
-            action: "Chat Now",
-            color: "text-primary"
+            title: "Customer Support (WhatsApp)",
+            desc: "Need help? WhatsApp us at 8340214646.",
+            action: "Chat on WhatsApp",
+            color: "text-primary",
+            href: "https://wa.me/918340214646"
         },
         {
             icon: <Briefcase size={32} />,
             title: "Organizer Support",
             desc: "Hosting an event? Get dedicated assistance.",
             action: "Contact Sales",
-            color: "text-blue-400"
+            color: "text-blue-400",
+            href: "https://wa.me/918409031739"
         },
         {
             icon: <FileText size={32} />,
             title: "Media & Press",
             desc: "For press inquiries and brand assets.",
             action: "Email Us",
-            color: "text-purple-400"
+            color: "text-purple-400",
+            href: "mailto:partners@tkthive.com"
         }
     ];
 
@@ -64,9 +67,14 @@ export default function ContactSupportPage() {
                             </div>
                             <h3 className="text-2xl font-bold mb-2">{card.title}</h3>
                             <p className="text-gray-400 mb-6">{card.desc}</p>
-                            <button className={`font-bold uppercase tracking-wider text-sm flex items-center gap-2 ${card.color} hover:underline`}>
+                            <a
+                                href={card.href}
+                                target={card.href.startsWith('http') ? "_blank" : "_self"}
+                                rel="noopener noreferrer"
+                                className={`font-bold uppercase tracking-wider text-sm flex items-center gap-2 ${card.color} hover:underline w-fit`}
+                            >
                                 {card.action} <MessageSquare size={16} />
-                            </button>
+                            </a>
                         </div>
                     ))}
                 </div>
@@ -74,7 +82,7 @@ export default function ContactSupportPage() {
                 <div className="flex flex-col lg:flex-row gap-12 items-start">
 
                     {/* Contact Form */}
-                    <div className="w-full lg:w-2/3 bg-card border border-white/10 rounded-3xl p-8 md:p-12 relative overflow-hidden">
+                    {/* <div className="w-full lg:w-2/3 bg-card border border-white/10 rounded-3xl p-8 md:p-12 relative overflow-hidden">
                         <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 blur-[50px] rounded-full pointer-events-none" />
 
                         <h2 className="text-3xl font-bold mb-8 flex items-center gap-3">
@@ -109,7 +117,7 @@ export default function ContactSupportPage() {
                                             type="email"
                                             required
                                             className="w-full bg-black/40 border border-white/10 rounded-xl p-4 focus:border-primary/50 outline-none text-white transition-colors"
-                                            placeholder="john@example.com"
+                                            placeholder="your email address"
                                             value={formState.email}
                                             onChange={e => setFormState({ ...formState, email: e.target.value })}
                                         />
@@ -151,13 +159,13 @@ export default function ContactSupportPage() {
                                 </button>
                             </form>
                         )}
-                    </div>
+                    </div> */}
 
                     {/* Info Sidebar */}
-                    <div className="w-full lg:w-1/3 space-y-6">
+                    <div className="w-full space-y-6">
                         <div className="bg-card border border-white/10 p-8 rounded-3xl">
                             <h3 className="text-xl font-bold mb-6">Contact Info</h3>
-                            <div className="space-y-6">
+                            <div className="grid md:grid-cols-3 gap-8">
                                 <div className="flex items-start gap-4">
                                     <div className="p-3 bg-white/5 rounded-full text-primary">
                                         <MapPin size={24} />
@@ -165,8 +173,7 @@ export default function ContactSupportPage() {
                                     <div>
                                         <h4 className="font-bold text-white">Headquarters</h4>
                                         <p className="text-gray-400 text-sm mt-1">
-                                            123 Hive Tower, Tech Park,<br />
-                                            Mumbai, Maharashtra 400001
+                                           Phagwara, <br/>Punjab 144001
                                         </p>
                                     </div>
                                 </div>
@@ -177,7 +184,8 @@ export default function ContactSupportPage() {
                                     <div>
                                         <h4 className="font-bold text-white">Phone</h4>
                                         <p className="text-gray-400 text-sm mt-1">
-                                            +91 1800 123 4567<br />
+                                            +91 8340214646 (WhatsApp)<br />
+                                            +91 8409031739<br />
                                             <span className="text-xs text-gray-500">Mon-Fri, 9am - 6pm</span>
                                         </p>
                                     </div>
@@ -197,11 +205,11 @@ export default function ContactSupportPage() {
                             </div>
                         </div>
 
-                        <div className="bg-gradient-to-br from-primary/20 to-transparent border border-primary/20 p-8 rounded-3xl">
+                        {/* <div className="bg-gradient-to-br from-primary/20 to-transparent border border-primary/20 p-8 rounded-3xl">
                             <h3 className="text-xl font-bold mb-2">FAQ</h3>
                             <p className="text-gray-400 text-sm mb-4">Find answers quickly in our help center.</p>
                             <button className="text-primary font-bold hover:underline">Visit Help Center &rarr;</button>
-                        </div>
+                        </div> */}
                     </div>
                 </div>
             </div>

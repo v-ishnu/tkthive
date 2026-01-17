@@ -65,6 +65,15 @@ export default function Home() {
         />
       </section>
 
+          <div className="container mx-auto px-4 mt-20 mb-12">
+                      <AdSection
+                          title="Sponsorship Opportunities"
+                          description="Want to see your brand here? Partner with the biggest events in the region."
+                          cta="Contact Sales"
+                          align="left"
+                      />
+                  </div>
+
       {/* <CreativePromoSection /> */}
 
       {/* <section className="bg-secondary">

@@ -11,6 +11,7 @@ import { EventTabs } from '@/components/events/EventTabs';
 import EventSchedule from '@/components/events/EventSchedule';
 import EventDocs from '@/components/events/EventDocs';
 import EventSubmissions from '@/components/events/EventSubmissions';
+import { OrganizerProfile, OrganizerContact } from '@/components/events/OrganizerCard';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { fetchEventById, clearEvent } from '@/store/slices/eventSlice';
 import { RootState } from '@/store/store';
@@ -82,8 +83,7 @@ export default function EventDetails() {
     const onBook = (event: EventData) => {
         if (!user) {
             showToast("Please login to book tickets.", "error");
-            // Alternatively, you could redirect to login:
-            // router.push('/auth?redirect=/events/' + event.id);
+            router.push(`/auth?redirect=/events/${eventSlug}`);
             return;
         }
         // Handle booking logic
@@ -183,17 +183,17 @@ export default function EventDetails() {
             <div className="container mx-auto px-4 mt-8 flex flex-col lg:flex-row gap-12 relative z-10">
 
                 {/* Main Content */}
-                <div className="lg:w-2/3 order-2 lg:order-1">
+                <div className="lg:w-2/3 order-1">
                     {/* New Event Tabs Component */}
                     <EventTabs event={event} />
                 </div>
 
                 {/* Sidebar Booking Card */}
-                <div className="lg:w-1/3 relative z-20 order-1 lg:order-2">
+                <div className="lg:w-1/3 relative z-20 order-2">
                     <div className="lg:sticky top-24 space-y-6">
 
                         {/* Booking Info Card */}
-                        <div className="bg-card/80 backdrop-blur-xl border border-white/10 rounded-3xl p-6 shadow-2xl">
+                        <div className="hidden lg:block bg-card/80 backdrop-blur-xl border border-white/10 rounded-3xl p-6 shadow-2xl order-1 lg:order-none mb-6 lg:mb-0">
                             <div className="flex justify-between items-center mb-6 pb-6 border-b border-white/10">
                                 <div>
                                     <p className="text-gray-400 text-sm">Starting from</p>
@@ -239,65 +239,17 @@ export default function EventDetails() {
                             </p>
                         </div>
 
-                        {/* Organizer Info Card */}
-                        {/* Organizer Info Card */}
-                        <div className="bg-card/50 backdrop-blur-sm border border-white/10 rounded-3xl p-8 flex flex-col md:flex-row gap-6 items-start hover:bg-card/80 transition-colors">
-                            <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-primary/20 shrink-0">
-                                <img
-                                    src={event.organizer.imageUrl || `https://ui-avatars.com/api/?name=${event.organizer.name}&background=random`}
-                                    alt={event.organizer.name}
-                                    className="w-full h-full object-cover"
-                                />
-                            </div>
-                            <div className="flex-1">
-                                <p className="text-xs text-gray-500 uppercase tracking-widest font-bold mb-1">Organized by</p>
-                                <h4 className="font-bold text-white text-2xl mb-3">{event.organizer.name}</h4>
-
-                                {event.organizer.description && (
-                                    <p className="text-sm text-gray-400 mb-4 leading-relaxed max-w-2xl">{event.organizer.description}</p>
-                                )}
-
-                                <div className="space-y-1.5">
-                                    {event.organizer?.contactEmail && (
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-primary font-medium text-sm w-16">Email:</span>
-                                            <a href={`mailto:${event.organizer.contactEmail}`} className="text-gray-300 hover:text-white transition-colors text-sm">
-                                                {event.organizer.contactEmail}
-                                            </a>
-                                        </div>
-                                    )}
-                                    {event.organizer.contactPhone && (
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-primary font-medium text-sm w-16">Phone:</span>
-                                            <a href={`tel:${event.organizer.contactPhone}`} className="text-gray-300 hover:text-white transition-colors text-sm">
-                                                {event.organizer.contactPhone}
-                                            </a>
-                                        </div>
-                                    )}
-                                    {event.organizer.website && (
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-primary font-medium text-sm w-16">Website:</span>
-                                            <a href={event.organizer.website} target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white transition-colors text-sm">
-                                                Visit Site
-                                            </a>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
+                        {/* Organizer Info Cards */}
+                        <div className="order-3 lg:order-none w-full space-y-6 md:mt-6">
+                            <OrganizerProfile organizer={event.organizer} />
+                            <OrganizerContact organizer={event.organizer} />
                         </div>
                     </div>
                 </div>
             </div>
 
             {/* Footer Ad Section */}
-            <div className="container mx-auto px-4 mt-20 mb-12">
-                <AdSection
-                    title="Sponsorship Opportunities"
-                    description="Want to see your brand here? Partner with the biggest events in the region."
-                    cta="Contact Sales"
-                    align="left"
-                />
-            </div>
+        
 
             <ShareModal
                 isOpen={isShareModalOpen}
@@ -305,6 +257,29 @@ export default function EventDetails() {
                 url={typeof window !== 'undefined' ? window.location.href : ''}
                 title={event.title}
             />
+
+            {/* Mobile Fixed Bottom Booking Bar */}
+            <div className="fixed bottom-0 left-0 right-0 bg-black/90 backdrop-blur-xl border-t border-white/10 p-4 z-50 lg:hidden flex items-center justify-between gap-4 pb-8">
+                <div>
+                    <p className="text-gray-400 text-[10px] font-bold uppercase tracking-wider mb-0.5">Starting from</p>
+                    <div className="text-xl font-bold text-primary">{event.price}</div>
+                </div>
+                <div className="flex items-center gap-3">
+                    <button
+                        onClick={() => setIsShareModalOpen(true)}
+                        className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center text-white hover:bg-white/20 transition-colors"
+                    >
+                        <Share2 size={20} />
+                    </button>
+                    <button
+                        onClick={() => !isEventCompleted && onBook(event)}
+                        disabled={isEventCompleted}
+                        className={`px-8 h-12 font-bold rounded-xl transition-all shadow-lg active:scale-95 flex items-center justify-center ${isEventCompleted ? 'bg-gray-600 cursor-not-allowed opacity-70' : 'bg-primary text-black'}`}
+                    >
+                        {isEventCompleted ? 'Closed' : 'Book Now'}
+                    </button>
+                </div>
+            </div>
         </div >
     );
 };

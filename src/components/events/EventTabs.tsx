@@ -18,6 +18,11 @@ export const EventTabs: React.FC<EventTabsProps> = ({ event }) => {
     // Filter dynamic tabs
     const dynamicTabs = (event.tabs || []).filter(t => t.isActive).sort((a, b) => a.order - b.order);
 
+    // Helper to generate unique ID for tabs since 'key' might be duplicated (e.g. CUSTOM)
+    const getTabUniqueId = (tab: EventTab, index: number) => {
+        return `${tab.key}-${index}`;
+    };
+
     const [activeTabKey, setActiveTabKey] = useState<string>('overview');
 
     const renderTabContent = () => {
@@ -29,9 +34,10 @@ export const EventTabs: React.FC<EventTabsProps> = ({ event }) => {
 
                         <section>
                             <h2 className="text-2xl font-bold text-white mb-4">About This Event</h2>
-                            <p className="text-gray-300 text-lg leading-relaxed whitespace-pre-line">
-                                {event.description}
-                            </p>
+                            <div
+                                className="text-gray-300 text-lg leading-relaxed whitespace-pre-line"
+                                dangerouslySetInnerHTML={{ __html: event.description }}
+                            />
 
 
 
@@ -142,31 +148,119 @@ export const EventTabs: React.FC<EventTabsProps> = ({ event }) => {
 
             // Dynamic Tabs Handling
             default:
-                const currentTab = dynamicTabs.find(t => t.key === activeTabKey);
+                const currentTab = dynamicTabs.find((t, idx) => getTabUniqueId(t, idx) === activeTabKey);
                 if (!currentTab) return null;
 
-                // Render based on key or schema type
-                if (currentTab.key === 'SCHEDULE' || currentTab.schema?.type === 'timeline') {
-                    // Normalize data structure if needed
-                    const subEvents = Array.isArray(currentTab.data) ? currentTab.data : [];
-                    return <EventSchedule subEvents={subEvents} />;
+                const { schema, data } = currentTab;
+                const items = data?.items || (Array.isArray(data) ? data : []);
+
+                // 1. Timeline (Event Structure)
+                if (currentTab.key === 'SCHEDULE' || schema?.type === 'timeline') {
+                    return (
+                        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                            <div className="relative border-l-2 border-primary/30 ml-3 md:ml-6 space-y-12 py-4">
+                                {items.map((item: any, idx: number) => (
+                                    <div key={idx} className="relative pl-8 md:pl-12">
+                                        {/* Dot */}
+                                        <div className="absolute -left-[9px] top-0 w-5 h-5 rounded-full bg-primary border-4 border-dark shadow-[0_0_10px_rgba(251,191,36,0.6)]"></div>
+
+                                        <h3 className="text-xl font-bold text-white mb-4">{item.title}</h3>
+
+                                        {item.details && Array.isArray(item.details) && (
+                                            <ul className="space-y-2">
+                                                {item.details.map((detail: string, dIdx: number) => (
+                                                    <li key={dIdx} className="text-gray-300 flex items-start gap-2 text-base">
+                                                        <span className="w-1.5 h-1.5 rounded-full bg-white/40 mt-2 shrink-0"></span>
+                                                        <span>{detail}</span>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    );
                 }
 
-                if (currentTab.key === 'DOCUMENTS' || currentTab.schema?.type === 'document_list') {
-                    const docs = Array.isArray(currentTab.data) ? currentTab.data : [];
-                    return <EventDocs docs={docs} />;
+                // 2. Info List (Participation Details)
+                if (schema?.type === 'info_list') {
+                    return (
+                        <div className="bg-white/5 border border-white/10 rounded-2xl p-6 md:p-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                            <ul className="space-y-4">
+                                {items.map((item: string, idx: number) => (
+                                    <li key={idx} className="flex items-start gap-3">
+                                        <Info className="text-primary shrink-0 mt-1" size={20} />
+                                        <span className="text-lg text-gray-200">{item}</span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    );
                 }
 
-                if (currentTab.key === 'SUBMISSIONS' || currentTab.schema?.type === 'submission_list') {
-                    // Submissions might need backend fetching, but using passed data for now if available
+                // 3. Card List (Thematic Tracks)
+                if (schema?.type === 'card_list') {
+                    return (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                            {items.map((item: any, idx: number) => (
+                                <div key={idx} className="bg-card border border-white/10 p-6 rounded-xl hover:border-primary/50 transition-colors group">
+                                    <h4 className="text-xl font-bold text-white mb-3 group-hover:text-primary transition-colors">{item.title}</h4>
+                                    <p className="text-gray-400 leading-relaxed">{item.description}</p>
+                                </div>
+                            ))}
+                        </div>
+                    );
+                }
+
+                // 4. Bullet List (Eligibility, Certifications, Governance, Objectives)
+                if (schema?.type === 'bullet_list') {
+                    return (
+                        <div className="bg-white/5 border border-white/10 rounded-2xl p-6 md:p-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                            <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                                {items.map((item: string, idx: number) => (
+                                    <li key={idx} className="flex items-start gap-3 text-gray-300">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2.5 shrink-0"></div>
+                                        <span className="text-lg">{item}</span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    );
+                }
+
+                // 5. Prize List (Prizes & Recognition)
+                if (currentTab.key === 'PRIZES' || schema?.type === 'prize_list') {
+                    return (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                            {items.map((prize: any, idx: number) => (
+                                <div key={idx} className="bg-linear-to-br from-card to-white/5 border border-white/10 p-6 rounded-2xl flex items-center gap-6">
+                                    <div className={`w-16 h-16 rounded-full flex items-center justify-center shrink-0 ${idx === 0 ? 'bg-yellow-500 text-black' : idx === 1 ? 'bg-gray-300 text-black' : 'bg-orange-600 text-white'}`}>
+                                        <Trophy size={32} />
+                                    </div>
+                                    <div>
+                                        <div className="text-primary font-bold tracking-widest uppercase text-xs mb-1">{prize.title}</div>
+                                        <div className="text-2xl md:text-3xl font-bold text-white leading-tight">{prize.reward}</div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    );
+                }
+
+                // Legacy / Specific Renderers (Documents, Submissons, Sponsors)
+                if (currentTab.key === 'DOCUMENTS' || schema?.type === 'document_list') {
+                    return <EventDocs docs={items} />;
+                }
+
+                if (currentTab.key === 'SUBMISSIONS' || schema?.type === 'submission_list') {
                     return <EventSubmissions initialSubmissions={event.submissions || []} />;
                 }
 
-                if (currentTab.key === 'SPONSORS' || currentTab.schema?.type === 'sponsor_grid') {
-                    const sponsors = Array.isArray(currentTab.data) ? currentTab.data : [];
+                if (currentTab.key === 'SPONSORS' || schema?.type === 'sponsor_grid') {
                     return (
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                            {sponsors.map((sponsor: any, idx: number) => (
+                            {items.map((sponsor: any, idx: number) => (
                                 <div key={idx} className="bg-white p-6 rounded-2xl flex flex-col items-center justify-center gap-4 hover:scale-105 transition-transform">
                                     {sponsor.tkthiveUrl ? <img src={sponsor.tkthiveUrl} alt={sponsor.name} className="h-16 object-contain" /> : <div className="text-black font-bold text-xl">{sponsor.name}</div>}
                                     <div className="px-2 py-1 bg-gray-100 text-gray-600 text-[10px] font-bold uppercase rounded">{sponsor.tier || 'Partner'}</div>
@@ -176,31 +270,10 @@ export const EventTabs: React.FC<EventTabsProps> = ({ event }) => {
                     );
                 }
 
-                if (currentTab.key === 'CUSTOM' || currentTab.key === 'PRIZES' || currentTab.schema?.type === 'prize_list') {
-                    const prizes = Array.isArray(currentTab.data) ? currentTab.data : [];
-                    return (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                            {prizes.map((prize: any, idx: number) => (
-                                <div key={idx} className="bg-linear-to-br from-card to-white/5 border border-white/10 p-6 rounded-2xl flex items-center gap-6">
-                                    <div className={`w-16 h-16 rounded-full flex items-center justify-center shrink-0 ${idx === 0 ? 'bg-yellow-500 text-black' : idx === 1 ? 'bg-gray-400 text-black' : 'bg-orange-700 text-white'}`}>
-                                        <Trophy size={32} />
-                                    </div>
-                                    <div>
-                                        <div className="text-primary font-bold tracking-widest uppercase text-sm mb-1">{prize.title || prize.place}</div>
-                                        <div className="text-3xl font-bold text-white mb-1">{prize.reward || prize.amount}</div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    )
-                }
-
-                // Fallback for unknown text content
+                // Fallback
                 return (
-                    <div className="text-gray-300">
-                        <pre className="whitespace-pre-wrap font-sans">
-                            {JSON.stringify(currentTab.data, null, 2)}
-                        </pre>
+                    <div className="text-gray-300 bg-white/5 p-4 rounded-xl font-mono text-sm overflow-auto">
+                        <pre>{JSON.stringify(data, null, 2)}</pre>
                     </div>
                 );
         }
@@ -209,7 +282,7 @@ export const EventTabs: React.FC<EventTabsProps> = ({ event }) => {
     return (
         <div>
             {/* Tabs Navigation */}
-            <div className="sticky top-20 z-30 bg-dark/95 backdrop-blur-xl mb-8 border-b border-white/10 -mx-4 px-4 md:mx-0 md:px-0">
+            <div className="sticky top-20 z-30 bg-dark/95 backdrop-blur-xl mb-8 -mx-4 px-4 md:mx-0 md:px-0 py-4">
                 <div className="relative flex items-center">
                     {/* Left Scroll Button */}
                     <button
@@ -217,49 +290,50 @@ export const EventTabs: React.FC<EventTabsProps> = ({ event }) => {
                             const container = document.getElementById('tabs-container');
                             if (container) container.scrollBy({ left: -200, behavior: 'smooth' });
                         }}
-                        className="absolute left-0 z-10 p-2 bg-dark/80 backdrop-blur-sm border-r border-white/10 text-white hover:text-primary hidden md:block" // Hidden on mobile, shown on desktop if needed
+                        className="absolute left-0 z-10 p-3 bg-dark/80 backdrop-blur-xl border border-white/10 text-white hover:text-primary rounded-full shadow-lg hidden md:block -ml-2"
                     >
                         <ChevronLeft size={20} />
                     </button>
 
                     <div
                         id="tabs-container"
-                        className="flex gap-4 overflow-x-auto py-3 scrollbar-hide px-8 md:px-8 w-full"
+                        className="flex gap-3 overflow-x-auto py-2 scrollbar-hide px-2 md:px-12 w-full snap-x"
                     >
                         <button
                             onClick={() => setActiveTabKey('overview')}
-                            className={`px-4 py-2 text-sm font-bold uppercase tracking-wide transition-colors whitespace-nowrap border-b-2 flex items-center gap-2 ${activeTabKey === 'overview' ? 'border-primary text-primary' : 'border-transparent text-gray-400 hover:text-white'}`}
+                            className={`px-6 py-2.5 rounded-full text-sm font-bold uppercase tracking-wide transition-all duration-300 border whitespace-nowrap ${activeTabKey === 'overview'
+                                ? 'bg-primary text-black border-primary shadow-lg shadow-primary/25 scale-105'
+                                : 'bg-white/5 border-white/10 text-gray-400 hover:text-white hover:bg-white/10 hover:border-white/20'
+                                }`}
                         >
-                            <Info size={14} /> Overview
+                            Overview
                         </button>
 
-                        {/* Location / Online Tab - Always 2nd */}
                         <button
                             onClick={() => setActiveTabKey('location')}
-                            className={`px-4 py-2 text-sm font-bold uppercase tracking-wide transition-colors whitespace-nowrap border-b-2 flex items-center gap-2 ${activeTabKey === 'location' ? 'border-primary text-primary' : 'border-transparent text-gray-400 hover:text-white'}`}
+                            className={`px-6 py-2.5 rounded-full text-sm font-bold uppercase tracking-wide transition-all duration-300 border whitespace-nowrap ${activeTabKey === 'location'
+                                ? 'bg-primary text-black border-primary shadow-lg shadow-primary/25 scale-105'
+                                : 'bg-white/5 border-white/10 text-gray-400 hover:text-white hover:bg-white/10 hover:border-white/20'
+                                }`}
                         >
-                            {event.isOnline ? <Globe size={14} /> : <Map size={14} />}
                             {event.isOnline ? 'Online Event' : 'Location'}
                         </button>
 
-                        {dynamicTabs.map(tab => {
+                        {dynamicTabs.map((tab, idx) => {
                             if (tab.key === 'ABOUT') return null;
 
-                            let Icon = FileText;
-                            if (tab.key === 'SCHEDULE') Icon = LayoutList;
-                            if (tab.key === 'SUBMISSIONS') Icon = Send;
-                            if (tab.key === 'LOCATION') Icon = Map;
-                            if (tab.key === 'LIVE') Icon = Play;
-                            if (tab.key === 'PRIZES' || tab.key === 'CUSTOM') Icon = Trophy;
-                            if (tab.key === 'GUESTS') Icon = Mic2;
+                            const uniqueId = getTabUniqueId(tab, idx);
 
                             return (
                                 <button
-                                    key={tab.key}
-                                    onClick={() => setActiveTabKey(tab.key)}
-                                    className={`px-4 py-2 text-sm font-bold uppercase tracking-wide transition-colors whitespace-nowrap border-b-2 flex items-center gap-2 ${activeTabKey === tab.key ? 'border-primary text-primary' : 'border-transparent text-gray-400 hover:text-white'}`}
+                                    key={uniqueId}
+                                    onClick={() => setActiveTabKey(uniqueId)}
+                                    className={`px-6 py-2.5 rounded-full text-sm font-bold uppercase tracking-wide transition-all duration-300 border whitespace-nowrap ${activeTabKey === uniqueId
+                                        ? 'bg-primary text-black border-primary shadow-lg shadow-primary/25 scale-105'
+                                        : 'bg-white/5 border-white/10 text-gray-400 hover:text-white hover:bg-white/10 hover:border-white/20'
+                                        }`}
                                 >
-                                    <Icon size={14} /> {tab.title}
+                                    {tab.title}
                                 </button>
                             );
                         })}
@@ -271,7 +345,7 @@ export const EventTabs: React.FC<EventTabsProps> = ({ event }) => {
                             const container = document.getElementById('tabs-container');
                             if (container) container.scrollBy({ left: 200, behavior: 'smooth' });
                         }}
-                        className="absolute right-0 z-10 p-2 bg-dark/80 backdrop-blur-sm border-l border-white/10 text-white hover:text-primary hidden md:block"
+                        className="absolute right-0 z-10 p-3 bg-dark/80 backdrop-blur-xl border border-white/10 text-white hover:text-primary rounded-full shadow-lg hidden md:block -mr-2"
                     >
                         <ChevronRight size={20} />
                     </button>

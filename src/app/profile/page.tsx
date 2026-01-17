@@ -91,7 +91,7 @@ export default function ProfilePage() {
                                 </h1>
                                 <div className="flex items-center gap-4 text-gray-400 text-sm md:text-base">
                                     <span className="flex items-center gap-1.5">
-                                        <MapPin size={16} className="text-primary" /> {user?.location || 'Mumbai, India'}
+                                        <MapPin size={16} className="text-primary" /> {user?.location || ' India'}
                                     </span>
                                     <span className="w-1 h-1 bg-gray-600 rounded-full" />
                                     <span>Event Enthusiast</span>
@@ -113,12 +113,12 @@ export default function ProfilePage() {
                     {/* Stats Block (Desktop) */}
                     <div className="hidden lg:flex gap-8 items-center bg-card/50 backdrop-blur-md p-6 rounded-3xl border border-white/10">
                         <div className="text-center">
-                            <div className="text-2xl font-black text-white">{user?.stats?.followers || '2,985'}</div>
+                            <div className="text-2xl font-black text-white">{user?.stats?.followers || '0'}</div>
                             <div className="text-xs text-gray-400 font-bold uppercase tracking-wider">Followers</div>
                         </div>
                         <div className="w-px h-8 bg-white/10" />
                         <div className="text-center">
-                            <div className="text-2xl font-black text-white">{user?.stats?.following || '132'}</div>
+                            <div className="text-2xl font-black text-white">{user?.stats?.following || '0'}</div>
                             <div className="text-xs text-gray-400 font-bold uppercase tracking-wider">Following</div>
                         </div>
                         <div className="w-px h-8 bg-white/10" />
@@ -200,23 +200,32 @@ export default function ProfilePage() {
                 )}
 
                 {activeTab === 'saved' && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                        {/* Mock Saved Cards */}
-                        {[1, 2, 3].map((i) => (
-                            <div key={i} className="bg-card rounded-3xl overflow-hidden border border-white/5 hover:border-white/20 transition-all group cursor-pointer">
-                                <div className="h-48 bg-gray-800 relative">
-                                    <img src={`https://picsum.photos/seed/${i + 100}/400/300`} className="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity" alt="" />
-                                    <div className="absolute top-4 right-4 bg-primary text-black p-2 rounded-full">
-                                        <Heart size={16} fill="currentColor" />
-                                    </div>
-                                </div>
-                                <div className="p-6">
-                                    <div className="text-xs font-bold text-primary uppercase tracking-wider mb-2">Concert</div>
-                                    <h3 className="text-xl font-bold text-white mb-1">Neon Lights Festival</h3>
-                                    <p className="text-gray-400 text-sm">Mumbai • Dec 2025</p>
-                                </div>
-                            </div>
-                        ))}
+                    <div className="flex flex-col items-center justify-center py-20 bg-card rounded-3xl border border-dashed border-white/10 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mb-6">
+                            <Heart className="text-gray-500" size={32} />
+                        </div>
+                        <h3 className="text-2xl font-bold text-white mb-2">Saved Events</h3>
+                        <p className="text-gray-500 max-w-sm text-center">
+                            This feature is currently under development. Soon you'll be able to save your favorite events here.
+                        </p>
+                        <div className="mt-6 px-4 py-2 bg-primary/10 text-primary text-sm font-bold rounded-lg uppercase tracking-wider">
+                            Coming Soon
+                        </div>
+                    </div>
+                )}
+
+                {activeTab === 'reviews' && (
+                    <div className="flex flex-col items-center justify-center py-20 bg-card rounded-3xl border border-dashed border-white/10 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mb-6">
+                            <MessageCircle className="text-gray-500" size={32} />
+                        </div>
+                        <h3 className="text-2xl font-bold text-white mb-2">Your Reviews</h3>
+                        <p className="text-gray-500 max-w-sm text-center">
+                            We are building a space for you to share your experiences. This feature will be available shortly.
+                        </p>
+                        <div className="mt-6 px-4 py-2 bg-primary/10 text-primary text-sm font-bold rounded-lg uppercase tracking-wider">
+                            Coming Soon
+                        </div>
                     </div>
                 )}
 

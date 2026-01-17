@@ -133,13 +133,14 @@ export const resetPassword = createAsyncThunk<
 
 export const googleLogin = createAsyncThunk<
     void,
-    void,
+    string | undefined,
     { rejectValue: string }
 >(
     "auth/googleLogin",
-    async (_, { rejectWithValue }) => {
+    async (redirectPath, { rejectWithValue }) => {
         // For Passport Google OAuth, we redirect the browser to the backend route
-        window.location.href = API_BASE_URL + "v1/auth/google";
+        const query = redirectPath ? `?redirect=${encodeURIComponent(redirectPath)}` : "";
+        window.location.href = API_BASE_URL + "v1/auth/google" + query;
         // Returns nothing as page will redirect
     }
 )
