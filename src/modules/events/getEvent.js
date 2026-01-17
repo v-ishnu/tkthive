@@ -79,7 +79,7 @@ export const getEventById = async (req, res) => {
                     tabs: true,
                     addons: true,
                     customFields: { orderBy: { order: 'asc' } },
-                    organizer: { select: { id: true, name: true, type: true, contactEmail: true, contactPhone: true, website: true } },
+                    organizer: { select: { id: true, name: true, type: true, contactEmail: true, contactPhone: true, website: true, logoUrl: true } },
                 },
             });
         }

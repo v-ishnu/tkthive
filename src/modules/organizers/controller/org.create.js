@@ -7,7 +7,7 @@ export const createOrganizerController = async (req, res) => {
       message: "AUTHENTICATION_REQUIRED"
     });
   }
-  const { name, type, about, website, tkthiveUrl, contactEmail, contactPhone } = req.body;
+  const { name, type, about, website, logoUrl, contactEmail, contactPhone } = req.body;
 
   if (!name || !type) {
     return res.status(400).json({
@@ -35,7 +35,7 @@ export const createOrganizerController = async (req, res) => {
         type,
         about,
         website,
-        tkthiveUrl,
+        logoUrl,
         contactEmail,
         contactPhone,
         adminId: targetUserId, // Set Owner as the main Admin of the Org

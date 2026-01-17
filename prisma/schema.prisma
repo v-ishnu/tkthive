@@ -182,7 +182,7 @@ model Organizer {
 
   // Business profile
   about        String?
-  tkthiveUrl      String?
+  logoUrl      String?
   website      String?
   contactEmail String?
   contactPhone String?
