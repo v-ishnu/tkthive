@@ -85,6 +85,7 @@ export const EventTabs: React.FC<EventTabsProps> = ({ event }) => {
 
             case 'location':
                 if (event.isOnline) {
+           
                     return (
                         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
                             <div className="bg-gradient-to-br from-indigo-900/50 to-purple-900/50 border border-white/10 rounded-2xl p-8 text-center">

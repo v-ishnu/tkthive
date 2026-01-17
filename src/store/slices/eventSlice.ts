@@ -122,8 +122,9 @@ export const fetchEventById = createAsyncThunk(
                         imageUrl: addon.imageUrl,
                         type: 'access'
                     })) || [],
-                    isLive: false,
-                    featured: false,
+                    isLive: fetchedEvent.isLive,
+                    isOnline: fetchedEvent.isOnline,
+                    featured: fetchedEvent.featured,
                     customFields: fetchedEvent.customFields?.map((f: any) => ({
                         id: f.id,
                         label: f.label,
