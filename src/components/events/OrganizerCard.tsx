@@ -4,7 +4,7 @@ import { ExternalLink, Mail, Phone, Globe } from 'lucide-react';
 interface OrganizerProps {
     organizer: {
         name: string;
-        imageUrl?: string;
+        logoUrl?: string;
         description?: string;
         contactEmail?: string;
         contactPhone?: string;
@@ -18,7 +18,7 @@ export const OrganizerProfile: React.FC<OrganizerProps> = ({ organizer }) => {
             {/* Avatar */}
             <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-primary/20 shrink-0">
                 <img
-                    src={organizer.imageUrl || `https://ui-avatars.com/api/?name=${organizer.name}&background=random`}
+                    src={organizer.logoUrl || `https://ui-avatars.com/api/?name=${organizer.name}&background=random`}
                     alt={organizer.name}
                     className="w-full h-full object-cover"
                 />

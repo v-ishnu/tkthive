@@ -82,7 +82,7 @@ export const fetchEventById = createAsyncThunk(
                     accessType: fetchedEvent.evType === 'PUBLIC' ? 'public' : 'private',
                     organizer: {
                         name: fetchedEvent.organizer?.name || 'Organizer',
-                        imageUrl: fetchedEvent.organizer?.imageUrl,
+                        logoUrl: fetchedEvent.organizer?.logoUrl,
                         description: fetchedEvent.organizer?.description,
                         contactEmail: fetchedEvent.organizer?.contactEmail,
                         contactPhone: fetchedEvent.organizer?.contactPhone,
