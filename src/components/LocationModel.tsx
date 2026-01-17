@@ -3,6 +3,7 @@ import { X, Search, Crosshair, MapPin, Globe } from 'lucide-react';
 import { LocationData } from '../types';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { fetchLocations } from '@/store/slices/eventSlice';
+import { Skeleton } from './ui/Skeleton';
 
 interface LocationModalProps {
   isOpen: boolean;
@@ -13,7 +14,7 @@ interface LocationModalProps {
 
 export const LocationModal: React.FC<LocationModalProps> = ({ isOpen, onClose, onSelect, canClose = true }) => {
   const dispatch = useAppDispatch();
-  const { locations: availableLocations } = useAppSelector((state) => state.event);
+  const { locations: availableLocations, locationsLoading } = useAppSelector((state) => state.event);
 
   useEffect(() => {
     if (isOpen) {
@@ -70,7 +71,14 @@ export const LocationModal: React.FC<LocationModalProps> = ({ isOpen, onClose, o
 
           {/* City Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-y-4 gap-x-8">
-            {sortedLocations.length > 0 ? (
+            {locationsLoading ? (
+              // Skeleton Loading State
+              Array.from({ length: 12 }).map((_, index) => (
+                <div key={index} className="flex items-center gap-2 py-1">
+                  <Skeleton className="h-4 w-24 rounded bg-white/5" />
+                </div>
+              ))
+            ) : sortedLocations.length > 0 ? (
               sortedLocations.map((loc) => (
                 <button
                   key={loc.city}

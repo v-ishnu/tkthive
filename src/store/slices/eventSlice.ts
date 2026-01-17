@@ -19,6 +19,7 @@ interface EventState {
     event: EventData | null;
     events: EventData[];
     locations: string[]; // Added locations state
+    locationsLoading: boolean; // Added locations loading state
     loading: boolean;
     error: string | null;
     bookingStatus: 'idle' | 'loading' | 'success' | 'failed';
@@ -31,6 +32,7 @@ const initialState: EventState = {
     event: null,
     events: [],
     locations: [], // Initial locations
+    locationsLoading: false,
     loading: false,
     error: null,
     bookingStatus: 'idle',
@@ -315,8 +317,15 @@ const eventSlice = createSlice({
             .addCase(fetchAllEvents.rejected, (state, action) => { state.loading = false; state.error = action.payload as string; })
 
             // Fetch Locations
+            .addCase(fetchLocations.pending, (state) => {
+                state.locationsLoading = true;
+            })
             .addCase(fetchLocations.fulfilled, (state, action) => {
+                state.locationsLoading = false;
                 state.locations = action.payload;
+            })
+            .addCase(fetchLocations.rejected, (state) => {
+                state.locationsLoading = false;
             })
 
             // Initiate Booking
