@@ -28,7 +28,7 @@ const EVENT_IMAGES_COL_3 = [
     "https://images.unsplash.com/photo-1506157786151-b8491531f063?q=80&w=400&auto=format&fit=crop", // Festival
 ];
 
-export default function AuthPage() {
+function AuthContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const redirectPath = searchParams.get('redirect') || '/';
@@ -558,3 +558,11 @@ export default function AuthPage() {
         </div>
     );
 };
+
+export default function AuthPage() {
+    return (
+        <React.Suspense fallback={<div className="min-h-screen bg-dark w-full flex items-center justify-center text-white">Loading...</div>}>
+            <AuthContent />
+        </React.Suspense>
+    );
+}
