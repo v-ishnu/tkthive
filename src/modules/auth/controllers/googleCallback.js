@@ -25,8 +25,16 @@ const googleCallbackController = async (req, res) => {
         res.cookie("rToken", refreshToken, refreshTokenCookieOptions);
 
         // Redirect to frontend dashboard or home
+        // Redirect to frontend dashboard or home
         const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
-        return res.redirect(`${frontendUrl}`); // Adjust the redirect path as needed
+
+        // Check for redirect state
+        const redirectPath = req.query.state || "/";
+
+        // Ensure redirectPath starts with / to prevent external redirects
+        const finalRedirect = redirectPath.startsWith("/") ? `${frontendUrl}${redirectPath}` : `${frontendUrl}`;
+
+        return res.redirect(finalRedirect);
 
     } catch (error) {
         console.error("Google callback error:", error);

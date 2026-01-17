@@ -19,7 +19,15 @@ authRouter.post("/signup", signUpController);
 
 authRouter.post("/signin", signInController);
 
-authRouter.get("/google", passport.authenticate("google", { scope: ["profile", "email"], session: false }));
+authRouter.get("/google", (req, res, next) => {
+    const state = req.query.redirect;
+    const authenticator = passport.authenticate("google", {
+        scope: ["profile", "email"],
+        session: false,
+        state: state
+    });
+    authenticator(req, res, next);
+});
 
 authRouter.get(
     "/google/callback",

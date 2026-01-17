@@ -250,6 +250,8 @@ model Event {
   totalBooked          Int            @default(0)
   totalTickets         Int            @default(0)
 
+  showevent            Boolean        @default(true) // ✅ Added
+
   approvalStatus        ApprovalStatus @default(PENDING)
   approvedBy            String?        @map("approved_by") @db.ObjectId
   approvedAt            DateTime?

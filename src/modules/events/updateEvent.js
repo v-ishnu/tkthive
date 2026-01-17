@@ -24,6 +24,7 @@ export async function updateEvent(req, res) {
       isRegistrationOpen,
       totalBooked,
       totalTickets,
+      showevent, // ✅ Added
     } = req.body;
 
     // 1. Check if event exists
@@ -71,6 +72,7 @@ export async function updateEvent(req, res) {
         ...(isRegistrationOpen !== undefined && { isRegistrationOpen: Boolean(isRegistrationOpen) }),
         ...(totalBooked !== undefined && { totalBooked: parseInt(totalBooked) }),
         ...(totalTickets !== undefined && { totalTickets: parseInt(totalTickets) }),
+        ...(showevent !== undefined && { showevent: Boolean(showevent) }), // ✅ Added
         ...(req.body.coupons !== undefined && { coupons: req.body.coupons }), // ✅ Added
       },
     });

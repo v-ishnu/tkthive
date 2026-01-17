@@ -43,6 +43,7 @@ export const eventCreate = async (req, res) => {
             isRegistrationOpen,
             totalBooked,
             totalTickets,
+            showevent, // ✅ Added
             category,     // ✅ Added
             subCategory   // ✅ Added
         } = req.body;
@@ -160,6 +161,8 @@ export const eventCreate = async (req, res) => {
                 subCategory: subCategory || null,
 
                 coupons: req.body.coupons || [], // ✅ Added
+
+                showevent: showevent !== undefined ? Boolean(showevent) : true, // ✅ Added
             },
         });
 
