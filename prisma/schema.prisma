@@ -224,7 +224,7 @@ model Event {
   id          String          @id @default(auto()) @map("_id") @db.ObjectId
   title       String
   description String?
-  venue       Json
+  venue       Venue
   imageUrl    String?        // ✅ Added
   slug        String?        @unique // ✅ Added for URL-friendly lookup
   startDate   DateTime
@@ -314,7 +314,15 @@ type Coupon {
   used               Int      @default(0)
 }
 
-
+type Venue {
+  name      String
+  city      String
+  state     String
+  country   String
+  pincode   String
+  latitude  String?
+  longitude String?
+}
 
 // =====================================
 // TICKET {ADMIN INTENT} //User only select this, Basicaly it is a Ticket type
@@ -328,6 +336,7 @@ model Ticket {
 
   type       TicketType @default(INDIVIDUAL)
   maxMembers Int?
+  minMembers Int?
 
   startDate DateTime?
   endDate   DateTime?

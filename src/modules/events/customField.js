@@ -53,6 +53,66 @@ export const createCustomField = async (req, res) => {
 };
 
 
+export const createBulkCustomFields = async (req, res) => {
+  try {
+    const { eventId } = req.params;
+    const { fields } = req.body; // Expecting an array of fields
+
+    if (!Array.isArray(fields) || fields.length === 0) {
+      return res.status(400).json({ message: "INVALID_FIELDS_DATA" });
+    }
+
+    const event = await prisma.event.findUnique({ where: { id: eventId } });
+
+    if (!event) throw new Error("EVENT_NOT_FOUND");
+
+    const registrationCount = await prisma.eventRegistration.count({
+      where: { eventId }
+    });
+
+    if (registrationCount > 0) {
+      throw new Error("CUSTOM_FIELDS_LOCKED");
+    }
+
+    // Prepare data for bulk creation
+    // map fields to include eventId and defaults
+    const fieldsData = fields.map(field => ({
+      eventId,
+      ticketId: field.ticketId || null,
+      label: field.label,
+      scope: field.scope,
+      placeholder: field.placeholder,
+      type: field.type,
+      required: field.required ?? false,
+      options: field.options || [],
+      order: field.order || 0
+    }));
+
+    // Use transaction or createMany
+    const createdFields = await prisma.eventCustomField.createMany({
+      data: fieldsData
+    });
+
+    // Auto-enable custom fields on the event
+    if (!event.hasCustomFields) {
+      await prisma.event.update({
+        where: { id: eventId },
+        data: { hasCustomFields: true }
+      });
+    }
+
+    res.status(201).json({
+      message: "BULK_CUSTOM_FIELDS_CREATED",
+      count: createdFields.count
+    });
+
+  } catch (err) {
+    console.log(err.message)
+    res.status(400).json({ message: err.message });
+  }
+};
+
+
 export async function updateCustomField(req, res) {
   try {
     const { fieldId } = req.params;

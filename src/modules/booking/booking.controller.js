@@ -64,6 +64,10 @@ export const initiateBooking = async (req, res) => {
             return res.status(400).json({ message: "ATTENDEE_COUNT_MISMATCH", details: ticket.name });
         }
 
+        if (ticket.type === "GROUP" && ticket.minMembers && item.attendees.length < ticket.minMembers) {
+            return res.status(400).json({ message: "MINIMUM_MEMBERS_REQUIRED", details: `${ticket.name} requires at least ${ticket.minMembers} members.` });
+        }
+
         const ticketTotal = ticket.price * item.quantity;
         let addonTotal = 0;
         const selectedAddons = [];

@@ -10,7 +10,7 @@ import { getEvent, getEventById, getEventTickets } from "./getEvent.js";
 // import { ticketBooking } from "../booking/controller/ticketBooking.js";
 import { createAddon } from "./createAddon.js";
 import { updateAddon } from "./updateAddon.js";
-import { createCustomField, updateCustomField, deleteCustomField } from "./customField.js";
+import { createCustomField, createBulkCustomFields, updateCustomField, deleteCustomField } from "./customField.js";
 import { updateEvent } from "./updateEvent.js";
 import { getEventLocations } from "../users/getLocations.js";
 import { validateTicket } from "./validateTicket.js";
@@ -109,6 +109,13 @@ eventRouter.post("/:eventId/custom-field",
     protect,
     authorize(Permission.MANAGE_EVENT),
     createCustomField
+);
+
+// Create Bulk Custom Fields
+eventRouter.post("/:eventId/custom-field/bulk",
+    protect,
+    authorize(Permission.MANAGE_EVENT),
+    createBulkCustomFields
 );
 
 
