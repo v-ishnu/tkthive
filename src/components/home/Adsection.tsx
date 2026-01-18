@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import React from 'react';
 
 interface AdProps {
@@ -36,10 +37,10 @@ const SingleAdBlock: React.FC<AdProps & { fullWidth?: boolean }> = ({
         <h2 className="text-2xl md:text-4xl font-black text-white mb-4 leading-tight">{title}</h2>
         <p className="text-text-secondary text-sm md:text-base mb-8 max-w-sm font-medium leading-relaxed">{description}</p>
 
-        <button className="px-6 py-3 bg-white text-black font-bold rounded-xl hover:bg-primary transition-colors duration-300 flex items-center gap-2 shadow-lg hover:shadow-primary/20">
+        <Link href="/support" className="px-6 py-3 bg-white text-black font-bold rounded-xl hover:bg-primary transition-colors duration-300 flex items-center gap-2 shadow-lg hover:shadow-primary/20">
           {cta}
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
-        </button>
+        </Link>
       </div>
     </div>
   );
