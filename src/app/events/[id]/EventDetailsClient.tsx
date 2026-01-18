@@ -136,16 +136,16 @@ export default function EventDetails() {
                             )}
                         </div>
 
-                        <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 drop-shadow-2xl max-w-4xl leading-tight">{event.title}</h1>
+                        <h1 className="text-2xl md:text-4xl lg:text-5xl font-bold text-white mb-4 drop-shadow-2xl max-w-4xl leading-tight">{event.title}</h1>
 
-                        <div className="flex flex-col md:flex-row gap-4 md:gap-6 text-gray-200">
-                            <div className="flex items-center gap-3 bg-black/40 backdrop-blur-sm px-4 py-2 rounded-xl border border-white/10 w-fit">
-                                <Calendar className="text-primary" size={20} />
-                                <span className="text-sm md:text-lg font-medium">{event.date}</span>
+                        <div className="flex flex-col md:flex-row gap-3 md:gap-6 text-gray-200">
+                            <div className="flex items-center gap-3 bg-black/40 backdrop-blur-sm px-3 py-2 md:px-4 rounded-xl border border-white/10 w-fit">
+                                <Calendar className="text-primary" size={18} />
+                                <span className="text-xs md:text-lg font-medium">{event.date}</span>
                             </div>
-                            <div className="flex items-center gap-3 bg-black/40 backdrop-blur-sm px-4 py-2 rounded-xl border border-white/10 w-fit">
-                                <MapPin className="text-primary" size={20} />
-                                <span className="text-sm md:text-lg font-medium">{event.venue.name}, {event.venue.city}</span>
+                            <div className="flex items-center gap-3 bg-black/40 backdrop-blur-sm px-3 py-2 md:px-4 rounded-xl border border-white/10 w-fit">
+                                <MapPin className="text-primary" size={18} />
+                                <span className="text-xs md:text-lg font-medium">{event.venue.name}, {event.venue.city}</span>
                             </div>
                         </div>
 
@@ -154,10 +154,10 @@ export default function EventDetails() {
                             <div className="mt-6 flex flex-col md:flex-row gap-4 max-w-5xl animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">
                                 {event.announcement && (
                                     <div className="flex-1 p-3 bg-primary/20 backdrop-blur-md border border-primary/30 rounded-xl flex items-start gap-3 shadow-lg shadow-primary/5">
-                                        <Megaphone className="text-primary shrink-0 mt-0.5 animate-pulse" size={18} />
+                                        <Megaphone className="text-primary shrink-0 mt-0.5 animate-pulse" size={16} />
                                         <div>
-                                            <h4 className="font-bold text-primary text-sm mb-0.5 tracking-wide">ANNOUNCEMENT</h4>
-                                            <p className="text-white text-sm  ">
+                                            <h4 className="font-bold text-primary text-xs md:text-sm mb-0.5 tracking-wide">ANNOUNCEMENT</h4>
+                                            <p className="text-white text-xs md:text-sm">
                                                 {event.announcement}
                                             </p>
                                         </div>
@@ -165,10 +165,10 @@ export default function EventDetails() {
                                 )}
                                 {event.info && (
                                     <div className="flex-1 p-3 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl flex items-start gap-3">
-                                        <InfoIcon className="text-blue-400 shrink-0 mt-0.5" size={18} />
+                                        <InfoIcon className="text-blue-400 shrink-0 mt-0.5" size={16} />
                                         <div>
-                                            <h4 className="font-bold text-blue-400 text-sm mb-0.5 tracking-wide">IMPORTANT INFO</h4>
-                                            <p className="text-gray-200 text-sm  whitespace-pre-line">
+                                            <h4 className="font-bold text-blue-400 text-xs md:text-sm mb-0.5 tracking-wide">IMPORTANT INFO</h4>
+                                            <p className="text-gray-200 text-xs md:text-sm whitespace-pre-line">
                                                 {event.info}
                                             </p>
                                         </div>
@@ -249,7 +249,7 @@ export default function EventDetails() {
             </div>
 
             {/* Footer Ad Section */}
-        
+
 
             <ShareModal
                 isOpen={isShareModalOpen}

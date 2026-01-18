@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { EventData, TicketTier, Ticket, RegistrationFormField, AttendeeDetail } from '@/types';
-import { ArrowLeft, Check, CreditCard, User, Users, ChevronRight, Lock, Tag, Ticket as TicketIcon, ShoppingBag, Plus, Minus, Utensils, AlertCircle, ChevronDown, Loader2 } from 'lucide-react';
+import { ArrowLeft, Check, CreditCard, User, Users, ChevronRight, Lock, Tag, Ticket as TicketIcon, ShoppingBag, Plus, Minus, Utensils, AlertCircle, ChevronDown, Loader2, Calendar, Clock, MapPin, Trash2 } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
@@ -72,6 +72,11 @@ export default function RegistrationPage() {
 
 
 
+    // Scroll to top on step change
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, [step]);
+
     // Removed: now handled by /registration/success page via returnUrl
     useEffect(() => {
         // Optional: Could clear query params if we want to avoid sticky state
@@ -88,7 +93,9 @@ export default function RegistrationPage() {
 
     const handleTierSelect = (tier: TicketTier) => {
         setSelectedTier(tier);
-        const count = tier.type === 'group' && tier.maxMembers ? tier.maxMembers : 1;
+        // Initialize with Min Members (or 1), not Max
+        const count = tier.type === 'group' && tier.minMembers ? tier.minMembers : 1;
+
         const initialAttendees: AttendeeDetail[] = Array(count).fill(null).map(() => ({
             name: '', email: '', customData: {}
         }));
@@ -97,9 +104,6 @@ export default function RegistrationPage() {
         if (primaryUser.name || primaryUser.email) {
             initialAttendees[0].name = primaryUser.name;
             initialAttendees[0].email = primaryUser.email;
-            // AttendeeDetail phone is optional, but often not top-level input for attendees unless custom field. 
-            // However, our UI has a phone input for attendees in some cases? 
-            // Checking UI... handleAttendeeChange handles phone.
             if (primaryUser.phone) initialAttendees[0].phone = primaryUser.phone;
         } else if (user) {
             // Fallback if primaryUser wasn't set yet (rare)
@@ -130,20 +134,35 @@ export default function RegistrationPage() {
         setBookingCustomData(prev => ({ ...prev, [fieldId]: value }));
     };
 
-    const handleAttendeeChange = (index: number, field: string, value: string, isCustom: boolean = false) => {
-        const newAttendees = [...attendeeDetails];
+    const handleAttendeeChange = (index: number, field: string, value: string, isCustom = false) => {
+        const updated = [...attendeeDetails];
         if (isCustom) {
-            newAttendees[index] = {
-                ...newAttendees[index],
-                customData: { ...(newAttendees[index].customData || {}), [field]: value }
-            };
+            updated[index].customData = { ...updated[index].customData, [field]: value };
         } else {
-            newAttendees[index] = { ...newAttendees[index], [field]: value };
-            if (index === 0 && ['name', 'email', 'phone'].includes(field)) {
-                setPrimaryUser(prev => ({ ...prev, [field]: value }));
-            }
+            // @ts-ignore
+            updated[index][field] = value;
         }
-        setAttendeeDetails(newAttendees);
+        setAttendeeDetails(updated);
+    };
+
+    const handleAddAttendee = () => {
+        if (!selectedTier) return;
+        if (selectedTier.maxMembers && attendeeDetails.length >= selectedTier.maxMembers) {
+            toast.error(`Maximum ${selectedTier.maxMembers} members allowed.`);
+            return;
+        }
+        setAttendeeDetails([...attendeeDetails, { name: '', email: '', phone: '' }]);
+    };
+
+    const handleRemoveAttendee = (index: number) => {
+        if (!selectedTier) return;
+        const minRequired = selectedTier.minMembers || 1;
+        if (attendeeDetails.length <= minRequired) {
+            toast.error(`Minimum ${minRequired} members required.`);
+            return;
+        }
+        const updated = attendeeDetails.filter((_, i) => i !== index);
+        setAttendeeDetails(updated);
     };
 
     const handleAddOnQuantity = (id: string, delta: number) => {
@@ -297,7 +316,7 @@ export default function RegistrationPage() {
     };
 
     const handleFinish = () => {
-        router.push('/events');
+        router.push('/mytickets');
     };
 
     const steps = [
@@ -450,12 +469,39 @@ export default function RegistrationPage() {
 
                         {/* Attendee Details */}
                         <div className="bg-secondary border border-white/10 p-6 rounded-2xl space-y-6">
-                            <h2 className="text-xl font-bold flex items-center gap-2"><Users className="text-purple-400" size={20} />Attendee Information</h2>
+                            <div className="flex items-center justify-between">
+                                <h2 className="text-xl font-bold flex items-center gap-2"><Users className="text-purple-400" size={20} />Attendee Information</h2>
+
+                                {selectedTier.type === 'group' && (
+                                    <button
+                                        type="button"
+                                        onClick={handleAddAttendee}
+                                        disabled={selectedTier.maxMembers ? attendeeDetails.length >= selectedTier.maxMembers : false}
+                                        className="text-xs bg-primary/20 text-primary border border-primary/20 px-3 py-1.5 rounded-lg hover:bg-primary/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1 font-bold"
+                                    >
+                                        <Plus size={14} /> Add Member
+                                    </button>
+                                )}
+                            </div>
+
                             <div className="space-y-4">
                                 {attendeeDetails.map((attendee, idx) => (
-                                    <div key={idx} className="p-6 bg-white/5 rounded-2xl border border-white/5 relative">
+                                    <div key={idx} className="p-6 bg-white/5 rounded-2xl border border-white/5 relative group">
                                         <div className="absolute -left-3 top-6 w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center text-xs text-black font-bold border-4 border-dark">{idx + 1}</div>
-                                        <h4 className="font-bold text-white mb-4 ml-2">Attendee #{idx + 1} {idx === 0 && "(Primary)"}</h4>
+
+                                        <div className="flex justify-between items-start mb-4 ml-2">
+                                            <h4 className="font-bold text-white">Attendee #{idx + 1} {idx === 0 && "(Primary)"}</h4>
+                                            {idx > 0 && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleRemoveAttendee(idx)}
+                                                    className="p-1.5 text-gray-500 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-colors"
+                                                >
+                                                    <Trash2 size={16} />
+                                                </button>
+                                            )}
+                                        </div>
+
                                         <div className="grid md:grid-cols-2 gap-4 mb-4">
                                             <div className="space-y-1"><label className="text-[10px] md:text-xs text-gray-500 font-semibold uppercase tracking-wide">Name</label><input type="text" required value={attendee.name} onChange={(e) => handleAttendeeChange(idx, 'name', e.target.value)} readOnly={idx === 0} className="w-full bg-dark border border-white/10 rounded-lg p-2 text-xs md:text-sm text-white focus:border-purple-500/50 outline-none" /></div>
                                             <div className="space-y-1"><label className="text-[10px] md:text-xs text-gray-500 font-semibold uppercase tracking-wide">Email</label><input type="email" required value={attendee.email} onChange={(e) => handleAttendeeChange(idx, 'email', e.target.value)} readOnly={idx === 0} className="w-full bg-dark border border-white/10 rounded-lg p-2 text-xs md:text-sm text-white focus:border-purple-500/50 outline-none" /></div>
@@ -555,39 +601,73 @@ export default function RegistrationPage() {
                             )}
                             <div className="flex justify-between items-center py-4"><span className="text-gray-400">Total Amount</span><span className="text-3xl font-bold text-primary">₹{calculateTotal()}</span></div>
 
-                            {/* Payment Methods */}
-                            <div className="mt-8">
-                                <h3 className="text-lg font-bold mb-4 text-white">Select Payment Method</h3>
-                                <div className="grid gap-4">
-                                    <label className={`flex items-center gap-4 p-4 rounded-xl border cursor-pointer transition-all ${selectedPaymentMethod === 'CASHFREE' ? 'border-primary bg-primary/10' : 'border-white/10 bg-white/5'}`}>
-                                        <input type="radio" name="payment" value="CASHFREE" checked={selectedPaymentMethod === 'CASHFREE'} onChange={() => setSelectedPaymentMethod('CASHFREE')} className="accent-primary w-5 h-5" />
-                                        <div className="flex-1"><span className="font-bold block text-white">Cashfree Payments</span><span className="text-xs text-gray-400">UPI, Cards, Netbanking</span></div>
-                                    </label>
-                                    <label className="flex items-center gap-4 p-4 rounded-xl border border-white/5 bg-white/5 opacity-50 cursor-not-allowed">
-                                        <input type="radio" name="payment" value="RAZORPAY" disabled className="accent-primary w-5 h-5" />
-                                        <div className="flex-1"><span className="font-bold block text-gray-400">Razorpay</span><span className="text-xs text-gray-500">Coming Soon</span></div>
-                                    </label>
+                            {/* Payment Methods - Only if amount > 0 */}
+                            {parseFloat(calculateTotal()) > 0 ? (
+                                <div className="mt-8">
+                                    <h3 className="text-lg font-bold mb-4 text-white">Select Payment Method</h3>
+                                    <div className="grid gap-4">
+                                        <label className={`flex items-center gap-4 p-4 rounded-xl border cursor-pointer transition-all ${selectedPaymentMethod === 'CASHFREE' ? 'border-primary bg-primary/10' : 'border-white/10 bg-white/5'}`}>
+                                            <input type="radio" name="payment" value="CASHFREE" checked={selectedPaymentMethod === 'CASHFREE'} onChange={() => setSelectedPaymentMethod('CASHFREE')} className="accent-primary w-5 h-5" />
+                                            {/* ... payment method details ... */}
+                                            <div className="flex-1">
+                                                <div className="flex justify-between items-center mb-1">
+                                                    <span className="font-bold text-white">Credit / Debit Card / UPI</span>
+                                                    <div className="flex gap-2">
+                                                        <CreditCard size={20} className="text-gray-400" />
+                                                    </div>
+                                                </div>
+                                                <p className="text-sm text-gray-400">Secure payment via Cashfree</p>
+                                            </div>
+                                        </label>
+                                        <label className="flex items-center gap-4 p-4 rounded-xl border border-white/5 bg-white/5 opacity-50 cursor-not-allowed">
+                                            <input type="radio" name="payment" value="RAZORPAY" disabled className="accent-primary w-5 h-5" />
+                                            <div className="flex-1"><span className="font-bold block text-gray-400">Razorpay</span><span className="text-xs text-gray-500">Coming Soon</span></div>
+                                        </label>
+                                    </div>
                                 </div>
-                            </div>
+                            ) : (
+                                <div className="mt-8 p-4 bg-green-500/10 border border-green-500/20 rounded-xl flex items-center gap-3 text-green-400">
+                                    <Check size={20} />
+                                    <span>No payment required for this order.</span>
+                                </div>
+                            )}
 
-                            <button onClick={handlePayment} disabled={isProcessing} className="w-full bg-primary text-black font-bold p-4 rounded-xl flex items-center justify-center gap-3 hover:bg-primary-hover transition-colors mt-8 disabled:opacity-70 disabled:cursor-wait">
-                                {isProcessing ? <><Loader2 className="animate-spin" size={20} /> Processing...</> : <><CreditCard size={20} /> {parseFloat(calculateTotal()) === 0 ? 'Register for Free' : `Pay ₹${calculateTotal()}`}</>}
+                            <button
+                                onClick={handlePayment}
+                                disabled={isProcessing}
+                                className="w-full bg-primary hover:bg-primary-hover text-black font-bold py-4 rounded-xl transition-all shadow-lg shadow-primary/20 mt-8 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-lg"
+                            >
+                                {isProcessing ? (
+                                    <>
+                                        <Loader2 className="animate-spin" size={20} />
+                                        Processing...
+                                    </>
+                                ) : (
+                                    <>
+                                        {parseFloat(calculateTotal()) > 0 ? `Pay ₹${calculateTotal()}` : 'Complete Registration'}
+                                        <ArrowLeft className="rotate-180" size={20} />
+                                    </>
+                                )}
                             </button>
+
                             {bookingError && <div className="mt-4 p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-red-200 text-sm flex items-center gap-2"><AlertCircle size={16} />{bookingError}</div>}
                         </div>
-                    </div>
-                )}
+                    </div >
+                )
+                }
 
                 {/* Step 5: Success */}
-                {step === 5 && (
-                    <div className="text-center py-12 animate-in fade-in zoom-in duration-500">
-                        <div className="w-24 h-24 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-8 shadow-[0_0_50px_rgba(34,197,94,0.4)]"><Check size={48} className="text-black" /></div>
-                        <h1 className="text-4xl font-bold text-white mb-4">Registration Successful!</h1>
-                        <p className="text-xl text-gray-400 mb-8 max-w-md mx-auto">We have sent the tickets to <strong>{primaryUser.email}</strong>.</p>
-                        <button onClick={handleFinish} className="bg-primary text-black font-bold px-8 py-3 rounded-full hover:bg-primary-hover transition-colors">View My Tickets</button>
-                    </div>
-                )}
-            </div>
-        </div>
+                {
+                    step === 5 && (
+                        <div className="text-center py-12 animate-in fade-in zoom-in duration-500">
+                            <div className="w-24 h-24 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-8 shadow-[0_0_50px_rgba(34,197,94,0.4)]"><Check size={48} className="text-black" /></div>
+                            <h1 className="text-4xl font-bold text-white mb-4">Registration Successful!</h1>
+                            <p className="text-xl text-gray-400 mb-8 max-w-md mx-auto">We have sent the tickets to <strong>{primaryUser.email}</strong>.</p>
+                            <button onClick={handleFinish} className="bg-primary text-black font-bold px-8 py-3 rounded-full hover:bg-primary-hover transition-colors">View My Tickets</button>
+                        </div>
+                    )
+                }
+            </div >
+        </div >
     );
 };
