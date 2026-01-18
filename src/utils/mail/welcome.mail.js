@@ -3,7 +3,7 @@ import  sendMail from "./mail.send.js";
 const sendWelcomeMail = async (email) => {
   return sendMail({
   to: email,
-  subject: "Welcome to Ticket Hive – Your Account Is Ready",
+  subject: "Welcome to tkthive – Your Account Is Ready",
   textContent: "We're excited to have you on board.",
   htmlContent: `
   <div style="background:#000000; padding:40px 0; font-family:Arial, sans-serif;">
@@ -12,7 +12,7 @@ const sendWelcomeMail = async (email) => {
 
       <!-- Logo -->
       <div style="text-align:center; margin-bottom:20px;">
-        <img src="https://www.tkthive.com/logo/whitelogo.png" alt="Ticket Hive Logo" style="max-width:140px;" />
+        <img src="https://www.tkthive.com/logo/whitelogo.png" alt="tkthive Logo" style="max-width:140px;" />
       </div>
 
       <!-- Heading -->
