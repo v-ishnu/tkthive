@@ -96,52 +96,56 @@ export const Navbar = () => {
                     }`}
             >
                 <div className="container mx-auto px-4 h-20 flex items-center justify-between">
-                    {/* tkthive */}
-                    <Link href='/' className="flex items-center gap-3 group cursor-pointer">
-                        <div className="flex items-center gap-3 group cursor-pointer">
-                            <img src="/logo/whitelogo.png" alt="tkthive" className="h-10 w-auto object-contain group-hover:opacity-80 transition-opacity" />
-                        </div>
-                    </Link>
-                    {/* Center Links (Desktop) */}
-                    <div className="hidden md:flex items-center gap-8 text-sm font-medium text-text-secondary">
-                        <Link href='/' className={`  transition-colors ${pathname == '/' ? 'text-primary' : 'hover:text-primary'}`}>Home</Link>
-                        <div className="relative group/cat">
-                            <Link
-                                className={`flex items-center gap-1 hover:text-primary transition-colors ${pathname === '/events' ? 'text-primary' : ''}`}
-                                onMouseEnter={() => setIsCatDropdownOpen(true)}
-                                href='/events'
-                            >
-                                Categories <ChevronDown size={14} />
-                            </Link>
+                    {/* Left Side: Logo & Navigation */}
+                    <div className="flex items-center gap-8 lg:gap-12">
+                        {/* tkthive */}
+                        <Link href='/' className="flex items-center gap-3 group cursor-pointer">
+                            <div className="flex items-center gap-3 group cursor-pointer">
+                                <img src="/logo/whitelogo.png" alt="tkthive" className="h-10 w-auto object-contain group-hover:opacity-80 transition-opacity" />
+                            </div>
+                        </Link>
 
-                            <div
-                                className="absolute top-full left-1/2 -translate-x-1/2 pt-4 hidden group-hover/cat:block hover:block"
-                            >
-                                <div className="w-64 bg-card border border-white/10 rounded-xl shadow-2xl p-2 grid gap-1">
-                                    {[
-                                        { id: 'Tech', label: 'Tech & Coding', icon: Cpu },
-                                        { id: 'Esports', label: 'Esports', icon: Gamepad2 },
-                                        { id: 'Concert', label: 'Concerts', icon: Music },
-                                        { id: 'Sports', label: 'Sports', icon: Trophy },
-                                        { id: 'Art', label: 'Arts & Culture', icon: Palette },
-                                    ].map((cat) => (
-                                        <Link
-                                            key={cat.id}
-                                            href={`/events?category=${cat.id}`}
+                        {/* Nav Links (Desktop) */}
+                        <div className="hidden lg:flex items-center gap-6 lg:gap-8 text-sm font-medium text-text-secondary">
+                            <Link href='/' className={`transition-colors ${pathname == '/' ? 'text-primary' : 'hover:text-primary'}`}>Home</Link>
 
-                                            className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/5 text-left text-text-secondary hover:text-primary transition-all group/item"
-                                        >
-                                            <cat.icon size={16} className="text-text-muted group-hover/item:text-primary" />
-                                            {cat.label}
-                                        </Link>
-                                    ))}
-                                    <div className="h-px bg-white/5 my-1" />
-                                    <Link href='/events' className="text-center py-2 text-xs font-bold uppercase tracking-wider text-text-muted hover:text-text-main">View All Events</Link>
+                            <div className="relative group/cat">
+                                <Link
+                                    className={`flex items-center gap-1 hover:text-primary transition-colors ${pathname === '/events' ? 'text-primary' : ''}`}
+                                    onMouseEnter={() => setIsCatDropdownOpen(true)}
+                                    href='/events'
+                                >
+                                    Categories <ChevronDown size={14} />
+                                </Link>
+
+                                <div
+                                    className="absolute top-full left-1/2 -translate-x-1/2 pt-4 hidden group-hover/cat:block hover:block"
+                                >
+                                    <div className="w-64 bg-card border border-white/10 rounded-xl shadow-2xl p-2 grid gap-1">
+                                        {[
+                                            { id: 'Tech', label: 'Tech & Coding', icon: Cpu },
+                                            { id: 'Esports', label: 'Esports', icon: Gamepad2 },
+                                            { id: 'Concert', label: 'Concerts', icon: Music },
+                                            { id: 'Sports', label: 'Sports', icon: Trophy },
+                                            { id: 'Art', label: 'Arts & Culture', icon: Palette },
+                                        ].map((cat) => (
+                                            <Link
+                                                key={cat.id}
+                                                href={`/events?category=${cat.id}`}
+                                                className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/5 text-left text-text-secondary hover:text-primary transition-all group/item"
+                                            >
+                                                <cat.icon size={16} className="text-text-muted group-hover/item:text-primary" />
+                                                {cat.label}
+                                            </Link>
+                                        ))}
+                                        <div className="h-px bg-white/5 my-1" />
+                                        <Link href='/events' className="text-center py-2 text-xs font-bold uppercase tracking-wider text-text-muted hover:text-text-main">View All Events</Link>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <Link href='/support' className={`${pathname === '/support' ? 'text-primary' : 'hover:text-primary transition-colors'}`}>Support</Link>
+                            <Link href='/support' className={`${pathname === '/support' ? 'text-primary' : 'hover:text-primary transition-colors'}`}>Support</Link>
+                        </div>
                     </div>
 
                     {/* Right Actions */}
@@ -167,11 +171,10 @@ export const Navbar = () => {
                             <div className="flex items-center gap-3">
                                 {/* My Tickets Button - Desktop */}
                                 <Link href='/mytickets'
-
-                                    className="hidden md:flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 hover:bg-white/10 border border-white/5 hover:border-primary/30 transition-all text-sm font-medium text-text-secondary hover:text-text-main group"
+                                    className="hidden md:flex items-center gap-2 px-3 py-2 rounded-full bg-white/5 hover:bg-white/10 border border-white/5 hover:border-primary/30 transition-all text-sm font-medium text-text-secondary hover:text-text-main group"
                                 >
                                     <Ticket size={16} className="text-primary group-hover:scale-110 transition-transform" />
-                                    <span>My Tickets</span>
+                                    <span className="hidden xl:inline">My Tickets</span>
                                 </Link>
 
                                 {/* Notification Bell */}
@@ -188,11 +191,10 @@ export const Navbar = () => {
 
                                 <div className="relative group hidden md:block">
                                     <Link href='/profile'
-
                                         className="flex items-center gap-3 pl-2 pr-4 py-1.5 rounded-full hover:bg-white/5 border border-transparent hover:border-white/10 transition-all"
                                     >
                                         <img src={user.avatar || "/default-avatar.svg"} alt="User" className="w-8 h-8 rounded-full border border-white/20 object-cover" />
-                                        <span className="text-sm font-bold text-text-main hidden sm:block">{user.name ? user.name.split(' ')[0] : 'User'}</span>
+                                        <span className="text-sm font-bold text-text-main hidden xl:block">{user.name ? user.name.split(' ')[0] : 'User'}</span>
                                     </Link>
 
                                     {/* Dropdown */}
@@ -234,7 +236,7 @@ export const Navbar = () => {
                         )}
 
                         <button
-                            className="md:hidden text-white p-2 hover:bg-white/10 rounded-lg transition-colors group"
+                            className="lg:hidden text-white p-2 hover:bg-white/10 rounded-lg transition-colors group"
                             onClick={() => setIsMenuOpen(true)}
                         >
                             <AlignRight size={28} className="text-white group-hover:text-primary transition-colors" />
@@ -244,7 +246,7 @@ export const Navbar = () => {
             </nav>
 
             {/* Mobile Menu Overlay */}
-            <div className={`fixed inset-0 z-[60] bg-dark/95 backdrop-blur-xl transition-transform duration-300 md:hidden ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+            <div className={`fixed inset-0 z-[60] bg-dark/95 backdrop-blur-xl transition-transform duration-300 lg:hidden ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
                 <div className="flex flex-col h-full p-6">
                     <div className="flex justify-between items-center mb-8">
                         <span className="text-2xl font-bold text-white">Menu</span>

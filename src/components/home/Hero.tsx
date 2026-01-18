@@ -104,7 +104,7 @@ export default function Hero() {
                 </div>
 
                 {/* RIGHT: Vertical Scroll Cards */}
-                <div className="relative flex justify-center lg:justify-end">
+                <div className="relative hidden  md:flex justify-center lg:justify-end">
                     <HeroCards />
                 </div>
 
