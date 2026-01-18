@@ -67,10 +67,10 @@ export const exportRegistrations = async (req, res) => {
                     "Registration Date": reg.createdAt,
 
                     // Payment Info
-                    "Payment Status": reg.booking.paymentStatus,
-                    "Payment Amount": reg.booking.payment,
-                    "Discount": reg.booking.discount || 0,
-                    "Coupon Code": reg.booking.appliedCoupon || "N/A",
+                    "Payment Status": reg.booking?.paymentStatus || "N/A",
+                    "Payment Amount": reg.booking?.payment || 0,
+                    "Discount": reg.booking?.discount || 0,
+                    "Coupon Code": reg.booking?.appliedCoupon || "N/A",
                 };
 
                 // Attendee Info (Prefer registrationData, fall back to User profile if missing)

@@ -36,7 +36,7 @@ const sendRegistrationSuccessEmail = async ({
         <!-- Header / Logo -->
         <div style="text-align:center; padding:24px 20px; border-bottom:1px solid #222;">
           <img src="https://www.tkthive.com/logo/whitelogo.png" alt="tkthive" style="max-width:140px; margin-bottom:10px;" />
-          <h2 style="margin:0; color:#ffa116; font-weight:600;">Booking Confirmed 🎉</h2>
+          <h2 style="margin:0; color:#ffa116; font-weight:600;">Booking Confirmed</h2>
         </div>
 
         <!-- Body -->
@@ -81,7 +81,7 @@ const sendRegistrationSuccessEmail = async ({
         <!-- Footer -->
         <div style="background:#0d0d0d; padding:14px; text-align:center;">
           <p style="margin:0; font-size:12px; color:#777777;">
-            © Dinestx. All rights reserved.
+            © tkthive. All rights reserved.
           </p>
         </div>
 
