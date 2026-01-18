@@ -289,6 +289,30 @@ export const validateCoupon = createAsyncThunk(
     }
 );
 
+export const submitProject = createAsyncThunk(
+    'events/submitProject',
+    async ({ eventId, formData }: { eventId: string, formData: any }, { rejectWithValue }) => {
+        try {
+            // const token = localStorage.getItem('token'); // Not used, cookie based auth
+            const response = await fetch(`${API_BASE_URL}event/${eventId}/submit`, { // User corrected route to 'event'
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    // 'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(formData),
+                credentials: 'include'
+            });
+
+            const data = await response.json();
+            if (!response.ok) return rejectWithValue(data.message || 'Submission failed');
+            return data;
+        } catch (error: any) {
+            return rejectWithValue(error.message);
+        }
+    }
+);
+
 const eventSlice = createSlice({
     name: 'event',
     initialState,
@@ -353,6 +377,11 @@ const eventSlice = createSlice({
             .addCase(verifyPayment.pending, (state) => { state.bookingStatus = 'loading'; state.bookingError = null; })
             .addCase(verifyPayment.fulfilled, (state) => { state.bookingStatus = 'success'; })
             .addCase(verifyPayment.rejected, (state, action) => { state.bookingStatus = 'failed'; state.bookingError = action.payload as string; })
+
+            // Submit Project
+            .addCase(submitProject.pending, (state) => { state.loading = true; }) // Don't reset error here if we want to keep event data visible
+            .addCase(submitProject.fulfilled, (state) => { state.loading = false; })
+            .addCase(submitProject.rejected, (state, action) => { state.loading = false; }) // Do NOT set global error, handled locally
     },
 });
 

@@ -4,7 +4,7 @@ import { EventData, EventTab } from '../../types';
 import EventSchedule from './EventSchedule';
 import EventDocs from './EventDocs';
 import EventSubmissions from './EventSubmissions';
-import { LayoutList, FileText, Send, Map, Play, Trophy, Mic2, AlertCircle, Info, ChevronLeft, ChevronRight, Megaphone, Globe } from 'lucide-react';
+import { LayoutList, FileText, Send, Map, Play, Trophy, Mic2, AlertCircle, Info, ChevronLeft, ChevronRight, Megaphone, Globe, MapPin, Calendar } from 'lucide-react';
 
 interface EventTabsProps {
     event: EventData;
@@ -15,12 +15,29 @@ export const EventTabs: React.FC<EventTabsProps> = ({ event }) => {
     // We can assume 'ABOUT' maps to 'details' or use a separate Overview tab.
     // Let's keep 'Overview' and 'Location' as fixed tabs, and insert dynamic tabs in between.
 
-    // Filter dynamic tabs
-    const dynamicTabs = (event.tabs || []).filter(t => t.isActive).sort((a, b) => a.order - b.order);
+    // Filter dynamic tabs and normalize keys to lowercase
+    const dynamicTabs = (event.tabs || [])
+        .filter(t => t.isActive)
+        .sort((a, b) => a.order - b.order)
+        .map(t => ({ ...t, key: t.key.toLowerCase() }));
 
     // Helper to generate unique ID for tabs since 'key' might be duplicated (e.g. CUSTOM)
     const getTabUniqueId = (tab: EventTab, index: number) => {
         return `${tab.key}-${index}`;
+    };
+
+    const getTabIcon = (key: string) => {
+        switch (key.toLowerCase()) {
+            case 'overview': return <Info size={16} />;
+            case 'location': return event.isOnline ? <Globe size={16} /> : <MapPin size={16} />;
+            case 'schedule': return <Calendar size={16} />;
+            case 'prizes': return <Trophy size={16} />;
+            case 'documents': return <FileText size={16} />;
+            case 'submissions': return <Send size={16} />;
+            case 'sponsors': return <Megaphone size={16} />;
+            case 'about': return <Info size={16} />;
+            default: return <LayoutList size={16} />;
+        }
     };
 
     const [activeTabKey, setActiveTabKey] = useState<string>('overview');
@@ -42,10 +59,10 @@ export const EventTabs: React.FC<EventTabsProps> = ({ event }) => {
 
 
                             {/* Dynamic About content if any */}
-                            {dynamicTabs.find(t => t.key === 'ABOUT')?.data?.content && (
+                            {dynamicTabs.find(t => t.key === 'about')?.data?.content && (
                                 <div className="mt-6 text-gray-400">
                                     {/* Simple render, ideally use a rich text renderer */}
-                                    {dynamicTabs.find(t => t.key === 'ABOUT')?.data?.content}
+                                    {dynamicTabs.find(t => t.key === 'about')?.data?.content}
                                 </div>
                             )}
                         </section>
@@ -156,7 +173,7 @@ export const EventTabs: React.FC<EventTabsProps> = ({ event }) => {
                 const items = data?.items || (Array.isArray(data) ? data : []);
 
                 // 1. Timeline (Event Structure)
-                if (currentTab.key === 'SCHEDULE' || schema?.type === 'timeline') {
+                if (currentTab.key === 'schedule' || schema?.type === 'timeline') {
                     return (
                         <div className="space-y-8  ">
                             <div className="relative border-l-2 border-primary/30 ml-3 md:ml-6 space-y-12 py-4">
@@ -231,7 +248,7 @@ export const EventTabs: React.FC<EventTabsProps> = ({ event }) => {
                 }
 
                 // 5. Prize List (Prizes & Recognition)
-                if (currentTab.key === 'PRIZES' || schema?.type === 'prize_list') {
+                if (currentTab.key === 'prizes' || schema?.type === 'prize_list') {
                     return (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4  ">
                             {items.map((prize: any, idx: number) => (
@@ -250,15 +267,15 @@ export const EventTabs: React.FC<EventTabsProps> = ({ event }) => {
                 }
 
                 // Legacy / Specific Renderers (Documents, Submissons, Sponsors)
-                if (currentTab.key === 'DOCUMENTS' || schema?.type === 'document_list') {
+                if (currentTab.key === 'documents' || schema?.type === 'document_list') {
                     return <EventDocs docs={items} />;
                 }
 
-                if (currentTab.key === 'SUBMISSIONS' || schema?.type === 'submission_list') {
-                    return <EventSubmissions initialSubmissions={event.submissions || []} />;
+                if (currentTab.key === 'submissions' || schema?.type === 'submission_list') {
+                    return <EventSubmissions tab={currentTab} eventId={event.id} initialSubmissions={event.submissions || []} />;
                 }
 
-                if (currentTab.key === 'SPONSORS' || schema?.type === 'sponsor_grid') {
+                if (currentTab.key === 'sponsors' || schema?.type === 'sponsor_grid') {
                     return (
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-6  duration-500">
                             {items.map((sponsor: any, idx: number) => (
@@ -302,26 +319,28 @@ export const EventTabs: React.FC<EventTabsProps> = ({ event }) => {
                     >
                         <button
                             onClick={() => setActiveTabKey('overview')}
-                            className={`px-4 py-2 md:px-6 md:py-2.5 rounded-full text-xs md:text-sm font-bold uppercase tracking-wide transition-all duration-300 border whitespace-nowrap ${activeTabKey === 'overview'
+                            className={`px-4 py-2 md:px-6 md:py-2.5 rounded-full text-xs md:text-sm font-bold uppercase tracking-wide transition-all duration-300 border whitespace-nowrap flex items-center gap-2 ${activeTabKey === 'overview'
                                 ? 'bg-primary text-black border-primary shadow-lg shadow-primary/25 scale-105'
                                 : 'bg-white/5 border-white/10 text-gray-400 hover:text-white hover:bg-white/10 hover:border-white/20'
                                 }`}
                         >
+                            {getTabIcon('overview')}
                             Overview
                         </button>
 
                         <button
                             onClick={() => setActiveTabKey('location')}
-                            className={`px-4 py-2 md:px-6 md:py-2.5 rounded-full text-xs md:text-sm font-bold uppercase tracking-wide transition-all duration-300 border whitespace-nowrap ${activeTabKey === 'location'
+                            className={`px-4 py-2 md:px-6 md:py-2.5 rounded-full text-xs md:text-sm font-bold uppercase tracking-wide transition-all duration-300 border whitespace-nowrap flex items-center gap-2 ${activeTabKey === 'location'
                                 ? 'bg-primary text-black border-primary shadow-lg shadow-primary/25 scale-105'
                                 : 'bg-white/5 border-white/10 text-gray-400 hover:text-white hover:bg-white/10 hover:border-white/20'
                                 }`}
                         >
+                            {getTabIcon('location')}
                             {event.isOnline ? 'Online Event' : 'Location'}
                         </button>
 
                         {dynamicTabs.map((tab, idx) => {
-                            if (tab.key === 'ABOUT') return null;
+                            if (tab.key === 'about') return null;
 
                             const uniqueId = getTabUniqueId(tab, idx);
 
@@ -329,11 +348,12 @@ export const EventTabs: React.FC<EventTabsProps> = ({ event }) => {
                                 <button
                                     key={uniqueId}
                                     onClick={() => setActiveTabKey(uniqueId)}
-                                    className={`px-4 py-2 md:px-6 md:py-2.5 rounded-full text-xs md:text-sm font-bold uppercase tracking-wide transition-all duration-300 border whitespace-nowrap ${activeTabKey === uniqueId
+                                    className={`px-4 py-2 md:px-6 md:py-2.5 rounded-full text-xs md:text-sm font-bold uppercase tracking-wide transition-all duration-300 border whitespace-nowrap flex items-center gap-2 ${activeTabKey === uniqueId
                                         ? 'bg-primary text-black border-primary shadow-lg shadow-primary/25 scale-105'
                                         : 'bg-white/5 border-white/10 text-gray-400 hover:text-white hover:bg-white/10 hover:border-white/20'
                                         }`}
                                 >
+                                    {getTabIcon(tab.key)}
                                     {tab.title}
                                 </button>
                             );

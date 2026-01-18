@@ -30,7 +30,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 
     if (!event) {
         return {
-            title: 'Event Not Found | tkthive',
+            title: ' ',
             description: 'The requested event could not be found.',
         }
     }

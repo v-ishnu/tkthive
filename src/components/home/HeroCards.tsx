@@ -107,8 +107,9 @@ const CARDS_COLUMN_2 = [
 
 // Duplicate for seamless loop
 // Duplicate for seamless loop (2 sets for -50% animation)
-const COL_1_DOUBLED = [...CARDS_COLUMN_1];
-const COL_2_DOUBLED = [...CARDS_COLUMN_2];
+// Duplicate for seamless loop (2 sets for -50% animation)
+const COL_1_DOUBLED = [...CARDS_COLUMN_1, ...CARDS_COLUMN_1];
+const COL_2_DOUBLED = [...CARDS_COLUMN_2, ...CARDS_COLUMN_2];
 
 export function HeroCards() {
     return (
@@ -119,7 +120,7 @@ export function HeroCards() {
             <div className="absolute bottom-0 left-0 w-full h-20 md:h-32 bg-gradient-to-t from-zinc-950 via-zinc-950/80 to-transparent z-10 pointer-events-none" />
 
             {/* Column 1 (Scrolls UP) */}
-            <div className="flex flex-col w-1/2 md:w-56 animate-vertical-marquee">
+            <div className="flex flex-col flex-1 min-w-0 animate-vertical-marquee">
                 {COL_1_DOUBLED.map((card, idx) => (
                     <Link
                         key={`${card.id}-${idx}`}
@@ -161,7 +162,7 @@ export function HeroCards() {
             </div>
 
             {/* Column 2 (Scrolls DOWN) */}
-            <div className="flex flex-col w-1/2 md:w-56 animate-vertical-marquee-reverse translate-y-[-50%]">
+            <div className="flex flex-col flex-1 min-w-0 animate-vertical-marquee-reverse translate-y-[-50%]">
                 {COL_2_DOUBLED.map((card, idx) => (
                     <Link
                         key={`${card.id}-${idx}`}
