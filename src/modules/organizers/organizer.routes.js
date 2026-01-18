@@ -23,5 +23,9 @@ import { getTicketDetails, markTicketUsed } from "./controller/verifyTicket.cont
 organizerRouter.get("/tickets/:id", protect, getTicketDetails);
 organizerRouter.post("/tickets/:id/scan", protect, markTicketUsed);
 
+// Export Data
+import { exportRegistrations } from "./controller/export.controller.js";
+organizerRouter.get("/events/:eventId/export", protect, exportRegistrations);
+
 
 export default organizerRouter;

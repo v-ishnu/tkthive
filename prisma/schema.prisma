@@ -445,7 +445,7 @@ model EventRegistration {
   booking Booking @relation(fields: [bookingId], references: [id])
   ticket  Ticket  @relation(fields: [ticketId], references: [id])
 
-  responses EventFieldResponse[]
+  registrationData Json? // Stores full attendee list/details for this registration (especially for group tickets)
 
   @@index([bookingId])
   @@index([eventId, scanned])
@@ -472,7 +472,7 @@ model EventCustomField {
   scope String @default("attendee")
 
   event     Event                @relation(fields: [eventId], references: [id])
-  responses EventFieldResponse[]
+
 
   @@map("event_custom_fields")
 }
@@ -503,17 +503,7 @@ model EventTab {
  * // FIELD RESPONSES
  * =========================
  */
-model EventFieldResponse {
-  id             String @id @default(auto()) @map("_id") @db.ObjectId
-  registrationId String @map("registration_id") @db.ObjectId
-  fieldId        String @map("field_id") @db.ObjectId
-  value          String
 
-  registration EventRegistration @relation(fields: [registrationId], references: [id])
-  field        EventCustomField  @relation(fields: [fieldId], references: [id])
-
-  @@map("event_field_responses")
-}
 
 /**
  * =========================

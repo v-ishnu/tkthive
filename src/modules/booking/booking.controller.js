@@ -60,7 +60,7 @@ export const initiateBooking = async (req, res) => {
             return res.status(400).json({ message: "TICKET_SOLD_OUT", details: ticket.name });
         }
 
-        if (item.attendees && item.attendees.length !== item.quantity) {
+        if (ticket.type !== "GROUP" && item.attendees && item.attendees.length !== item.quantity) {
             return res.status(400).json({ message: "ATTENDEE_COUNT_MISMATCH", details: ticket.name });
         }
 
@@ -88,6 +88,29 @@ export const initiateBooking = async (req, res) => {
 
         totalAmount += ticketTotal + addonTotal;
 
+        // Helper to map field IDs to Labels
+        const fieldMap = (event.customFields || []).reduce((acc, field) => {
+            acc[field.id] = field.label;
+            return acc;
+        }, {});
+
+        const processedAttendees = (item.attendees || []).map(att => {
+            const flatResponses = {};
+            if (att.responses && Array.isArray(att.responses)) {
+                att.responses.forEach(r => {
+                    const label = fieldMap[r.fieldId] || r.fieldId; // Fallback to ID if label not found
+                    flatResponses[label] = r.value;
+                });
+            }
+            // Return flat structure
+            return {
+                name: att.name,
+                email: att.email,
+                phone: att.phone,
+                ...flatResponses // Spread custom fields: { "Team Name": "X", "WhatsApp": "Y" }
+            };
+        });
+
         bookingItems.push({
             ticketId: ticket.id,
             ticketName: ticket.name,
@@ -95,7 +118,7 @@ export const initiateBooking = async (req, res) => {
             quantity: item.quantity,
             totalPrice: ticketTotal + addonTotal,
             addons: selectedAddons,
-            attendeeData: item.attendees // Save raw attendee data (names, fields, etc.)
+            attendeeData: processedAttendees // Save FLATTENED data
         });
     }
 
@@ -314,10 +337,11 @@ async function finalizeBooking(orderId) {
 
             for (let i = 0; i < item.quantity; i++) {
                 const attendee = attendees[i] || {};
-                const fieldResponses = attendee.responses ? attendee.responses.map(r => ({
-                    fieldId: r.fieldId,
-                    value: String(r.value)
-                })) : [];
+
+                // Determine data to store: For Group tickets (Qty=1, Multiple Attendees), store ALL.
+                // For Individual (Qty=N, Attendees=N), store specific one.
+                const isGroupTicket = item.ticket.type === 'GROUP' || item.ticket.type === 'group';
+                const dataToStore = isGroupTicket ? attendees : attendee;
 
                 await tx.eventRegistration.create({
                     data: {
@@ -329,10 +353,8 @@ async function finalizeBooking(orderId) {
                         unitPrice: item.unitPrice,
                         qrCode: `QR_${Date.now()}_${crypto.randomUUID()}`,
                         status: "CONFIRMED",
-                        addons: item.addons, // Addons from BookingItem
-                        responses: {
-                            create: fieldResponses
-                        }
+                        addons: item.addons,
+                        registrationData: dataToStore // Store Array for Group, Object for Individual
                     }
                 });
             }
@@ -401,7 +423,7 @@ export const registerFreeEvent = async (req, res) => {
     // ... (Free event logic remains largely same: validate -> transaction create booking/regs -> update stock)
     // Re-implementing correctly for this file
     try {
-        const event = await prisma.event.findUnique({ where: { id: eventId }, include: { tickets: true } });
+        const event = await prisma.event.findUnique({ where: { id: eventId }, include: { tickets: true, customFields: true } }); // Include customFields
         if (!event) return res.status(404).json({ message: "EVENT_NOT_FOUND" });
 
         // Check for Duplicate Registration
@@ -430,10 +452,35 @@ export const registerFreeEvent = async (req, res) => {
         const orderId = `FREE_${Date.now()}_${crypto.randomUUID()}`;
         let totalCount = 0;
 
+        // Map Helper
+        const fieldMap = (event.customFields || []).reduce((acc, field) => {
+            acc[field.id] = field.label;
+            return acc;
+        }, {});
+
         for (const item of inputTickets) {
             const ticket = event.tickets.find(t => t.id === item.ticketId);
             if (!ticket || ticket.price > 0) return res.status(400).json({ message: "INVALID_FREE_TICKET" });
             if (ticket.sold + item.quantity > ticket.quantity) return res.status(400).json({ message: "SOLD_OUT" });
+
+            const rawAttendees = item.attendees || [];
+
+            // Flatten Data
+            const processedAttendees = rawAttendees.map(att => {
+                const flatResponses = {};
+                if (att.responses && Array.isArray(att.responses)) {
+                    att.responses.forEach(r => {
+                        const label = fieldMap[r.fieldId] || r.fieldId;
+                        flatResponses[label] = r.value;
+                    });
+                }
+                return {
+                    name: att.name,
+                    email: att.email,
+                    phone: att.phone,
+                    ...flatResponses
+                };
+            });
 
             totalCount += item.quantity;
             bookingItemsToCreate.push({
@@ -442,11 +489,15 @@ export const registerFreeEvent = async (req, res) => {
                 unitPrice: 0,
                 quantity: item.quantity,
                 totalPrice: 0,
-                addons: []
+                addons: [],
+                attendeeData: processedAttendees // Store flattened data
             });
 
             for (let i = 0; i < item.quantity; i++) {
-                registrationsToCreate.push({ ticketId: ticket.id });
+                registrationsToCreate.push({
+                    ticketId: ticket.id,
+                    attendee: processedAttendees[i] || {}
+                });
             }
         }
 
@@ -464,6 +515,23 @@ export const registerFreeEvent = async (req, res) => {
             });
 
             for (const reg of registrationsToCreate) {
+                const attendee = reg.attendee; // This is single attendee from loop
+
+                // Retrieve ticket to check type
+                // We know ticketId from reg.ticketId. We need the full ticket object or type.
+                // We have 'event.tickets' available in this scope.
+                const ticket = event.tickets.find(t => t.id === reg.ticketId);
+                const isGroupTicket = ticket && (ticket.type === 'GROUP' || ticket.type === 'group');
+
+                // If Group, we need the FULL list of processed attendees for this ticket item.
+                // We can find the original item from inputTickets or bookingItemsToCreate?
+                // Actually 'attendeeData' in bookingItemsToCreate stores the full list.
+                // Let's find the matching booking item.
+                const bookingItem = bookingItemsToCreate.find(bi => bi.ticketId === reg.ticketId);
+                const fullAttendees = bookingItem ? bookingItem.attendeeData : [attendee];
+
+                const dataToStore = isGroupTicket ? fullAttendees : attendee;
+
                 await tx.eventRegistration.create({
                     data: {
                         eventId,
@@ -474,10 +542,10 @@ export const registerFreeEvent = async (req, res) => {
                         unitPrice: 0,
                         qrCode: crypto.randomUUID(),
                         status: "CONFIRMED",
-                        addons: []
+                        addons: [],
+                        registrationData: dataToStore
                     }
                 });
-                // Assuming no custom fields update here for brevity or it matches similar logic
             }
 
             for (const item of inputTickets) {
