@@ -383,7 +383,7 @@ async function finalizeBooking(orderId) {
                 amount: booking.payment,
                 ticketCount: totalTickets,
                 eventTitle: firstTicket?.event?.title || "Event",
-                actionUrl: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/mytickets`
+                actionUrl: `${process.env.FRONTEND_URL || "https://tkthive.com"}/mytickets`
             });
         } catch (err) {
             console.error("Email Sending Failed in Finalize:", err);
@@ -563,7 +563,7 @@ export const registerFreeEvent = async (req, res) => {
             amount: 0,
             ticketCount: totalCount,
             eventTitle: event.title,
-            actionUrl: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/mytickets`
+            actionUrl: `${process.env.FRONTEND_URL || "https://tkthive.com"}/mytickets`
         }).catch(err => console.error("Email API Error:", err));
 
         // Create Notification
