@@ -139,11 +139,18 @@ eventRouter.delete('/del-field/:fieldId',
 // );
 
 import { removeCoupon } from "./removeCoupon.js";
+import { submitProject } from "./submitProject.js";
 
 eventRouter.delete("/:eventId/coupons/:code",
     protect,
     authorize(Permission.MANAGE_EVENT),
     removeCoupon
+);
+
+// Submit Project
+eventRouter.post("/:eventId/submit",
+    protect,
+    submitProject
 );
 
 export default eventRouter;

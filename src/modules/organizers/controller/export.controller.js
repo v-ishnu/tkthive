@@ -83,10 +83,17 @@ export const exportRegistrations = async (req, res) => {
                 // Custom Fields (Spread the rest of registrationData, excluding name/email/phone which we already grabbed)
                 const { name, email, phone, ...customFields } = attendeeInfo;
 
+                // Submission Data (Flattened)
+                const submissionData = reg.submissions || {};
+                // Exclude internal fields if any, or just spread all
+                // We might want to prefix them to avoid collisions? e.g. "Submission: Project Title"
+                // For now, raw spread as requested "add sumbission in exported data"
+
                 return {
                     ...baseInfo,
                     ...userInfo,
-                    ...customFields
+                    ...customFields,
+                    ...submissionData
                 };
             });
         });

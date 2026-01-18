@@ -446,6 +446,7 @@ model EventRegistration {
   ticket  Ticket  @relation(fields: [ticketId], references: [id])
 
   registrationData Json? // Stores full attendee list/details for this registration (especially for group tickets)
+  submissions      Json? // Stores project submissions or other custom form data
 
   @@index([bookingId])
   @@index([eventId, scanned])
