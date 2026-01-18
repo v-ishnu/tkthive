@@ -165,7 +165,7 @@ export const TicketCard: React.FC<TicketCardProps> = ({ ticket }) => {
                             </div>
 
                             {/* Meta Grid */}
-                            <div className="mt-6 grid grid-cols-2 md:grid-cols-3 gap-4 font-mono text-xs">
+                            <div className="mt-6 grid grid-cols-2 gap-4 font-mono text-xs">
                                 <div>
                                     <p className="text-[10px] text-gray-500 uppercase mb-1">Date</p>
                                     <p className="text-white font-bold flex items-center">
@@ -178,11 +178,13 @@ export const TicketCard: React.FC<TicketCardProps> = ({ ticket }) => {
                                         <Clock size={12} className={`mr-2 ${theme.color}`} /> {eventTime}
                                     </p>
                                 </div>
-                                <div className="col-span-2 md:col-span-1">
+                                <div className="col-span-2">
                                     <p className="text-[10px] text-gray-500 uppercase mb-1">Venue</p>
-                                    <p className="text-white font-bold flex items-center truncate" title={ticket.event.venue?.name || ticket.event.location || ticket.event.city}>
-                                        <MapPin size={12} className={`mr-2 ${theme.color}`} />
-                                        {ticket.event.venue?.name || ticket.event.city || "TBA"}
+                                    <p className="text-white font-bold flex items-start break-words" title={ticket.event.venue?.name || ticket.event.location || ticket.event.city}>
+                                        <MapPin size={12} className={`mr-2 mt-0.5 shrink-0 ${theme.color}`} />
+                                        <span>
+                                            {ticket.event.venue?.name ? `${ticket.event.venue.name}, ${ticket.event.venue.city || ''}` : (ticket.event.city || "TBA")}
+                                        </span>
                                     </p>
                                 </div>
                             </div>
