@@ -17,7 +17,7 @@ const sendWelcomeMail = async (email) => {
 
       <!-- Heading -->
       <h2 style="text-align:center; color:#ffa116; margin-bottom:10px;">
-        Welcome to Ticket Hive
+        Welcome to tkthive
       </h2>
 
       <!-- Subheading -->
@@ -33,7 +33,7 @@ const sendWelcomeMail = async (email) => {
 
       <!-- CTA Button -->
       <div style="text-align:center; margin:30px 0;">
-        <a href="https://tickethive.com"
+        <a href="https://tkthive.com"
            style="background:#ffa116; color:#000000; padding:14px 28px; text-decoration:none; border-radius:6px; font-size:14px; font-weight:bold; display:inline-block;">
           Visit Dashboard
         </a>
@@ -46,7 +46,7 @@ const sendWelcomeMail = async (email) => {
 
       <!-- Footer -->
       <p style="text-align:center; font-size:11px; color:#666666; margin-top:25px;">
-        © Ticket Hive. All rights reserved.
+        © tkthive. All rights reserved.
       </p>
 
     </div>
