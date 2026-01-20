@@ -68,7 +68,7 @@ export default function PrivacyPolicy() {
                                 Information We Collect
                             </h2>
                             <div className="space-y-4 text-gray-400 leading-relaxed">
-                                <p>We collect information that you provide directly to us, such as when you create an account, purchase a ticket, or contact support.</p>
+                                <p>tkthive (operated by Shubham Kumar) collects information that you provide directly to us, such as when you create an account, purchase a ticket, or contact support.</p>
                                 <div className="grid md:grid-cols-2 gap-4 mt-6">
                                     <div className="p-4 bg-white/5 rounded-xl border border-white/5">
                                         <UserCheck className="text-primary mb-3" />

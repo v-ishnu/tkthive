@@ -67,7 +67,7 @@ export default function TermsPage() {
                             </h2>
                             <div className="space-y-4 text-gray-400 leading-relaxed">
                                 <p>
-                                    Welcome to <strong>tkthive</strong>. By accessing our website, mobile application, or any other services (collectively, the "Service"), you agree to be bound by these Terms and Conditions ("Terms"). Please read them carefully.
+                                    Welcome to <strong>tkthive</strong>, operated by Shubham Kumar. By accessing our website, mobile application, or any other services (collectively, the "Service"), you agree to be bound by these Terms and Conditions ("Terms"). Please read them carefully.
                                 </p>
                                 <p>
                                     If you do not agree to these Terms, you may not use the Service. We reserve the right to modify these Terms at any time, and your continued use of the Service constitutes acceptance of such modifications.
