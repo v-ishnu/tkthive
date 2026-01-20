@@ -4,7 +4,7 @@ import { EventData, EventTab } from '../../types';
 import EventSchedule from './EventSchedule';
 import EventDocs from './EventDocs';
 import EventSubmissions from './EventSubmissions';
-import { LayoutList, FileText, Send, Map, Play, Trophy, Mic2, AlertCircle, Info, ChevronLeft, ChevronRight, Megaphone, Globe, MapPin, Calendar } from 'lucide-react';
+import { LayoutList, FileText, Send, Map, Play, Trophy, Mic2, AlertCircle, Info, ChevronLeft, ChevronRight, Megaphone, Globe, MapPin, Calendar, LifeBuoy } from 'lucide-react';
 
 interface EventTabsProps {
     event: EventData;
@@ -36,6 +36,7 @@ export const EventTabs: React.FC<EventTabsProps> = ({ event }) => {
             case 'submissions': return <Send size={16} />;
             case 'sponsors': return <Megaphone size={16} />;
             case 'about': return <Info size={16} />;
+            case 'support': return <LifeBuoy size={16} />;
             default: return <LayoutList size={16} />;
         }
     };
