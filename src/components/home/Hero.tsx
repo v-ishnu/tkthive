@@ -26,7 +26,7 @@ export default function Hero() {
             onMouseMove={handleMouseMove}
             onMouseEnter={() => setIsHoveringHero(true)}
             onMouseLeave={() => setIsHoveringHero(false)}
-            className="relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-zinc-950 text-white selection:bg-amber-400 selection:text-black group/hero"
+            className="relative min-h-[50vh] lg:min-h-[90vh] flex items-center justify-center overflow-hidden bg-zinc-950 text-white selection:bg-amber-400 selection:text-black group/hero"
         >
             {/* 1. Dark Event Background with Top/Bottom Fade */}
             <div
@@ -104,7 +104,7 @@ export default function Hero() {
                 </div>
 
                 {/* RIGHT: Vertical Scroll Cards */}
-                <div className="relative flex justify-center lg:justify-end mt-12 md:mt-0">
+                <div className="hidden lg:flex relative justify-center lg:justify-end mt-12 md:mt-0">
                     <HeroCards />
                 </div>
 
