@@ -2,6 +2,7 @@
 import React, { useState, useMemo } from 'react';
 import { ArrowUpRight } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { EventData } from '../../types';
 
 interface FeaturedEventsProps {
@@ -11,6 +12,7 @@ interface FeaturedEventsProps {
 
 export const FeaturedEvents: React.FC<FeaturedEventsProps> = ({ events, isLoading }) => {
     const [activeIndex, setActiveIndex] = useState(0);
+    const router = useRouter();
 
     // Filter for featured events, fallback to first 4 if none found
     const featuredEvents = useMemo(() => {
@@ -98,7 +100,7 @@ export const FeaturedEvents: React.FC<FeaturedEventsProps> = ({ events, isLoadin
                             onMouseEnter={() => setActiveIndex(index)}
                             onClick={() => {
                                 setActiveIndex(index);
-
+                                router.push(`/events/${event.slug}`);
                             }}
                             className={`
                 relative rounded-3xl overflow-hidden cursor-pointer transition-[flex] duration-700 ease-[cubic-bezier(0.25,0.1,0.25,1)]
