@@ -33,10 +33,7 @@
   background: var(--primary);
 }
 
-/* Smooth Scrolling */
-html {
-  scroll-behavior: smooth;
-}
+/* Smooth Scrolling handled by Lenis */
 
 @theme inline {
   --font-sans: var(--font-space-grotesk);
@@ -172,10 +169,7 @@ body {
   background: var(--primary);
 }
 
-/* Smooth Scrolling */
-html {
-  scroll-behavior: smooth;
-}
+
 
 /* Horizontal Auto Scroll (0 to -50%) */
 @keyframes marquee-infinite {

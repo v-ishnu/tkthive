@@ -7,6 +7,7 @@ import { Provider } from "react-redux";
 import { store } from "@/store/store";
 import AuthInitializer from "@/components/AuthInitializer";
 import { ToastProvider } from "@/context/ToastContext";
+import LenisProvider from "@/components/LenisProvider";
 
 export default function RootComponent({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
@@ -17,16 +18,18 @@ export default function RootComponent({ children }: { children: React.ReactNode 
     const isTransparentNavPage = pathname === '/' || /^\/events\/[^/]+$/.test(pathname || '');
 
     return (
-        <Provider store={store}>
-            <ToastProvider>
-                <AuthInitializer />
-                <div className="">
-                    {!isLoginPage && <Navbar />}
-                    <main className={!isLoginPage && !isTransparentNavPage ? "pt-20" : ""}>{children}</main>
-                    {!isLoginPage && <Footer />}
+        <LenisProvider>
+            <Provider store={store}>
+                <ToastProvider>
+                    <AuthInitializer />
+                    <div className="">
+                        {!isLoginPage && <Navbar />}
+                        <main className={!isLoginPage && !isTransparentNavPage ? "pt-20" : ""}>{children}</main>
+                        {!isLoginPage && <Footer />}
 
-                </div>
-            </ToastProvider>
-        </Provider>
+                    </div>
+                </ToastProvider>
+            </Provider>
+        </LenisProvider>
     );
 }
