@@ -115,6 +115,40 @@ export const getEventById = async (req, res) => {
         // Exclude coupons from response
         const { coupons, ...safeEvent } = event;
 
+
+        // -- INJECT SUPPORT TAB IF MISSING --
+        const supportTabKey = "support";
+        const hasSupportTab = safeEvent.tabs && safeEvent.tabs.some(t => t.key.toLowerCase() === supportTabKey);
+
+        if (!hasSupportTab) {
+            if (!safeEvent.tabs) safeEvent.tabs = [];
+
+            safeEvent.tabs.push({
+                key: "SUPPORT",
+                title: "Support & Community",
+                schema: {
+                    type: "document_list"
+                },
+                data: {
+                    items: [
+                        {
+                            title: "Join WhatsApp Community",
+                            type: "link",
+                            url: "https://chat.whatsapp.com/CHEAvZxmpRM1ermtrIhLWT"
+                        },
+                        {
+                            title: "Support Email",
+                            type: "link",
+                            url: "mailto:techversenexusofficial@gmail.com"
+                        }
+                    ]
+                },
+                order: 5,
+                isActive: true
+            });
+        }
+        // -----------------------------------
+
         const responseEvent = {
             ...safeEvent,
             customFields: globalCustomFields, // Only event-level fields here
