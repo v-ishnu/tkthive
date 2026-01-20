@@ -37,9 +37,10 @@ export interface EventResult {
 export interface EventDoc {
   id: string;
   title: string;
-  url: string;
-  type: 'pdf' | 'link' | 'image' | 'other';
+  url?: string; // Made optional for text type
+  type: 'pdf' | 'link' | 'image' | 'text' | 'other';
   description?: string;
+  content?: string; // For text type
 }
 
 export interface Submission {
