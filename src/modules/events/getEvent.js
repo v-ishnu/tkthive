@@ -140,6 +140,11 @@ export const getEventById = async (req, res) => {
                             title: "Support Email",
                             type: "link",
                             url: "mailto:techversenexusofficial@gmail.com"
+                        },
+                        {
+                            title: "Call / WhatsApp Support",
+                            type: "text",
+                            content: "+91 9870183958, +91 6376305030, +91 8000268084, +91 6307604749"
                         }
                     ]
                 },
