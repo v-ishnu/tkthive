@@ -4,7 +4,9 @@ export const getEvent = async (req, res) => {
     try {
         const { city } = req.query;
 
-        const where = {};
+        const where = {
+            showEvent: true
+        };
 
         // Filter by City if provided and not "All" (case-insensitive check safe)
         if (city && city.toUpperCase() !== 'ALL') {
@@ -58,8 +60,11 @@ export const getEventById = async (req, res) => {
 
         // Check if slugOrId is a valid ObjectId (24 char hex string)
         if (/^[0-9a-fA-F]{24}$/.test(slugOrId)) {
-            event = await prisma.event.findUnique({
-                where: { id: slugOrId },
+            event = await prisma.event.findFirst({
+                where: {
+                    id: slugOrId,
+                    showEvent: true
+                },
                 include: {
                     tickets: true,
                     tabs: true,
@@ -72,8 +77,11 @@ export const getEventById = async (req, res) => {
 
         // If not found by ID (or invalid ObjectId), try finding by slug
         if (!event) {
-            event = await prisma.event.findUnique({
-                where: { slug: slugOrId },
+            event = await prisma.event.findFirst({
+                where: {
+                    slug: slugOrId,
+                    showEvent: true
+                },
                 include: {
                     tickets: true,
                     tabs: true,
@@ -116,7 +124,7 @@ export const getEventById = async (req, res) => {
         const { coupons, ...safeEvent } = event;
 
 
-    
+
 
         const responseEvent = {
             ...safeEvent,
