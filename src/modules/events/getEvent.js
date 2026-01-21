@@ -80,7 +80,7 @@ export const getEventById = async (req, res) => {
             event = await prisma.event.findFirst({
                 where: {
                     slug: slugOrId,
-                    showEvent: true
+                    showevent: true
                 },
                 include: {
                     tickets: true,
