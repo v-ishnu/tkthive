@@ -5,7 +5,7 @@ export const getEvent = async (req, res) => {
         const { city } = req.query;
 
         const where = {
-            showEvent: true
+            showevent: true
         };
 
         // Filter by City if provided and not "All" (case-insensitive check safe)
