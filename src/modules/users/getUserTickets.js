@@ -36,7 +36,6 @@ export const getUserTickets = async (req, res) => {
                     }
                 },
                 addons: true, // Selected addons
-                registrationData: true, // ✅ Added
                 // responses: false // User requested to remove responses
             },
             orderBy: { createdAt: 'desc' }
