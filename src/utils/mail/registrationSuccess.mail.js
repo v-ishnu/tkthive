@@ -80,11 +80,12 @@ const sendRegistrationSuccessEmail = async ({
           <!-- Community Link -->
           <div style="margin: 30px 0; padding: 20px; background: #1a1a1a; border-radius: 10px; border: 1px solid #2a2a2a; text-align: center;">
             <p style="color: #ffffff; font-size: 16px; margin: 0 0 15px;">
-              ${communityMessage || "Join our community to stay updated!"}
+              "Join our community to stay updated!"
             </p>
             <a href="${communityLink}"
-               style="background: #25D366; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-size: 15px; font-weight: 600; display: inline-block;">
-              Join Community
+               style="background: #25D366; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 50px; font-size: 16px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4); text-transform: uppercase; letter-spacing: 0.5px;">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/WhatsApp.svg/512px-WhatsApp.svg.png" width="20" height="20" alt="WA" style="filter: brightness(0) invert(1);" />
+              ${communityMessage}
             </a>
           </div>
           ` : ''}
