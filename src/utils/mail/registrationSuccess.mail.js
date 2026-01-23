@@ -76,13 +76,13 @@ const sendRegistrationSuccessEmail = async ({
           </div>
 
           
-          ${params.communityLink ? `
+          ${communityLink ? `
           <!-- Community Link -->
           <div style="margin: 30px 0; padding: 20px; background: #1a1a1a; border-radius: 10px; border: 1px solid #2a2a2a; text-align: center;">
             <p style="color: #ffffff; font-size: 16px; margin: 0 0 15px;">
-              ${params.communityMessage || "Join our community to stay updated!"}
+              ${communityMessage || "Join our community to stay updated!"}
             </p>
-            <a href="${params.communityLink}"
+            <a href="${communityLink}"
                style="background: #25D366; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-size: 15px; font-weight: 600; display: inline-block;">
               Join Community
             </a>
