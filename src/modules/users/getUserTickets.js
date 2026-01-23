@@ -21,8 +21,8 @@ export const getUserTickets = async (req, res) => {
                         title: true,
                         startDate: true,
                         endDate: true,
-                        endDate: true,
                         venue: true,
+                        slug: true, // ✅ Added
                         // images: true, // Not in schema currently
                         // city: true    // Not in schema currently
                     }
@@ -36,6 +36,7 @@ export const getUserTickets = async (req, res) => {
                     }
                 },
                 addons: true, // Selected addons
+                registrationData: true, // ✅ Added
                 // responses: false // User requested to remove responses
             },
             orderBy: { createdAt: 'desc' }
