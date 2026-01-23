@@ -10,9 +10,10 @@ interface LocationModalProps {
   onClose: () => void;
   onSelect: (location: LocationData) => void;
   canClose?: boolean;
+  selectedCity?: string | null; // Added prop
 }
 
-export const LocationModal: React.FC<LocationModalProps> = ({ isOpen, onClose, onSelect, canClose = true }) => {
+export const LocationModal: React.FC<LocationModalProps> = ({ isOpen, onClose, onSelect, canClose = true, selectedCity }) => {
   const dispatch = useAppDispatch();
   const { locations: availableLocations, locationsLoading } = useAppSelector((state) => state.event);
 
@@ -57,9 +58,9 @@ export const LocationModal: React.FC<LocationModalProps> = ({ isOpen, onClose, o
           <div className="mb-8">
             <button
               onClick={() => onSelect({ city: 'All', country: 'Global', imageUrl: '' })}
-              className="flex items-center gap-3 text-primary hover:text-primary-hover transition-colors font-bold text-lg group"
+              className={`flex items-center gap-3 transition-colors font-bold text-lg group ${selectedCity === 'All' || !selectedCity ? 'text-primary' : 'text-[var(--text-secondary)] hover:text-primary'}`}
             >
-              <div className="p-2 bg-primary/10 rounded-full group-hover:bg-primary/20 transition-colors">
+              <div className={`p-2 rounded-full transition-colors ${selectedCity === 'All' || !selectedCity ? 'bg-primary/20 text-primary' : 'bg-[var(--bg-elevated)] group-hover:bg-primary/20'}`}>
                 <Globe size={20} />
               </div>
               All Locations
@@ -83,7 +84,7 @@ export const LocationModal: React.FC<LocationModalProps> = ({ isOpen, onClose, o
                 <button
                   key={loc.city}
                   onClick={() => onSelect(loc)}
-                  className="text-left text-[var(--text-secondary)] hover:text-primary transition-colors text-sm py-1"
+                  className={`text-left transition-colors text-sm py-1 ${selectedCity === loc.city ? 'text-primary font-bold' : 'text-[var(--text-secondary)] hover:text-primary'}`}
                 >
                   {loc.city}
                 </button>

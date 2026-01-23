@@ -101,7 +101,7 @@ const ESummitTicket: React.FC<ESummitTicketProps> = ({ ticket, attendeeName, col
                     </g>
 
                     {/* TKTHive Logo */}
-                    <image href="/logo/whitelogo.png" x="800" y="230" height="40" width="120" opacity="0.8" />
+                    <image href="/logo/whitelogo.png" x="0" y="0" height="48" width="120" opacity="1" transform="translate(770, 210) rotate(-90)" />
 
 
                     <text x="155" y="45" fill="white" fontSize="16" fontWeight="700" className="font-main">IIT TIRUPATI’S</text>

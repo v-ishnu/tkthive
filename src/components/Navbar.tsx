@@ -330,6 +330,7 @@ export const Navbar = () => {
                 onClose={() => setIsLocationModalOpen(false)}
                 onSelect={handleLocationSelect}
                 canClose={!!location}
+                selectedCity={location?.city}
             />
             <NotificationPanel
                 isOpen={isNotificationOpen}
