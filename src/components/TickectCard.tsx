@@ -1,74 +1,32 @@
-import React, { useMemo } from 'react';
-import { Calendar, MapPin, Clock, Ticket as TicketIcon, User, Download } from 'lucide-react';
-import QRCode from 'react-qr-code';
-import { toPng } from 'html-to-image';
+import ESummitTicket from './ESummitTicket';
 
-interface TicketCardProps {
-    ticket: {
-        id: string;
-        event: {
-            title: string;
-            startDate: string;
-            endDate: string;
-            venue?: any; // Venue | string
-            location?: string;
-            images?: string[];
-            city?: string;
-        };
-        ticket: {
-            name: string;
-            type: string;
-            price: number;
-        };
-        addons: any[];
-        qrCode: string;
-        status: string;
-        unitPrice: number;
-        scanned: boolean;
-        createdAt: string;
-    };
-}
-
-const HivePattern = () => (
-    <svg className="absolute inset-0 w-full h-full opacity-10 pointer-events-none" width="100%" height="100%">
-        <pattern id="hive-pattern" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
-            <path d="M20 0L37.32 10V30L20 40L2.68 30V10L20 0Z" fill="none" stroke="currentColor" strokeWidth="1" />
-        </pattern>
-        <rect width="100%" height="100%" fill="url(#hive-pattern)" />
-    </svg>
-);
-
-const Barcode = ({ className }: { className?: string }) => (
-    <div className={`flex flex-col gap-[2px] items-center justify-center opacity-70 ${className}`}>
-        {[...Array(20)].map((_, i) => (
-            <div key={i} className={`w-full bg-current ${Math.random() > 0.5 ? 'h-full' : 'h-3/4'}`} style={{ height: `${Math.random() * 40 + 60}%` }}></div>
-        ))}
-        <div className="writing-vertical text-[8px] font-mono tracking-widest mt-2 uppercase opacity-50">
-            Entry Ticket
-        </div>
-    </div>
-);
-
-
-const getEventTheme = (title: string) => {
-    const lowerTitle = title.toLowerCase();
-    if (lowerTitle.includes('tech') || lowerTitle.includes('code') || lowerTitle.includes('hack') || lowerTitle.includes('dev') || lowerTitle.includes('ai')) {
-        return { image: '/vector/tech.png', type: 'tech', color: 'text-cyan-400', border: 'border-cyan-500/30', bg: 'from-cyan-900/40 to-blue-900/40' };
-    }
-    if (lowerTitle.includes('sport') || lowerTitle.includes('match') || lowerTitle.includes('cup') || lowerTitle.includes('game') && !lowerTitle.includes('video')) {
-        return { image: '/vector/sports.png', type: 'sports', color: 'text-orange-400', border: 'border-orange-500/30', bg: 'from-orange-900/40 to-red-900/40' };
-    }
-    if (lowerTitle.includes('music') || lowerTitle.includes('concert') || lowerTitle.includes('live') || lowerTitle.includes('band') || lowerTitle.includes('festival')) {
-        return { image: '/vector/concerts.png', type: 'music', color: 'text-purple-400', border: 'border-purple-500/30', bg: 'from-purple-900/40 to-pink-900/40' };
-    }
-    if (lowerTitle.includes('esport') || lowerTitle.includes('gaming')) {
-        return { image: '/vector/esports.png', type: 'esports', color: 'text-green-400', border: 'border-green-500/30', bg: 'from-green-900/40 to-emerald-900/40' };
-    }
-    return { image: '/vector/fest.png', type: 'general', color: 'text-primary', border: 'border-white/10', bg: 'from-gray-900 to-gray-800' };
-};
+// ... (existing imports and code)
 
 export const TicketCard: React.FC<TicketCardProps> = ({ ticket }) => {
+    // E-Summit 2026 Custom Ticket Check
+    const isESummit = ticket.event.slug === 'e-summit-2026-iit-tirupati-2026-01-31';
+
+    if (isESummit) {
+        // Attempt to extract name/college from registrationData or fallback
+        // ticket.registrationData might be an object or array depending on Group/Individual
+        // Assuming individual for now or taking first
+        const regData = ticket.registrationData || {};
+        const attendeeName = regData.name || "Attendee";
+
+        // Try to find college in custom field responses
+        // regData might contain flattened keys like "College Name" or similar if processed in backend
+        // Or we might need to search raw response arrays if passed differently.
+        // Based on booking controller, it seems we flattened custom fields into the object.
+        // So we look for keys that might match 'college', 'organization', 'institute'
+        const collegeKey = Object.keys(regData).find(k => k.toLowerCase().includes('college') || k.toLowerCase().includes('organization') || k.toLowerCase().includes('institute'));
+        const collegeName = collegeKey ? regData[collegeKey] : "";
+
+        return <ESummitTicket ticket={ticket} attendeeName={attendeeName} collegeName={collegeName} />;
+    }
+
     const theme = useMemo(() => getEventTheme(ticket.event.title), [ticket.event.title]);
+
+    // ... rest of existing render logic ...
 
     const eventDate = new Date(ticket.event.startDate).toLocaleDateString('en-GB', {
         day: '2-digit', month: 'short', year: 'numeric'

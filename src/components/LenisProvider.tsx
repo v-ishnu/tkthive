@@ -1,10 +1,14 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import Lenis from 'lenis';
 import 'lenis/dist/lenis.css';
+import { usePathname } from 'next/navigation';
 
 export default function LenisProvider({ children }: { children: React.ReactNode }) {
+    const lenisRef = useRef<Lenis | null>(null);
+    const pathname = usePathname();
+
     useEffect(() => {
         // Initialize Lenis
         const lenis = new Lenis({
@@ -18,6 +22,8 @@ export default function LenisProvider({ children }: { children: React.ReactNode 
             infinite: false,
         });
 
+        lenisRef.current = lenis;
+
         // Integrate with requestAnimationFrame
         function raf(time: number) {
             lenis.raf(time);
@@ -29,8 +35,15 @@ export default function LenisProvider({ children }: { children: React.ReactNode 
         // Cleanup
         return () => {
             lenis.destroy();
+            lenisRef.current = null;
         };
     }, []);
+
+    useEffect(() => {
+        if (lenisRef.current) {
+            lenisRef.current.scrollTo(0, { immediate: false });
+        }
+    }, [pathname]);
 
     return <>{children}</>;
 }
