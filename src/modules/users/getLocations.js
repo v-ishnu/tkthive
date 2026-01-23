@@ -19,7 +19,11 @@ export const getEventLocations = async (req, res) => {
         const cities = new Set();
         events.forEach(event => {
             if (event.venue && event.venue.city) {
-                cities.add(event.venue.city.trim());
+                let loc = event.venue.city.trim();
+                if (event.venue.state) {
+                    loc += `, ${event.venue.state.trim()}`;
+                }
+                cities.add(loc);
             }
         });
 

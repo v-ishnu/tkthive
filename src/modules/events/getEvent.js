@@ -10,11 +10,23 @@ export const getEvent = async (req, res) => {
 
         // Filter by City if provided and not "All" (case-insensitive check safe)
         if (city && city.toUpperCase() !== 'ALL') {
-            where.venue = {
-                is: {
-                    city: city
-                }
-            };
+            if (city.includes(',')) {
+                // Handle "City, State" format
+                const [cityPart, statePart] = city.split(',').map(s => s.trim());
+                where.venue = {
+                    is: {
+                        city: cityPart,
+                        state: statePart
+                    }
+                };
+            } else {
+                // Handle City only
+                where.venue = {
+                    is: {
+                        city: city
+                    }
+                };
+            }
         }
 
         const events = await prisma.event.findMany({
