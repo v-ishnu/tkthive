@@ -372,7 +372,7 @@ async function finalizeBooking(orderId) {
             // Let's refetch minimal event info or rely on what we have.
             const firstTicket = await prisma.ticket.findUnique({
                 where: { id: booking.items[0].ticketId },
-                include: { event: { select: { title: true } } }
+                include: { event: { select: { title: true, communityLink: true, communityMessage: true } } }
             });
 
             const totalTickets = booking.items.reduce((acc, item) => acc + item.quantity, 0);
@@ -383,7 +383,9 @@ async function finalizeBooking(orderId) {
                 amount: booking.payment,
                 ticketCount: totalTickets,
                 eventTitle: firstTicket?.event?.title || "Event",
-                actionUrl: `${process.env.FRONTEND_URL || "https://tkthive.com"}/mytickets`
+                actionUrl: `${process.env.FRONTEND_URL || "https://tkthive.com"}/mytickets`,
+                communityLink: firstTicket?.event?.communityLink,
+                communityMessage: firstTicket?.event?.communityMessage
             });
         } catch (err) {
             console.error("Email Sending Failed in Finalize:", err);
@@ -563,7 +565,9 @@ export const registerFreeEvent = async (req, res) => {
             amount: 0,
             ticketCount: totalCount,
             eventTitle: event.title,
-            actionUrl: `${process.env.FRONTEND_URL || "https://tkthive.com"}/mytickets`
+            actionUrl: `${process.env.FRONTEND_URL || "https://tkthive.com"}/mytickets`,
+            communityLink: event.communityLink,
+            communityMessage: event.communityMessage
         }).catch(err => console.error("Email API Error:", err));
 
         // Create Notification

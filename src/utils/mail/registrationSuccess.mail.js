@@ -18,7 +18,9 @@ const sendRegistrationSuccessEmail = async ({
   currency = "INR",
   ticketCount,
   eventTitle,
-  actionUrl
+  actionUrl,
+  communityLink,
+  communityMessage
 }) => {
   const subject = eventTitle
     ? `Booking Confirmed: ${eventTitle}`
@@ -72,6 +74,20 @@ const sendRegistrationSuccessEmail = async ({
               View My Tickets
             </a>
           </div>
+
+          
+          ${params.communityLink ? `
+          <!-- Community Link -->
+          <div style="margin: 30px 0; padding: 20px; background: #1a1a1a; border-radius: 10px; border: 1px solid #2a2a2a; text-align: center;">
+            <p style="color: #ffffff; font-size: 16px; margin: 0 0 15px;">
+              ${params.communityMessage || "Join our community to stay updated!"}
+            </p>
+            <a href="${params.communityLink}"
+               style="background: #25D366; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-size: 15px; font-weight: 600; display: inline-block;">
+              Join Community
+            </a>
+          </div>
+          ` : ''}
 
           <p style="text-align:center; font-size:13px; color:#cccccc; line-height:1.6; margin:0;">
             Access your QR codes, booking details, and event updates directly from your dashboard.

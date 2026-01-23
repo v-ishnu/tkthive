@@ -25,6 +25,8 @@ export async function updateEvent(req, res) {
       totalBooked,
       totalTickets,
       showevent, // ✅ Added
+      communityLink,  // ✅ Added
+      communityMessage // ✅ Added
     } = req.body;
 
     // 1. Check if event exists
@@ -72,10 +74,46 @@ export async function updateEvent(req, res) {
         ...(isRegistrationOpen !== undefined && { isRegistrationOpen: Boolean(isRegistrationOpen) }),
         ...(totalBooked !== undefined && { totalBooked: parseInt(totalBooked) }),
         ...(totalTickets !== undefined && { totalTickets: parseInt(totalTickets) }),
+        ...(communityLink !== undefined && { communityLink }), // ✅ Added
+        ...(communityMessage !== undefined && { communityMessage }), // ✅ Added
         ...(showevent !== undefined && { showevent: Boolean(showevent) }), // ✅ Added
-        ...(req.body.coupons !== undefined && { coupons: req.body.coupons }), // ✅ Added
+        // ...(req.body.coupons !== undefined && { coupons: req.body.coupons }), // ✅ Added
       },
     });
+
+    // Handle Coupons separately if provided (to validate)
+    if (req.body.coupons !== undefined) {
+      const coupons = req.body.coupons;
+
+      if (!Array.isArray(coupons)) {
+        throw new Error("Coupons must be an array");
+      }
+
+      // Validate each coupon
+      const validCoupons = coupons.map(c => {
+        if (!c.code || typeof c.code !== 'string') {
+          throw new Error(`Invalid coupon code: ${c.code}`);
+        }
+        if (c.discountPercentage === undefined || typeof c.discountPercentage !== 'number') {
+          throw new Error(`Invalid discount for coupon: ${c.code}`);
+        }
+        return {
+          code: c.code,
+          discountPercentage: c.discountPercentage,
+          limit: c.limit ? parseInt(c.limit) : null,
+          used: c.used ? parseInt(c.used) : 0
+        };
+      });
+
+      // Update event with validated coupons
+      await prisma.event.update({
+        where: { id: eventId },
+        data: { coupons: validCoupons }
+      });
+
+      // Merge for response
+      updatedEvent.coupons = validCoupons;
+    }
 
     return res.status(200).json({
       message: "EVENT_UPDATED_SUCCESSFULLY",

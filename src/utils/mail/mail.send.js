@@ -5,7 +5,7 @@ const sendMail = async ({to, subject, htmlContent, textContent}) => {
     //     throw new Error("EMAIL_NOT_PROVIDED");
     // }
     return transporter.sendMail({
-        from: `"TKTHive" <${process.env.MAIL_ADMINISTRATOR}>`,
+        from: `"tkthive" <${process.env.MAIL_ADMINISTRATOR}>`,
         to,
         subject,
         text: textContent,

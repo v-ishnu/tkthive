@@ -45,7 +45,9 @@ export const eventCreate = async (req, res) => {
             totalTickets,
             showevent, // ✅ Added
             category,     // ✅ Added
-            subCategory   // ✅ Added
+            subCategory,   // ✅ Added
+            communityLink,  // ✅ Added
+            communityMessage // ✅ Added
         } = req.body;
 
 
@@ -123,13 +125,13 @@ export const eventCreate = async (req, res) => {
                 title,
                 description,
                 venue: venue ? {
-                  name: venue.name ?? null,
-          city: venue.city ?? null,
-          state: venue.state ?? null,
-          country: venue.country ?? null,
-          pincode: venue.pincode ?? null,
-          latitude: venue.latitude ?? null,
-          longitude: venue.longitude ?? null
+                    name: venue.name ?? null,
+                    city: venue.city ?? null,
+                    state: venue.state ?? null,
+                    country: venue.country ?? null,
+                    pincode: venue.pincode ?? null,
+                    latitude: venue.latitude ?? null,
+                    longitude: venue.longitude ?? null
                 } : null,
                 imageUrl, // ✅ Added
                 slug,     // ✅ Added
@@ -161,6 +163,9 @@ export const eventCreate = async (req, res) => {
                 subCategory: subCategory || null,
 
                 coupons: req.body.coupons || [], // ✅ Added
+
+                communityLink,  // ✅ Added
+                communityMessage, // ✅ Added
 
                 showevent: showevent !== undefined ? Boolean(showevent) : true, // ✅ Added
             },
