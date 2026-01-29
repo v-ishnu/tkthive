@@ -275,6 +275,7 @@ model Event {
   eventStaffInvitations EventStaffInvitation[]
   
   coupons               Coupon[]       // ✅ Added
+  referralCodes         String[]       @default([]) // ✅ Added
 
   @@index([organizerId])
   @@map("events")
@@ -382,6 +383,7 @@ model Booking {
   
   discount      Float?   // ✅ Added
   appliedCoupon String?  // ✅ Added
+  referralCode  String?  // ✅ Added
 
   // scanned       Boolean       @default(false)
 

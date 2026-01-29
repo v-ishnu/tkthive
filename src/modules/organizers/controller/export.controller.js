@@ -38,7 +38,8 @@ export const exportRegistrations = async (req, res) => {
                         payment: true,
                         currency: true,
                         discount: true,
-                        appliedCoupon: true
+                        appliedCoupon: true,
+                        referralCode: true // ✅ Added
                     }
                 },
                 user: {
@@ -71,6 +72,7 @@ export const exportRegistrations = async (req, res) => {
                     "Payment Amount": reg.booking?.payment || 0,
                     "Discount": reg.booking?.discount || 0,
                     "Coupon Code": reg.booking?.appliedCoupon || "N/A",
+                    "Referral Code": reg.booking?.referralCode || "N/A", // ✅ Added
                 };
 
                 // Attendee Info (Prefer registrationData, fall back to User profile if missing)

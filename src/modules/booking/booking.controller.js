@@ -15,7 +15,7 @@ import { createNotification } from "../notifications/notification.service.js";
 export const initiateBooking = async (req, res) => {
     const { eventId } = req.params;
     const userId = req.user.id;
-    const { tickets, couponCode } = req.body;
+    const { tickets, couponCode, referralCode } = req.body;
 
     if (!tickets || !Array.isArray(tickets)) {
         return res.status(400).json({ message: "INVALID_TICKETS_DATA" });
@@ -27,6 +27,13 @@ export const initiateBooking = async (req, res) => {
     });
 
     if (!event) return res.status(404).json({ message: "EVENT_NOT_FOUND" });
+
+    // Validate Referral Code if provided
+    if (referralCode) {
+        if (!event.referralCodes || !event.referralCodes.includes(referralCode)) {
+            return res.status(400).json({ message: "INVALID_REFERRAL_CODE" });
+        }
+    }
 
     // Check for Duplicate Registration
 
@@ -155,6 +162,7 @@ export const initiateBooking = async (req, res) => {
             paymentStatus: "PENDING",
             expiresAt: new Date(Date.now() + 15 * 60 * 1000),
             items: { create: bookingItems },
+            referralCode: referralCode || null, // ✅ Added
 
         }
     });
@@ -413,7 +421,7 @@ async function finalizeBooking(orderId) {
 
 export const registerFreeEvent = async (req, res) => {
     const { eventId } = req.params;
-    const { tickets } = req.body;
+    const { tickets, referralCode } = req.body;
     const userId = req.user.id;
     const userEmail = req.user.email; // Capture for email
 
@@ -427,6 +435,13 @@ export const registerFreeEvent = async (req, res) => {
     try {
         const event = await prisma.event.findUnique({ where: { id: eventId }, include: { tickets: true, customFields: true } }); // Include customFields
         if (!event) return res.status(404).json({ message: "EVENT_NOT_FOUND" });
+
+        // Validate Referral Code if provided
+        if (referralCode) {
+            if (!event.referralCodes || !event.referralCodes.includes(referralCode)) {
+                return res.status(400).json({ message: "INVALID_REFERRAL_CODE" });
+            }
+        }
 
         // Check for Duplicate Registration
         if (!event.allowMultipleBookings) {
@@ -512,7 +527,8 @@ export const registerFreeEvent = async (req, res) => {
                     bookingStatus: "CONFIRMED",
                     paymentStatus: "PAID",
                     expiresAt: new Date(),
-                    items: { create: bookingItemsToCreate }
+                    items: { create: bookingItemsToCreate },
+                    referralCode: referralCode || null, // ✅ Added
                 }
             });
 

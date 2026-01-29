@@ -47,7 +47,8 @@ export const eventCreate = async (req, res) => {
             category,     // ✅ Added
             subCategory,   // ✅ Added
             communityLink,  // ✅ Added
-            communityMessage // ✅ Added
+            communityMessage, // ✅ Added
+            referralCodes // ✅ Added
         } = req.body;
 
 
@@ -168,6 +169,7 @@ export const eventCreate = async (req, res) => {
                 communityMessage, // ✅ Added
 
                 showevent: showevent !== undefined ? Boolean(showevent) : true, // ✅ Added
+                referralCodes: referralCodes || [], // ✅ Added
             },
         });
 
