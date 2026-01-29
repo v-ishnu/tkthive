@@ -225,12 +225,12 @@ export const createPaymentSession = createAsyncThunk(
 
 export const registerFreeEvent = createAsyncThunk(
     'events/registerFreeEvent',
-    async ({ eventId, ticketId, quantity, attendees }: { eventId: string, ticketId: string, quantity: number, attendees?: any[] }, { rejectWithValue }) => {
+    async ({ eventId, ticketId, quantity, attendees, referralCode }: { eventId: string, ticketId: string, quantity: number, attendees?: any[], referralCode?: string }, { rejectWithValue }) => {
         try {
             const response = await fetch(`${API_BASE_URL}booking/events/${eventId}/register-free`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ tickets: [{ ticketId, quantity, attendees }] }),
+                body: JSON.stringify({ tickets: [{ ticketId, quantity, attendees }], referralCode }), // ✅ Added referralCode
                 credentials: 'include'
             });
 

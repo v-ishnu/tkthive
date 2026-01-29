@@ -41,6 +41,7 @@ export default function RegistrationPage() {
     const [couponCode, setCouponCode] = useState('');
     const [discount, setDiscount] = useState(0);
     const [couponMessage, setCouponMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+    const [referralCode, setReferralCode] = useState(''); // ✅ Added Referral Code State
 
     // Initialize event
     useEffect(() => {
@@ -271,7 +272,8 @@ export default function RegistrationPage() {
                     eventId: event.id,
                     ticketId: selectedTier.id,
                     quantity: ticketsPayload[0].quantity,
-                    attendees: finalAttendees
+                    attendees: finalAttendees,
+                    referralCode: referralCode || undefined // ✅ Added
                 })).unwrap();
 
                 setStep(5);
@@ -282,7 +284,11 @@ export default function RegistrationPage() {
             // 2. PAID Event
             const bookingRes = await dispatch(initiateBooking({
                 eventId: event.id,
-                bookingData: { tickets: ticketsPayload, couponCode: discount > 0 ? couponCode : undefined }
+                bookingData: {
+                    tickets: ticketsPayload,
+                    couponCode: discount > 0 ? couponCode : undefined,
+                    referralCode: referralCode || undefined // ✅ Added
+                }
             })).unwrap();
 
             const orderId = bookingRes.orderId;
@@ -564,41 +570,60 @@ export default function RegistrationPage() {
                                 {discount > 0 && <div className="flex justify-between text-green-400"><span>Discount ({discount}%)</span><span>- ₹{((parseFloat(calculateTotal()) / (100 - discount)) * discount).toFixed(2)}</span></div>}
                             </div>
 
-                            {/* Coupon Input */}
-                            <div className="flex gap-2 mb-4">
-                                <div className="relative flex-1">
-                                    <Tag className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+                            {/* Coupon Input - Only for Paid Events */}
+                            {parseFloat(calculateTotal()) > 0 && (
+                                <>
+                                    <div className="flex gap-2 mb-4">
+                                        <div className="relative flex-1">
+                                            <Tag className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+                                            <input
+                                                type="text"
+                                                placeholder="Have a coupon code?"
+                                                value={couponCode}
+                                                onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                                                disabled={discount > 0}
+                                                className={`w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-sm text-white focus:border-primary/50 outline-none uppercase placeholder:normal-case ${discount > 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                            />
+                                        </div>
+                                        {discount > 0 ? (
+                                            <button
+                                                onClick={handleRemoveCoupon}
+                                                className="px-6 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-500 border border-red-500/50 rounded-xl font-medium transition-colors"
+                                            >
+                                                Remove
+                                            </button>
+                                        ) : (
+                                            <button
+                                                onClick={handleApplyCoupon}
+                                                disabled={!couponCode}
+                                                className="px-6 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl font-medium transition-colors disabled:opacity-50"
+                                            >
+                                                Apply
+                                            </button>
+                                        )}
+                                    </div>
+                                    {couponMessage && (
+                                        <div className={`text-sm mb-4 px-3 py-2 rounded-lg ${couponMessage.type === 'success' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
+                                            {couponMessage.text}
+                                        </div>
+                                    )}
+                                </>
+                            )}
+
+                            {/* Referral Code Input - Always Visible */}
+                            <div className="space-y-2 mb-4">
+                                <label className="text-sm text-gray-400 font-semibold uppercase tracking-wide">Referral Code (Optional)</label>
+                                <div className="relative">
+                                    <Users className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
                                     <input
                                         type="text"
-                                        placeholder="Have a coupon code?"
-                                        value={couponCode}
-                                        onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                                        disabled={discount > 0}
-                                        className={`w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-sm text-white focus:border-primary/50 outline-none uppercase placeholder:normal-case ${discount > 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                        placeholder="Enter referral code if any"
+                                        value={referralCode}
+                                        onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
+                                        className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-sm text-white focus:border-primary/50 outline-none uppercase placeholder:normal-case"
                                     />
                                 </div>
-                                {discount > 0 ? (
-                                    <button
-                                        onClick={handleRemoveCoupon}
-                                        className="px-6 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-500 border border-red-500/50 rounded-xl font-medium transition-colors"
-                                    >
-                                        Remove
-                                    </button>
-                                ) : (
-                                    <button
-                                        onClick={handleApplyCoupon}
-                                        disabled={!couponCode}
-                                        className="px-6 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl font-medium transition-colors disabled:opacity-50"
-                                    >
-                                        Apply
-                                    </button>
-                                )}
                             </div>
-                            {couponMessage && (
-                                <div className={`text-sm mb-4 px-3 py-2 rounded-lg ${couponMessage.type === 'success' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
-                                    {couponMessage.text}
-                                </div>
-                            )}
                             <div className="flex justify-between items-center py-4"><span className="text-gray-400">Total Amount</span><span className="text-3xl font-bold text-primary">₹{calculateTotal()}</span></div>
 
                             {/* Payment Methods - Only if amount > 0 */}
