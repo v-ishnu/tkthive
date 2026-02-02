@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { MapPin, Search, User, Menu, LogOut, Ticket, X, Home, Calendar, Info, ChevronDown, Cpu, Gamepad2, Music, Trophy, Palette, Bell, AlignRight } from 'lucide-react';
+import { MapPin, Search, User, Menu, LogOut, Ticket, X, Home, Calendar, Info, ChevronDown, Cpu, Gamepad2, Music, Trophy, Palette, Bell, AlignRight, LayoutDashboard } from 'lucide-react';
 import { LocationData, User as UserType } from '../types';
 import { LocationModal } from './LocationModel';
 import { NotificationPanel } from './NotificationPanel';
@@ -64,6 +64,7 @@ export const Navbar = () => {
         await dispatch(logoutUser());
         router.push('/');
     };
+
 
     const handleSearch = async (query: string) => {
         setSearchLoading(true);
@@ -169,6 +170,16 @@ export const Navbar = () => {
                             </div>
                         ) : user ? (
                             <div className="flex items-center gap-3">
+                                {/* Dashboard Button - Organizer Only */}
+                                {user.role === 'ORGANIZER' && (
+                                    <Link href='/organizer/dashboard'
+                                        className="hidden md:flex items-center gap-2 px-3 py-2 rounded-full bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 hover:border-amber-500/50 transition-all text-sm font-bold text-amber-500 hover:text-amber-400 group"
+                                    >
+                                        <LayoutDashboard size={16} className="text-amber-500 group-hover:scale-110 transition-transform" />
+                                        <span className="hidden xl:inline">Dashboard</span>
+                                    </Link>
+                                )}
+
                                 {/* My Tickets Button - Desktop */}
                                 <Link href='/mytickets'
                                     className="hidden md:flex items-center gap-2 px-3 py-2 rounded-full bg-white/5 hover:bg-white/10 border border-white/5 hover:border-primary/30 transition-all text-sm font-medium text-text-secondary hover:text-text-main group"

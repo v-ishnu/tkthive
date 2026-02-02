@@ -77,9 +77,10 @@ export default function ProfilePage() {
                             />
                         </div>
                         <div className="absolute bottom-4 -right-2 bg-primary text-black font-black text-xs px-2 py-1 rounded-lg border-4 border-dark z-20 uppercase tracking-wider">
-                            {user?.role || 'Pro'}
+                            {user?.platformRole || 'PRO'}
                         </div>
                     </div>
+
 
                     {/* Profile Info */}
                     <div className="flex-1 pb-4">
@@ -230,6 +231,6 @@ export default function ProfilePage() {
                 )}
 
             </div>
-        </div>
+        </div >
     );
 };

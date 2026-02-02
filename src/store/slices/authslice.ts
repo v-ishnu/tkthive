@@ -12,6 +12,7 @@ interface AuthState {
     user: User | null;
     tickets: any[]; // Storing tickets in auth state as requested
     isLoading: boolean;
+    isInitialized: boolean;
     error: string | null;
 }
 
@@ -19,6 +20,7 @@ const initialState: AuthState = {
     user: null,
     tickets: [],
     isLoading: false,
+    isInitialized: false,
     error: null
 }
 
@@ -293,11 +295,13 @@ const authSlice = createSlice({
         builder.addCase(checkAuth.fulfilled, (state, action: PayloadAction<User>) => {
             state.isLoading = false;
             state.user = action.payload;
+            state.isInitialized = true;
             state.error = null;
         })
         builder.addCase(checkAuth.rejected, (state) => {
             state.isLoading = false;
             state.user = null;
+            state.isInitialized = true;
         })
 
         builder.addCase(logoutUser.fulfilled, (state) => {

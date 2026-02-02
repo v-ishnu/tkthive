@@ -69,6 +69,7 @@ function AuthContent() {
         if (mode === 'login') {
             try {
                 const resultAction = await dispatch(loginUser({ email, password }));
+               
                 if (loginUser.fulfilled.match(resultAction)) {
                     if (resultAction.payload.requiresVerification) {
                         showToast("Please verify your email to continue", "info");
@@ -76,7 +77,11 @@ function AuthContent() {
                         setTimer(30);
                     } else {
                         showToast("Login successful! Welcome back.", "success");
-                        router.push(redirectPath);
+                        if (resultAction.payload.data.role === 'ORGANIZER') {
+                            router.push('/organizer/dashboard');
+                        } else {
+                            router.push(redirectPath);
+                        }
                     }
                 } else {
                     const msg = resultAction.payload as string || "Login failed";

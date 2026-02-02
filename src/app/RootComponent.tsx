@@ -13,6 +13,8 @@ export default function RootComponent({ children }: { children: React.ReactNode 
     const pathname = usePathname();
     const isLoginPage = pathname === "/auth";
 
+    const isOrganizerPage = pathname?.startsWith("/organizer");
+
     // Check if the current page is Home or Event Details (e.g., /events/123)
     // These pages should start under the navbar (transparent/overlay effect)
     const isTransparentNavPage = pathname === '/' || /^\/events\/[^/]+$/.test(pathname || '');
@@ -23,9 +25,9 @@ export default function RootComponent({ children }: { children: React.ReactNode 
                 <ToastProvider>
                     <AuthInitializer />
                     <div className="">
-                        {!isLoginPage && <Navbar />}
-                        <main className={!isLoginPage && !isTransparentNavPage ? "pt-20" : ""}>{children}</main>
-                        {!isLoginPage && <Footer />}
+                        {!isLoginPage && !isOrganizerPage && <Navbar />}
+                        <main className={!isLoginPage && !isOrganizerPage && !isTransparentNavPage ? "pt-20" : ""}>{children}</main>
+                        {!isLoginPage && !isOrganizerPage && <Footer />}
 
                     </div>
                 </ToastProvider>

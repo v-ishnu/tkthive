@@ -214,7 +214,7 @@ export interface User {
   email: string;
   avatar: string;
   phone?: string;
-  role?: 'Member' | 'Pro' | 'Organizer';
+  role?: 'MEMBER' | 'PRO' | 'ORGANIZER' | 'USER';
   coverImage?: string;
   location?: string;
   stats?: {
@@ -223,4 +223,22 @@ export interface User {
     following: number;
   };
   tickets: Ticket[];
+}
+
+
+
+export enum View {
+  DASHBOARD = 'DASHBOARD',
+  EVENTS = 'EVENTS',
+  CREATE_EVENT = 'CREATE_EVENT',
+  PAYMENTS = 'PAYMENTS',
+  NOTIFICATIONS = 'NOTIFICATIONS',
+  SETTINGS = 'SETTINGS'
+}
+
+export interface CustomField {
+  id: string;
+  label: string;
+  type: 'text' | 'number' | 'email' | 'select';
+  required: boolean;
 }
