@@ -151,8 +151,8 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
                 </div>
 
                 {/* Bottom Bar */}
-                <div className="flex flex-col md:flex-row justify-between items-center pt-12 mt-20 border-t border-white/5 text-[10px] md:text-xs uppercase tracking-wider opacity-60">
-                    <p>© 2025 tkthive. All rights reserved.</p>
+                <div className="flex flex-col md:flex-row justify-between items-center pt-12 mt-20 border-t border-white/5 text-[10px] md:text-xs  tracking-wider opacity-60">
+                    <p>© {new Date().getFullYear()} tkthive. All rights reserved.</p>
                     <a
                         href="https://dinestx.com"
                         target="_blank"
