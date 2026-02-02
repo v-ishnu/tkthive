@@ -166,6 +166,8 @@ export const fetchAllEvents = createAsyncThunk(
                     slug: fetchedEvent.slug, // Added slug
                     title: fetchedEvent.title,
                     date: new Date(fetchedEvent.startDate).toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric' }),
+                    startDate: fetchedEvent.startDate, // ✅ Added raw start date
+                    endDate: fetchedEvent.endDate,     // ✅ Added raw end date
                     venue: fetchedEvent.venue,
                     description: fetchedEvent.description,
                     imageUrl: fetchedEvent.imageUrl || '',
@@ -173,6 +175,9 @@ export const fetchAllEvents = createAsyncThunk(
                     // ... minimal mapping for list
                     category: fetchedEvent.category,
                     subCategory: fetchedEvent.subCategory,
+                    isLive: fetchedEvent.isLive,       // ✅ Added
+                    featured: fetchedEvent.featured,   // ✅ Added
+                    showevent: fetchedEvent.showevent, // ✅ Added
                     ticketTiers: []
                 })) as EventData[];
             }
