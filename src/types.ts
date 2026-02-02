@@ -168,6 +168,8 @@ export interface EventData {
   totalBooked?: number;
   totalTickets?: number;
   showevent?: boolean; // ✅ Added
+  startDate?: string;
+  endDate?: string;
 }
 
 export interface LocationData {

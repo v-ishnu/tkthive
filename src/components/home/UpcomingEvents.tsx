@@ -17,10 +17,10 @@ export const HomeUpcomingSection: React.FC<HomeUpcomingSectionProps> = ({ events
   const upcomingEvents = useMemo(() => {
     return events
       .filter(e => {
-        // Simple date check, assuming MOCK format works or using fallback
-        // In a real app, use a robust date library
-        if (e.isLive) return false; // Exclude live events from "Upcoming" list if desired, or keep them
-        return true;
+        if (!e.startDate) return false;
+        const now = new Date();
+        const start = new Date(e.startDate);
+        return start > now;
       })
       .slice(0, 8);
   }, [events]);

@@ -15,14 +15,26 @@ export const FeaturedEvents: React.FC<FeaturedEventsProps> = ({ events, isLoadin
     const router = useRouter();
 
     // Filter for featured events, fallback to first 4 if none found
+    // Filter for featured events, fallback to first 4 if none found
     const featuredEvents = useMemo(() => {
-        const featured = events.filter(e => e.featured);
+        const now = new Date();
+        const upcomingOrLive = events.filter(e => {
+            if (!e.startDate) return false;
+            const end = e.endDate ? new Date(e.endDate) : new Date(e.startDate); // Fallback if no end date
+            return end >= now; // Show if not ended yet
+        });
+
+        const featured = upcomingOrLive.filter(e => e.featured);
         if (featured.length >= 3) return featured.slice(0, 4);
-        return events.slice(0, 4); // Fallback
+        return upcomingOrLive.slice(0, 4); // Fallback
     }, [events]);
 
     const getStatus = (event: EventData) => {
-        if (event.isLive) return 'LIVE';
+        const now = new Date();
+        const start = event.startDate ? new Date(event.startDate) : null;
+        const end = event.endDate ? new Date(event.endDate) : (start || null);
+
+        if (start && end && now >= start && now <= end) return 'LIVE';
         if (event.venue.name.toLowerCase().includes('online')) return 'ONLINE';
         if (event.featured) return 'FEATURED';
         return 'UPCOMING';
