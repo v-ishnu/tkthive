@@ -56,7 +56,7 @@ export const getProfile = async (req, res) => {
             name: user.name,
             email: user.email,
             phone: user.phoneNumber,
-            role: user.platformRole === 'ORGANIZER' ? 'Organizer' : 'Pro', // Mapping PlatformRole to frontend role
+            role: user.platformRole,
             avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name}`, // Generate avatar based on name
             coverImage: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070&auto=format&fit=crop", // Default cover
             location: "Mumbai, India", // Default or fetch if available
