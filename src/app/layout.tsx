@@ -12,6 +12,7 @@ const spaceGrotesk = Space_Grotesk({
 
 
 export const metadata: Metadata = {
+  metadataBase: new URL('http://localhost:3000'),
   title: {
     default: "tkthive - Discover & Book Events",
     template: "%s | tkthive"

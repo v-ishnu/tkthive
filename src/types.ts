@@ -217,6 +217,7 @@ export interface User {
   avatar: string;
   phone?: string;
   role?: 'MEMBER' | 'PRO' | 'ORGANIZER' | 'USER';
+  platformRole?: 'SUPER_ADMIN' | 'ADMIN' | 'ORGANIZER' | 'USER' | string; // Matches backend enum
   coverImage?: string;
   location?: string;
   stats?: {
