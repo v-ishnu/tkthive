@@ -224,8 +224,8 @@ export const MOCK_EVENTS: EventData[] = [
             }
         ],
         addOns: [
-            { id: 'a1', name: 'Certified Workshop Pass', price: '₹1,500', description: 'Add-on for deep-dive sessions.', type: 'access', imageUrl: "https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=200&auto=format&fit=crop" },
-            { id: 'a2', name: 'Premium Lunch Buffet', price: '₹800', description: '3-Day meal pass.', type: 'meal', imageUrl: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=200&auto=format&fit=crop" }
+            { id: 'a1', name: 'Certified Workshop Pass', price: '₹1,500', description: 'Add-on for deep-dive sessions.', type: 'access', image: "https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=200&auto=format&fit=crop" },
+            { id: 'a2', name: 'Premium Lunch Buffet', price: '₹800', description: '3-Day meal pass.', type: 'meal', image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=200&auto=format&fit=crop" }
         ]
     },
     {
@@ -265,7 +265,7 @@ export const MOCK_EVENTS: EventData[] = [
             }
         ],
         addOns: [
-            { id: 'redbull', name: 'RedBull 6-Pack', price: '₹600', description: 'Fuel for the night.', type: 'meal', imageUrl: "https://images.unsplash.com/photo-1620916297397-a4a5402a3c6c?q=80&w=200&auto=format&fit=crop" },
+            { id: 'redbull', name: 'RedBull 6-Pack', price: '₹600', description: 'Fuel for the night.', type: 'meal', image: "https://images.unsplash.com/photo-1620916297397-a4a5402a3c6c?q=80&w=200&auto=format&fit=crop" },
             { id: 'mattress', name: 'Sleeping Bag Rental', price: '₹300', description: 'Stay comfortable.', type: 'access' }
         ]
     },
@@ -296,7 +296,7 @@ export const MOCK_EVENTS: EventData[] = [
             { id: 'premium', name: 'Premium Floor', price: '₹1,499', type: 'individual', description: 'Close to stage + Fan Sign access.', requiredFields: [] }
         ],
         addOns: [
-            { id: 'jersey', name: 'Team Jersey (Random)', price: '₹899', description: 'Official jersey of a participating team.', type: 'merch', imageUrl: "https://images.unsplash.com/photo-1577213426189-d9a263673f32?q=80&w=200&auto=format&fit=crop" }
+            { id: 'jersey', name: 'Team Jersey (Random)', price: '₹899', description: 'Official jersey of a participating team.', type: 'merch', image: "https://images.unsplash.com/photo-1577213426189-d9a263673f32?q=80&w=200&auto=format&fit=crop" }
         ]
     },
     {
@@ -363,7 +363,7 @@ export const MOCK_EVENTS: EventData[] = [
             { id: 'vip_season', name: 'VIP Season Pass', price: '₹14,000', type: 'individual', description: 'Elevated platforms, dedicated bars.', requiredFields: [{ id: 'age', label: 'Age Confirmation', type: 'select', options: ['I am 18+'], required: true, scope: 'booking' }] }
         ],
         addOns: [
-            { id: 'camp', name: 'Camping Tent (2 Pax)', price: '₹10,000', description: 'Stay at the festival village.', type: 'access', imageUrl: "https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?q=80&w=500&auto=format&fit=crop" },
+            { id: 'camp', name: 'Camping Tent (2 Pax)', price: '₹10,000', description: 'Stay at the festival village.', type: 'access', image: "https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?q=80&w=500&auto=format&fit=crop" },
             { id: 'afterparty', name: 'Official Afterparty Pass', price: '₹2,000', description: 'Access to club events post 10 PM.', type: 'access' }
         ]
     },
@@ -385,7 +385,7 @@ export const MOCK_EVENTS: EventData[] = [
             { id: 'tasting', name: 'Taster Pass', price: '₹999', type: 'individual', description: 'Entry + 5 Food Coupons.', requiredFields: [] }
         ],
         addOns: [
-            { id: 'beer', name: 'Beer Mug + Refill', price: '₹599', description: 'Keepsake mug + 1st fill free.', type: 'meal', imageUrl: "https://images.unsplash.com/photo-1571506538622-d3cf4eec01ae?q=80&w=200&auto=format&fit=crop" }
+            { id: 'beer', name: 'Beer Mug + Refill', price: '₹599', description: 'Keepsake mug + 1st fill free.', type: 'meal', image: "https://images.unsplash.com/photo-1571506538622-d3cf4eec01ae?q=80&w=200&auto=format&fit=crop" }
         ]
     },
 
@@ -413,7 +413,7 @@ export const MOCK_EVENTS: EventData[] = [
             { id: 'box', name: 'Corporate Box', price: '₹15,000', type: 'individual', description: 'AC Hospitality + Dinner.', requiredFields: [{ id: 'comp', label: 'Company Name', type: 'text', required: true, scope: 'booking' }] }
         ],
         addOns: [
-            { id: 'jersey_mi', name: 'MI Official Jersey', price: '₹1,999', description: '2026 Season Kit.', type: 'merch', imageUrl: "https://images.unsplash.com/photo-1631194758628-71ec7c35137e?q=80&w=200&auto=format&fit=crop" },
+            { id: 'jersey_mi', name: 'MI Official Jersey', price: '₹1,999', description: '2026 Season Kit.', type: 'merch', image: "https://images.unsplash.com/photo-1631194758628-71ec7c35137e?q=80&w=200&auto=format&fit=crop" },
             { id: 'flag', name: 'Team Flag', price: '₹200', description: 'Support your team.', type: 'merch' }
         ]
     },
