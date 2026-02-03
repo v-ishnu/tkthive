@@ -88,7 +88,8 @@ export const initiateBooking = async (req, res) => {
                     addonId: addon.id,
                     name: addon.name,
                     price: addon.price,
-                    quantity: ad.quantity
+                    quantity: ad.quantity,
+                    image: addon.image
                 });
             }
         }
