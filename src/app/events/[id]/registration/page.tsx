@@ -535,7 +535,7 @@ export default function RegistrationPage() {
                                 return (
                                     <div key={addon.id} className={`border rounded-2xl p-4 transition-all ${quantity > 0 ? 'bg-white/5 border-primary/50' : 'bg-secondary border-white/10'}`}>
                                         <div className="flex gap-4">
-                                            <div className="w-24 h-24 rounded-xl overflow-hidden bg-black shrink-0"><img src={addon.imageUrl || 'https://images.unsplash.com/photo-1544531586-fde5298cdd40'} alt={addon.name} className="w-full h-full object-cover" /></div>
+                                            <div className="w-24 h-24 rounded-xl overflow-hidden bg-black shrink-0"><img src={addon.image || 'https://images.unsplash.com/photo-1544531586-fde5298cdd40'} alt={addon.name} className="w-full h-full object-cover" /></div>
                                             <div className="flex-1 flex flex-col">
                                                 <div className="flex justify-between items-start mb-1"><h3 className="font-bold text-white line-clamp-1">{addon.name}</h3><span className="font-bold text-primary">{addon.price}</span></div>
                                                 <div className="mt-auto flex items-center justify-between">

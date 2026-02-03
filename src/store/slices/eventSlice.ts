@@ -121,7 +121,7 @@ export const fetchEventById = createAsyncThunk(
                         name: addon.name,
                         price: `₹${addon.price}`,
                         description: '',
-                        imageUrl: addon.imageUrl,
+                        image: addon.image,
                         type: 'access'
                     })) || [],
                     isLive: fetchedEvent.isLive,

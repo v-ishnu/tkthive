@@ -85,7 +85,7 @@ export interface AddOn {
   name: string;
   price: string;
   description?: string;
-  imageUrl?: string;
+  image?: string;
   type: 'merch' | 'meal' | 'access' | 'other';
 }
 
