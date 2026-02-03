@@ -380,7 +380,18 @@ async function finalizeBooking(orderId) {
             // Let's refetch minimal event info or rely on what we have.
             const firstTicket = await prisma.ticket.findUnique({
                 where: { id: booking.items[0].ticketId },
-                include: { event: { select: { title: true, communityLink: true, communityMessage: true } } }
+                include: {
+                    event: {
+                        select: {
+                            title: true,
+                            communityLink: true,
+                            communityMessage: true,
+                            organizer: {
+                                select: { contactEmail: true }
+                            }
+                        }
+                    }
+                }
             });
 
             const totalTickets = booking.items.reduce((acc, item) => acc + item.quantity, 0);
@@ -393,7 +404,8 @@ async function finalizeBooking(orderId) {
                 eventTitle: firstTicket?.event?.title || "Event",
                 actionUrl: `${process.env.FRONTEND_URL || "https://tkthive.com"}/mytickets`,
                 communityLink: firstTicket?.event?.communityLink,
-                communityMessage: firstTicket?.event?.communityMessage
+                communityMessage: firstTicket?.event?.communityMessage,
+                organizerEmail: firstTicket?.event?.organizer?.contactEmail
             });
         } catch (err) {
             console.error("Email Sending Failed in Finalize:", err);
@@ -433,7 +445,16 @@ export const registerFreeEvent = async (req, res) => {
     // ... (Free event logic remains largely same: validate -> transaction create booking/regs -> update stock)
     // Re-implementing correctly for this file
     try {
-        const event = await prisma.event.findUnique({ where: { id: eventId }, include: { tickets: true, customFields: true } }); // Include customFields
+        const event = await prisma.event.findUnique({
+            where: { id: eventId },
+            include: {
+                tickets: true,
+                customFields: true,
+                organizer: {
+                    select: { contactEmail: true }
+                }
+            }
+        });
         if (!event) return res.status(404).json({ message: "EVENT_NOT_FOUND" });
 
         // Validate Referral Code if provided
@@ -583,7 +604,8 @@ export const registerFreeEvent = async (req, res) => {
             eventTitle: event.title,
             actionUrl: `${process.env.FRONTEND_URL || "https://tkthive.com"}/mytickets`,
             communityLink: event.communityLink,
-            communityMessage: event.communityMessage
+            communityMessage: event.communityMessage,
+            organizerEmail: event.organizer?.contactEmail
         }).catch(err => console.error("Email API Error:", err));
 
         // Create Notification

@@ -20,7 +20,8 @@ const sendRegistrationSuccessEmail = async ({
   eventTitle,
   actionUrl,
   communityLink,
-  communityMessage
+  communityMessage,
+  organizerEmail
 }) => {
   const subject = eventTitle
     ? `Booking Confirmed: ${eventTitle}`
@@ -28,6 +29,7 @@ const sendRegistrationSuccessEmail = async ({
 
   return sendMail({
     to: email,
+    cc: organizerEmail,
     subject,
     textContent: `Your booking for Order #${orderId} was successful. Total paid: ${currency} ${amount}.`,
     htmlContent: `

@@ -4,7 +4,7 @@ import { ObjectId } from "bson";
 export const createAddon = async (req, res) => {
   try {
     const { eventId } = req.params;
-    const { name, price, quantity, isActive = true } = req.body;
+    const { name, price, quantity, image, isActive = true } = req.body;
 
     /* =============================
        BASIC VALIDATION
@@ -21,7 +21,7 @@ export const createAddon = async (req, res) => {
       });
     }
 
-    
+
 
     /* =============================
        CHECK EVENT EXISTS
@@ -46,6 +46,7 @@ export const createAddon = async (req, res) => {
         name,
         price,
         quantity,
+        image,
         isActive
       }
     });

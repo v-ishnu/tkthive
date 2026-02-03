@@ -296,6 +296,7 @@ model Addon {
   sold     Int    @default(0)
 
   isActive  Boolean  @default(true)
+  image     String?  // ✅ Added
   createdAt DateTime @default(now())
 
   event Event @relation(fields: [eventId], references: [id])
@@ -307,6 +308,7 @@ model Addon {
 type SelectedAddon {
   addonId  String @db.ObjectId
   name     String
+  image    String?
   price    Float
   quantity Int
 }

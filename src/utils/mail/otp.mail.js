@@ -42,7 +42,7 @@ const sendtOtpMail = async (email, otp) => {
         <!-- Footer -->
         <div style="background:#0d0d0d; padding:14px; text-align:center;">
           <p style="margin:0; font-size:11px; color:#777777;">
-            © tktHive (Dinestx). All rights reserved.
+            © tkthive. All rights reserved.
           </p>
         </div>
 

@@ -3,7 +3,7 @@ import { prisma } from "../../../config/prisma.js";
 export const updateAddon = async (req, res) => {
   try {
     const { eventId, addonId } = req.params;
-    const { name, price, quantity, isActive } = req.body;
+    const { name, price, quantity, image, isActive } = req.body;
 
     const event = await prisma.event.findUnique({
       where: { id: eventId },
@@ -34,6 +34,7 @@ export const updateAddon = async (req, res) => {
       ...(name !== undefined && { name }),
       ...(price !== undefined && { price }),
       ...(quantity !== undefined && { quantity }),
+      ...(image !== undefined && { image }),
       ...(isActive !== undefined && { isActive })
     };
 
