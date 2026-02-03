@@ -87,7 +87,7 @@ export const EventTabs: React.FC<EventTabsProps> = ({ event }) => {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     {event.addOns.map(addon => (
                                         <div key={addon.id} className="bg-white/5 p-4 rounded-xl border border-white/10 flex gap-4">
-                                            {addon.imageUrl && <div className="w-20 h-20 rounded-lg overflow-hidden shrink-0"><img src={addon.imageUrl} alt={addon.name} className="w-full h-full object-cover" /></div>}
+                                            {addon.image && <div className="w-20 h-20 rounded-lg overflow-hidden shrink-0"><img src={addon.image} alt={addon.name} className="w-full h-full object-cover" /></div>}
                                             <div>
                                                 <h4 className="font-bold text-white">{addon.name}</h4>
                                                 <p className="text-primary font-bold text-sm">{addon.price}</p>
