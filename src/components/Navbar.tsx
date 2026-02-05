@@ -285,6 +285,11 @@ export const Navbar = () => {
                         </Link>
                         {user && (
                             <>
+                                {user.role === 'ORGANIZER' && (
+                                    <Link href='/organizer/dashboard' onClick={() => setIsMenuOpen(false)} className="w-full p-4 rounded-xl text-left text-lg font-medium hover:bg-amber-500/10 text-amber-500 flex items-center gap-4 border border-amber-500/20 mb-2">
+                                        <LayoutDashboard size={20} className="text-amber-500" /> Organizer Dashboard
+                                    </Link>
+                                )}
                                 <Link href='/mytickets' onClick={() => setIsMenuOpen(false)} className="w-full p-4 rounded-xl text-left text-lg font-medium hover:bg-white/5 text-white flex items-center gap-4">
                                     <Ticket size={20} className="text-primary" /> My Tickets
                                 </Link>
