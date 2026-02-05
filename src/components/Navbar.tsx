@@ -276,7 +276,7 @@ export const Navbar = () => {
                         </div>
                     )}
 
-                    <div className="space-y-2 flex-1 overflow-y-auto">
+                    <div className="space-y-2 flex-1 overflow-y-auto scrollbar-hide">
                         <Link href='/' onClick={() => setIsMenuOpen(false)} className="w-full p-4 rounded-xl text-left text-lg font-medium hover:bg-white/5 text-white flex items-center gap-4">
                             <Home size={20} className="text-primary" /> Home
                         </Link>
