@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Space_Grotesk } from "next/font/google";
+import { GoogleAnalytics } from '@next/third-parties/google';
 import "./globals.css";
 
 import RootComponent from "./RootComponent";
@@ -82,6 +83,8 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <RootComponent>{children}</RootComponent>
+              <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID as string} />
+
       </body>
     </html>
   );
