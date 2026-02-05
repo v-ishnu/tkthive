@@ -21,10 +21,7 @@ export const getTicketDetails = async (req, res) => {
                 event: {
                     select: { title: true, organizerId: true }
                 },
-                addons: true,
-                responses: {
-                    include: { field: true }
-                }
+                addons: true
             }
         });
 

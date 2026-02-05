@@ -93,7 +93,7 @@ import notificationRouter from "./modules/notifications/notification.routes.js";
 
 app.use("/api/v1/auth", authRouter);
 app.use("/api/user", userRouter);
-app.use('/organizer', organizerRouter);
+app.use('/api/v1/organizer', organizerRouter);
 app.use("/admin/auth", adminRouter);
 app.use("/api/event", eventRouter)
 app.use("/api/booking", bookingRoute)
