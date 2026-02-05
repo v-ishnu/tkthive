@@ -42,7 +42,7 @@ const Header: React.FC<HeaderProps> = ({ currentView, user, toggleSidebar }) => 
                 </button>
                 <div>
                     <h1 className="text-xl lg:text-2xl font-bold text-text-main">{getTitle()}</h1>
-                    <p className="text-xs lg:text-sm text-text-muted hidden sm:block">Welcome back, Hive Organizer</p>
+                    <p className="text-xs lg:text-sm text-text-muted hidden sm:block">Welcome back, {user?.name}</p>
                 </div>
             </div>
 
