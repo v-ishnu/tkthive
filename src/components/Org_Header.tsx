@@ -17,7 +17,8 @@ const Header: React.FC<HeaderProps> = ({ currentView, user, toggleSidebar }) => 
             case View.CREATE_EVENT: return 'New Event Registration';
             case View.PAYMENTS: return 'Financial Analytics';
             case View.NOTIFICATIONS: return 'Campaign Center';
-            default: return 'Tkt Hive';
+            case View.SCANNER: return 'Ticket Scanner';
+            default: return 'tkthive';
         }
     };
 
