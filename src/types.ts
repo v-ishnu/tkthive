@@ -236,7 +236,8 @@ export enum View {
   CREATE_EVENT = 'CREATE_EVENT',
   PAYMENTS = 'PAYMENTS',
   NOTIFICATIONS = 'NOTIFICATIONS',
-  SETTINGS = 'SETTINGS'
+  SETTINGS = 'SETTINGS',
+  SCANNER = 'SCANNER'
 }
 
 export interface CustomField {

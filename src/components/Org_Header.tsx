@@ -1,14 +1,15 @@
 "use client"
 import React from 'react';
-import { Search, Bell, Mail, User } from 'lucide-react';
-import { View } from '../types';
+import { Search, Bell, Mail, User as UserIcon, Menu } from 'lucide-react';
+import { View, User } from '../types';
 
 interface HeaderProps {
     currentView: View;
     toggleSidebar: () => void;
+    user: User | null;
 }
 
-const Header: React.FC<HeaderProps> = ({ currentView }) => {
+const Header: React.FC<HeaderProps> = ({ currentView, user, toggleSidebar }) => {
     const getTitle = () => {
         switch (currentView) {
             case View.DASHBOARD: return 'Dashboard Overview';
@@ -20,11 +21,28 @@ const Header: React.FC<HeaderProps> = ({ currentView }) => {
         }
     };
 
+    const getInitials = (name: string) => {
+        return name
+            .split(' ')
+            .map((n) => n[0])
+            .join('')
+            .substring(0, 2)
+            .toUpperCase();
+    };
+
     return (
-        <header className="bg-card/80 backdrop-blur-md border-b border-border sticky top-0 z-10 px-8 py-4 flex items-center justify-between">
-            <div>
-                <h1 className="text-2xl font-bold text-text-main">{getTitle()}</h1>
-                <p className="text-sm text-text-muted">Welcome back, Hive Organizer</p>
+        <header className="bg-card/80 backdrop-blur-md border-b border-border sticky top-0 z-10 px-4 lg:px-8 py-4 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+                <button
+                    onClick={toggleSidebar}
+                    className="p-2 -ml-2 text-text-muted hover:bg-background rounded-lg lg:hidden"
+                >
+                    <Menu className="w-6 h-6" />
+                </button>
+                <div>
+                    <h1 className="text-xl lg:text-2xl font-bold text-text-main">{getTitle()}</h1>
+                    <p className="text-xs lg:text-sm text-text-muted hidden sm:block">Welcome back, Hive Organizer</p>
+                </div>
             </div>
 
             <div className="flex items-center gap-6">
@@ -49,11 +67,19 @@ const Header: React.FC<HeaderProps> = ({ currentView }) => {
 
                 <div className="flex items-center gap-3 cursor-pointer group">
                     <div className="text-right hidden sm:block">
-                        <p className="text-sm font-semibold text-text-main group-hover:text-primary-hover transition-colors">Alex Morgan</p>
-                        <p className="text-xs text-text-muted italic">Platinum Organizer</p>
+                        <p className="text-sm font-semibold text-text-main group-hover:text-primary-hover transition-colors">
+                            {user?.name || 'Organizer'}
+                        </p>
+                        <p className="text-xs text-text-muted italic">
+                            {user?.platformRole || 'Organizer'}
+                        </p>
                     </div>
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary-hover border-2 border-card shadow-md flex items-center justify-center text-white font-bold">
-                        AM
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary-hover border-2 border-card shadow-md flex items-center justify-center text-white font-bold overflow-hidden">
+                        {user?.avatar ? (
+                            <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+                        ) : (
+                            <span>{user?.name ? getInitials(user.name) : 'OR'}</span>
+                        )}
                     </div>
                 </div>
             </div>

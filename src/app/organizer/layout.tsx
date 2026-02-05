@@ -40,6 +40,7 @@ export default function OrganizerLayout({
         if (pathname?.includes('/organizer/payments')) return View.PAYMENTS;
         if (pathname?.includes('/organizer/notifications')) return View.NOTIFICATIONS;
         if (pathname?.includes('/organizer/settings')) return View.SETTINGS;
+        if (pathname?.includes('/organizer/scanner')) return View.SCANNER;
         return View.DASHBOARD;
     };
 
@@ -64,6 +65,9 @@ export default function OrganizerLayout({
                 break;
             case View.SETTINGS:
                 router.push('/organizer/settings');
+                break;
+            case View.SCANNER:
+                router.push('/organizer/scanner');
                 break;
             default:
                 break;
@@ -106,9 +110,10 @@ export default function OrganizerLayout({
                 <Header
                     currentView={currentView}
                     toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
+                    user={user}
                 />
 
-                <main className="flex-1 overflow-y-auto p-8" data-lenis-prevent>
+                <main className="flex-1 overflow-y-auto p-4 lg:p-8" data-lenis-prevent>
                     {children}
                 </main>
             </div>

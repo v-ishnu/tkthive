@@ -268,10 +268,8 @@ export const TicketCard: React.FC<TicketCardProps> = ({ ticket }) => {
 
 
                     {ticket.scanned && (
-                        <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-                            <div className="border-2 border-red-500 text-red-500 font-black text-xl uppercase px-3 py-1 transform -rotate-12 rounded-lg shadow-2xl">
-                                SCANNED
-                            </div>
+                        <div className="mt-4 border-2 border-red-500 text-red-500 font-black text-xl uppercase px-2 py-1 transform -rotate-6 rounded opacity-80">
+                            SCANNED
                         </div>
                     )}
                 </div>
