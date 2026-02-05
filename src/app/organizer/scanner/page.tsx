@@ -11,6 +11,7 @@ const ScannerPage: React.FC = () => {
     const { ticketDetails, isLoading, error, scanResult } = useAppSelector((state) => state.organizer);
 
     const [isScanning, setIsScanning] = useState(true);
+    const [cameraEnabled, setCameraEnabled] = useState(true);
 
     // Sync scanning state with result (if result exists, stop scanning)
     useEffect(() => {
@@ -45,8 +46,8 @@ const ScannerPage: React.FC = () => {
 
     useEffect(() => {
         let isMounted = true;
-        // Condition: Must be scanning, no result yet, and element must exist
-        if (!isScanning || scanResult) return;
+        // Condition: Must be scanning, no result yet, element must exist, AND camera must be enabled
+        if (!isScanning || scanResult || !cameraEnabled) return;
 
         const readerElement = document.getElementById("reader");
         if (!readerElement) return;
@@ -92,6 +93,15 @@ const ScannerPage: React.FC = () => {
                         // Error callback
                     }
                 );
+
+                // RACE CONDITION FIX:
+                // If the component unmounted (or camera disabled) while start() was pending,
+                // we must stop it immediately, otherwise the camera stays on.
+                if (!isMounted) {
+                    console.log("Scanner started after unmount, stopping...");
+                    html5QrCode.stop().then(() => html5QrCode.clear()).catch(e => console.warn("Failed to clean up orphan scanner", e));
+                }
+
             } catch (err) {
                 if (!isMounted) return;
                 console.error("Error starting scanner", err);
@@ -120,7 +130,7 @@ const ScannerPage: React.FC = () => {
                 // Ignore
             }
         };
-    }, [isScanning, scanResult, dispatch]);
+    }, [isScanning, scanResult, cameraEnabled, dispatch]);
 
     const handleReset = () => {
         dispatch(resetScanner());
@@ -132,21 +142,37 @@ const ScannerPage: React.FC = () => {
     return (
         <div className="max-w-4xl mx-auto p-4 space-y-6">
             <div className="flex flex-col gap-2">
-                <h1 className="text-2xl lg:text-3xl font-bold text-text-main flex items-center gap-3">
-                    <ScanLine className="w-8 h-8 text-primary" />
-                    Ticket Scanner
-                </h1>
+                <div className="flex justify-between items-center">
+                    <h1 className="text-2xl lg:text-3xl font-bold text-text-main flex items-center gap-3">
+                        <ScanLine className="w-8 h-8 text-primary" />
+                        Ticket Scanner
+                    </h1>
+                    <button
+                        onClick={() => setCameraEnabled(!cameraEnabled)}
+                        className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${cameraEnabled ? 'bg-red-100 text-red-700 hover:bg-red-200' : 'bg-green-100 text-green-700 hover:bg-green-200'}`}
+                    >
+                        {cameraEnabled ? 'Turn Off Camera' : 'Turn On Camera'}
+                    </button>
+                </div>
                 <p className="text-text-muted text-sm lg:text-base">Scan attendee QR codes to verify tickets.</p>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Scanner Section */}
-                <div className="bg-card p-4 lg:p-6 rounded-3xl border border-border shadow-sm h-fit">
-                    {isScanning ? (
-                        <div className="overflow-hidden rounded-2xl bg-black">
-                            <div id="reader" className="w-full"></div>
+                <div className="bg-card p-4 lg:p-6 rounded-3xl border border-border shadow-sm h-fit min-h-[300px]">
+                    {/* Always render reader div to ensure library cleanup works, hide when not needed */}
+                    <div className={`overflow-hidden rounded-2xl bg-black ${(!isScanning || !cameraEnabled) ? 'hidden' : 'block'}`}>
+                        <div id="reader" className="w-full"></div>
+                    </div>
+
+                    {!cameraEnabled && (
+                        <div className="h-64 flex flex-col items-center justify-center bg-gray-50 rounded-2xl border border-gray-200 text-text-muted opacity-60">
+                            <ScanLine className="w-16 h-16 mb-4" />
+                            <p className="font-medium">Camera is disabled</p>
                         </div>
-                    ) : (
+                    )}
+
+                    {!isScanning && cameraEnabled && (
                         <div className="h-64 flex flex-col items-center justify-center bg-gray-50 rounded-2xl border border-gray-200">
                             {error ? (
                                 <XCircle className="w-16 h-16 text-red-500 mb-4" />
