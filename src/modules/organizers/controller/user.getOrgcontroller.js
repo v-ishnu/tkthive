@@ -50,6 +50,7 @@ export const getOrganizerController = async (req, res) => {
         contactPhone: true,
         totalEvents: true,
         totalTicketsSold: true,
+        totalRevenue: true, // ✅ Added for dashboard stats
         createdAt: true,
         adminId: true,
         events: {

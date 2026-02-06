@@ -26,6 +26,7 @@ export const recalculateAllRevenues = async (req, res) => {
 
         for (const org of organizers) {
             let totalRevenue = 0;
+            let totalTicketsSold = 0;
 
             for (const event of org.events) {
                 const eventRevenue = event.registrations.reduce((sum, reg) => {
@@ -34,12 +35,18 @@ export const recalculateAllRevenues = async (req, res) => {
                     return sum + ticketRevenue + addonsRevenue;
                 }, 0);
                 totalRevenue += eventRevenue;
+
+                // Count confirmed registrations for this event
+                totalTicketsSold += event.registrations.length;
             }
 
-            if (totalRevenue !== org.totalRevenue) {
+            if (totalRevenue !== org.totalRevenue || totalTicketsSold !== org.totalTicketsSold) {
                 await prisma.organizer.update({
                     where: { id: org.id },
-                    data: { totalRevenue }
+                    data: {
+                        totalRevenue,
+                        totalTicketsSold
+                    }
                 });
                 updatedCount++;
             }

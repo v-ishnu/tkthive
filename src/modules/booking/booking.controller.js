@@ -349,11 +349,14 @@ async function finalizeBooking(orderId) {
             }
             const totalItemRevenue = itemTicketRevenue + itemAddonRevenue;
 
-            // Increment Organizer Revenue
+            // Increment Organizer Revenue and Tickets Sold
             if (item.ticket.event && item.ticket.event.organizerId) {
                 await tx.organizer.update({
                     where: { id: item.ticket.event.organizerId },
-                    data: { totalRevenue: { increment: totalItemRevenue } }
+                    data: {
+                        totalRevenue: { increment: totalItemRevenue },
+                        totalTicketsSold: { increment: item.quantity }
+                    }
                 });
             }
 
@@ -608,6 +611,16 @@ export const registerFreeEvent = async (req, res) => {
                 await tx.ticket.update({
                     where: { id: item.ticketId },
                     data: { sold: { increment: item.quantity } }
+                });
+            }
+
+            // Increment Organizer Tickets Sold (Free Event - Revenue is 0)
+            if (event.organizerId) {
+                await tx.organizer.update({
+                    where: { id: event.organizerId },
+                    data: {
+                        totalTicketsSold: { increment: totalCount }
+                    }
                 });
             }
         });

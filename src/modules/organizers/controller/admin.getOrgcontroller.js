@@ -36,6 +36,7 @@ export const getMyOrganizers = async (req, res) => {
     name: o.name,
     type: o.type,
     imageUrl: o.imageUrl, // Assuming imageUrl exists or add to select
+    totalRevenue: o.totalRevenue, // ✅ Added
     role: o.users[0]?.role,
   }));
 
