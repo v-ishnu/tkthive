@@ -93,13 +93,28 @@ export default function EventDetails() {
     // Calculate Completion Status
     const now = new Date();
     let isEventCompleted = false;
+    let isRegistrationClosed = false;
+
     try {
-        const dateStr = event.date; // Use mapped date string
-        const eventDate = new Date(dateStr);
+        // Prioritize endDate for completion check, fallback to date if explicit endDate is missing
+        // assuming date might be a start date or range string that new Date() can parse
+        const dateToCheck = event.endDate || event.date;
+        const eventDate = new Date(dateToCheck);
+
         if (!isNaN(eventDate.getTime()) && eventDate < now) {
             isEventCompleted = true;
         }
+
+        // Check registration status
+        if (event.isRegistrationOpen === false) {
+            isRegistrationClosed = true;
+        }
+
     } catch (e) { }
+
+    const isBookable = !isEventCompleted && !isRegistrationClosed;
+    const buttonText = isEventCompleted ? 'Event Completed' : (isRegistrationClosed ? 'Registration Closed' : 'Book Now');
+
 
     return (
         <div className="min-h-screen bg-dark pb-0">
@@ -180,7 +195,7 @@ export default function EventDetails() {
                 </div>
             </div>
 
-            <div className="container mx-auto px-4 mt-8 flex flex-col lg:flex-row gap-12 relative z-10">
+            <div className="container mx-auto px-4 flex flex-col lg:flex-row gap-12 relative z-10">
 
                 {/* Main Content */}
                 <div className="lg:w-2/3 order-1">
@@ -227,11 +242,11 @@ export default function EventDetails() {
                             </div>
 
                             <button
-                                onClick={() => !isEventCompleted && onBook(event)}
-                                disabled={isEventCompleted}
-                                className={`w-full py-4 font-bold text-lg rounded-xl transition-all shadow-[0_0_20px_rgba(255,214,10,0.2)] active:scale-95 flex items-center justify-center gap-2 ${isEventCompleted ? 'bg-gray-600 cursor-not-allowed opacity-70 shadow-none' : 'bg-primary hover:bg-primary-hover text-black'}`}
+                                onClick={() => isBookable && onBook(event)}
+                                disabled={!isBookable}
+                                className={`w-full py-4 font-bold text-lg rounded-xl transition-all shadow-[0_0_20px_rgba(255,214,10,0.2)] active:scale-95 flex items-center justify-center gap-2 ${!isBookable ? 'bg-gray-600 cursor-not-allowed opacity-70 shadow-none' : 'bg-primary hover:bg-primary-hover text-black'}`}
                             >
-                                {isEventCompleted ? 'Event Completed' : 'Book Now'}
+                                {buttonText}
                             </button>
 
                             <p className="text-center text-xs text-gray-500 mt-4">
@@ -272,11 +287,11 @@ export default function EventDetails() {
                         <Share2 size={20} />
                     </button>
                     <button
-                        onClick={() => !isEventCompleted && onBook(event)}
-                        disabled={isEventCompleted}
-                        className={`px-8 h-12 font-bold rounded-xl transition-all shadow-lg active:scale-95 flex items-center justify-center ${isEventCompleted ? 'bg-gray-600 cursor-not-allowed opacity-70' : 'bg-primary text-black'}`}
+                        onClick={() => isBookable && onBook(event)}
+                        disabled={!isBookable}
+                        className={`px-8 h-12 font-bold rounded-xl transition-all shadow-lg active:scale-95 flex items-center justify-center ${!isBookable ? 'bg-gray-600 cursor-not-allowed opacity-70' : 'bg-primary text-black'}`}
                     >
-                        {isEventCompleted ? 'Closed' : 'Book Now'}
+                        {buttonText}
                     </button>
                 </div>
             </div>
