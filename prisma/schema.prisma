@@ -71,6 +71,7 @@ enum CustomFieldType {
   DATE
   DROPDOWN
   CHECKBOX
+  RADIO
 }
 
 enum BookingStatus {
