@@ -57,12 +57,18 @@ export default function TicketsPage() {
         if (filterStatus !== 'all') {
             filtered = filtered.filter(t => {
                 const eventDate = new Date(t.event.startDate);
+                const eventEndDate = t.event.endDate ? new Date(t.event.endDate) : null;
 
-                if (filterStatus === 'pending') { // Upcoming
-                    return eventDate >= now && t.status === 'CONFIRMED';
+                // Use endDate if available, otherwise assume 24h duration from start
+                const effectiveEnd = (eventEndDate && !isNaN(eventEndDate.getTime()))
+                    ? eventEndDate
+                    : new Date(eventDate.getTime() + 86400000); // +24h
+
+                if (filterStatus === 'pending') { // Upcoming or Ongoing
+                    return effectiveEnd >= now && t.status === 'CONFIRMED';
                 }
                 if (filterStatus === 'completed') { // Past
-                    return eventDate < now && t.status === 'CONFIRMED';
+                    return effectiveEnd < now && t.status === 'CONFIRMED';
                 }
                 if (filterStatus === 'expired') {
                     // Could be based on date or explicit status

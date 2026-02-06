@@ -156,13 +156,41 @@ export const EventsSection: React.FC<EventsSectionProps> = ({
     if (activeSubTab !== 'All') {
       if (filters.category === 'All') {
         // If All category, treat tabs as Time Status (Existing logic)
-        if (activeSubTab === 'Live') result = result.filter(e => e.isLive);
+        if (activeSubTab === 'Live') result = result.filter(e => {
+          if (e.isLive) return true;
+          try {
+            const start = e.startDate ? new Date(e.startDate) : new Date(e.date);
+            const end = e.endDate
+              ? new Date(e.endDate)
+              : (start ? new Date(start.getTime() + 86400000) : null);
+
+            if (start && end) {
+              return now >= start && now <= end;
+            }
+            return false;
+          } catch { return false; }
+        });
         else if (activeSubTab === 'Past') result = result.filter(e => {
-          // ... date logic for past
-          try { return new Date(e.date) < now; } catch { return false; }
+          try {
+            const start = e.startDate ? new Date(e.startDate) : new Date(e.date);
+            const end = e.endDate
+              ? new Date(e.endDate)
+              : (start ? new Date(start.getTime() + 86400000) : null);
+
+            if (end) {
+              return now > end;
+            }
+            return false;
+          } catch { return false; }
         });
         else if (activeSubTab === 'Upcoming') result = result.filter(e => {
-          try { return new Date(e.date) >= now; } catch { return true; }
+          try {
+            const start = e.startDate ? new Date(e.startDate) : new Date(e.date);
+            if (start) {
+              return now < start;
+            }
+            return true;
+          } catch { return true; }
         });
       } else {
         // If Specific category, filter by subCategory field

@@ -38,20 +38,39 @@ export const EventCard: React.FC<EventCardProps> = ({ event }) => {
   // Determine Event Status
   let eventStatus = 'upcoming';
   const now = new Date();
-  try {
-    // Clean date string for parsing (e.g. "Sat, Nov 24, 2025 at 10:00 AM" -> "Nov 24 2025 10:00 AM")
-    const dateStr = event.date.replace(/at/i, '');
-    const eventDate = new Date(dateStr);
 
-    if (!isNaN(eventDate.getTime())) {
-      if (eventDate.getTime() < now.getTime()) {
+  try {
+    const startDate = event.startDate ? new Date(event.startDate) : null;
+    const endDate = event.endDate ? new Date(event.endDate) : null;
+
+    // Fallback parsing if raw dates missing
+    const dateStr = event.date.replace(/at/i, '');
+    const fallbackDate = new Date(dateStr);
+    const validFallback = !isNaN(fallbackDate.getTime());
+
+    const start = startDate && !isNaN(startDate.getTime()) ? startDate : (validFallback ? fallbackDate : null);
+    // If no end date, assume it lasts 24h or just use start for completed check
+    const end = endDate && !isNaN(endDate.getTime()) ? endDate : (start ? new Date(start.getTime() + 24 * 60 * 60 * 1000) : null);
+
+    if (start) {
+      const nowTime = now.getTime();
+      const startTime = start.getTime();
+      const endTime = end ? end.getTime() : startTime + 86400000; // Default 1 day if no end
+
+      if (nowTime >= startTime && nowTime <= endTime) {
+        eventStatus = 'live';
+      } else if (nowTime > endTime) {
         eventStatus = 'completed';
+      } else {
+        eventStatus = 'upcoming';
       }
     }
-    // Override if explicitly marked live
+
+    // Explicit override
     if (event.isLive) eventStatus = 'live';
+
   } catch (e) {
-    // Fallback to upcoming if parsing fails
+    // Fallback
   }
 
   // Workaround for current date parsing issues with mock data usually lacking year
@@ -92,7 +111,7 @@ export const EventCard: React.FC<EventCardProps> = ({ event }) => {
 
             {/* Status Tags (Bottom Left of Image) */}
             <div className="absolute bottom-4 left-4 flex gap-2">
-              {event.isLive ? (
+              {(event.isLive || eventStatus === 'live') ? (
                 <span className="bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded-lg animate-pulse shadow-lg flex items-center gap-1">
                   <span className="w-1.5 h-1.5 bg-white rounded-full" /> LIVE
                 </span>
