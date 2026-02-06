@@ -106,8 +106,7 @@ const EventsList: React.FC = () => {
                                         </div>
                                     </td>
                                     <td className="px-6 py-6 font-bold text-text-main">
-                                        {/* calc revenue if price is simple, else just show Tickets Sold * Price or N/A */}
-                                        ₹ --
+                                        ₹ {event.grossSales?.toLocaleString('en-IN') || 0}
                                     </td>
                                     <td className="px-6 py-6">
                                         <span className={`px-4 py-1.5 rounded-full text-xs font-bold ${event.isLive ? 'bg-green-100 text-green-700' :

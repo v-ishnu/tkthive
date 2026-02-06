@@ -136,7 +136,9 @@ const EventManagementPage = () => {
                             </div>
                         </div>
                         {/* Revenue Placeholder */}
-                        <h3 className="text-3xl font-bold text-text-main mb-1">₹ --</h3>
+                        <h3 className="text-3xl font-bold text-text-main mb-1">
+                            ₹ {event.grossSales?.toLocaleString('en-IN') || 0}
+                        </h3>
                         <p className="text-sm text-text-muted">Total Revenue</p>
                     </div>
                 </div>
