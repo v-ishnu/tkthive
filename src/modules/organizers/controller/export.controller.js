@@ -1,4 +1,5 @@
 import { prisma } from "../../../../config/prisma.js";
+import ExcelJS from 'exceljs';
 
 export const exportRegistrations = async (req, res) => {
     try {
@@ -49,63 +50,74 @@ export const exportRegistrations = async (req, res) => {
             orderBy: { createdAt: 'desc' }
         });
 
-        // 3. Flatten Data for Export
-        const exportData = registrations.flatMap(reg => {
-            const rawData = reg.registrationData || {};
+        // 3. Setup Workbook
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('Registrations');
 
+        worksheet.columns = [
+            { header: 'S.No', key: 'sNo', width: 8 },
+            { header: 'Registration ID', key: 'regId', width: 25 },
+            { header: 'Order ID', key: 'orderId', width: 25 },
+            { header: 'Name', key: 'name', width: 20 },
+            { header: 'Email', key: 'email', width: 30 },
+            { header: 'Phone', key: 'phone', width: 15 },
+            { header: 'Ticket Name', key: 'ticketName', width: 20 },
+            { header: 'Ticket Type', key: 'ticketType', width: 15 },
+            { header: 'Status', key: 'status', width: 15 },
+            { header: 'Scanned', key: 'scanned', width: 10 },
+            { header: 'Reg Date', key: 'createdAt', width: 20 },
+            { header: 'Payment Status', key: 'paymentStatus', width: 15 },
+            { header: 'Amount', key: 'amount', width: 10 },
+            { header: 'Discount', key: 'discount', width: 10 },
+            { header: 'Coupon', key: 'coupon', width: 15 },
+            { header: 'Referral', key: 'referral', width: 15 },
+            { header: 'Add-ons', key: 'addons', width: 30 },
+            { header: 'Custom Fields', key: 'customFields', width: 40 },
+        ];
+
+        // 4. Transform and Add Data
+        let serialNo = 1;
+        registrations.forEach(reg => {
+            const rawData = reg.registrationData || {};
             // Normalize to Array (Group = Array of Objs, Individual = Single Obj)
             const attendeeList = Array.isArray(rawData) ? rawData : [rawData];
 
-            return attendeeList.map(attendeeInfo => {
-                // Basic Registration Info
-                const baseInfo = {
-                    "Registration ID": reg.id,
-                    "Order ID": reg.orderId,
-                    "Ticket Name": reg.ticket.name,
-                    "Ticket Type": reg.ticket.type,
-                    "Status": reg.status,
-                    "Scanned": reg.scanned ? "Yes" : "No",
-                    "Registration Date": reg.createdAt,
+            attendeeList.forEach(attendee => {
+                // Extract custom fields (everything except standard profile fields)
+                const { name, email, phone, ...others } = attendee;
 
-                    // Payment Info
-                    "Payment Status": reg.booking?.paymentStatus || "N/A",
-                    "Payment Amount": reg.booking?.payment || 0,
-                    "Discount": reg.booking?.discount || 0,
-                    "Coupon Code": reg.booking?.appliedCoupon || "N/A",
-                    "Referral Code": reg.booking?.referralCode || "N/A",
-                    "Add-ons": (reg.addons || []).map(a => `${a.name} (x${a.quantity})`).join(', ') || "N/A"
-                };
+                // Format custom fields as key:value string
+                const customFieldStr = Object.entries(others).map(([k, v]) => `${k}: ${v}`).join('; ');
 
-                // Attendee Info (Prefer registrationData, fall back to User profile if missing)
-                const userInfo = {
-                    "Name": attendeeInfo.name || reg.user.name,
-                    "Email": attendeeInfo.email || reg.user.email,
-                    "Phone": attendeeInfo.phone || reg.user.phone || reg.user.phoneNumber || "N/A",
-                };
-
-                // Custom Fields (Spread the rest of registrationData, excluding name/email/phone which we already grabbed)
-                const { name, email, phone, ...customFields } = attendeeInfo;
-
-                // Submission Data (Flattened)
-                const submissionData = reg.submissions || {};
-                // Exclude internal fields if any, or just spread all
-                // We might want to prefix them to avoid collisions? e.g. "Submission: Project Title"
-                // For now, raw spread as requested "add sumbission in exported data"
-
-                return {
-                    ...baseInfo,
-                    ...userInfo,
-                    ...customFields,
-                    ...submissionData
-                };
+                worksheet.addRow({
+                    sNo: serialNo++,
+                    regId: reg.id,
+                    orderId: reg.orderId,
+                    name: attendee.name || reg.user.name,
+                    email: attendee.email || reg.user.email,
+                    phone: attendee.phone || reg.user.phone || reg.user.phoneNumber || "N/A",
+                    ticketName: reg.ticket.name,
+                    ticketType: reg.ticket.type,
+                    status: reg.status,
+                    scanned: reg.scanned ? "Yes" : "No",
+                    createdAt: new Date(reg.createdAt).toLocaleString(),
+                    paymentStatus: reg.booking?.paymentStatus || "N/A",
+                    amount: reg.booking?.payment || 0,
+                    discount: reg.booking?.discount || 0,
+                    coupon: reg.booking?.appliedCoupon || "",
+                    referral: reg.booking?.referralCode || "",
+                    addons: (reg.addons || []).map(a => `${a.name} (x${a.quantity})`).join(', '),
+                    customFields: customFieldStr
+                });
             });
         });
 
-        return res.json({
-            message: "EXPORT_SUCCESS",
-            count: exportData.length,
-            data: exportData
-        });
+        // 5. Send Response
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.setHeader('Content-Disposition', `attachment; filename=registrations-${eventId}.xlsx`);
+
+        await workbook.xlsx.write(res);
+        res.end();
 
     } catch (error) {
         console.error("Export Error:", error);

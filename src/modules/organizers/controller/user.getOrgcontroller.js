@@ -46,13 +46,42 @@ export const getOrganizerController = async (req, res) => {
         type: true,
         about: true,
         website: true,
-        tkthiveUrl: true,
         contactEmail: true,
         contactPhone: true,
         totalEvents: true,
         totalTicketsSold: true,
         createdAt: true,
-        adminId: true, // Admin might want to see who manages this
+        adminId: true,
+        events: {
+          select: {
+            id: true,
+            title: true,
+            startDate: true,
+            endDate: true,
+            imageUrl: true,
+            venue: true,
+            price: true,
+            category: true,
+            showevent: true,
+            isRegistrationOpen: true,
+            totalTickets: true,
+            totalBooked: true,
+            _count: {
+              select: {
+                registrations: {
+                  where: {
+                    status: {
+                      in: ["CONFIRMED", "USED"]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          orderBy: {
+            startDate: 'desc'
+          }
+        }
       },
     });
 
@@ -62,8 +91,28 @@ export const getOrganizerController = async (req, res) => {
       });
     }
 
+    // Compute isLive for each event
+    const now = new Date();
+    const eventsWithLiveStatus = organizer.events.map(event => {
+      const start = new Date(event.startDate);
+      const end = new Date(event.endDate);
+      // Use logic similar to frontend: Live if now is between start and end
+      // Fallback: if no end date, assume 24h duration? Or just use start date.
+      // Frontend logic: end || start + 24h
+      const effectiveEnd = end.getTime() > 0 ? end : new Date(start.getTime() + 86400000);
+
+      return {
+        ...event,
+        totalBooked: event._count.registrations,
+        isLive: (now >= start && now <= effectiveEnd)
+      };
+    });
+
     return res.status(200).json({
-      organizer,
+      organizer: {
+        ...organizer,
+        events: eventsWithLiveStatus
+      },
     });
   } catch (error) {
     console.error("GET_ORGANIZER_ERROR:", error);

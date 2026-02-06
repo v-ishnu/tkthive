@@ -31,13 +31,15 @@ export const getMyOrganizers = async (req, res) => {
       },
     },
   });
+  const mappedOrganizers = organizers.map(o => ({
+    id: o.id,
+    name: o.name,
+    type: o.type,
+    imageUrl: o.imageUrl, // Assuming imageUrl exists or add to select
+    role: o.users[0]?.role,
+  }));
+
   return res.json({
-    organizers
-    // organizers: organizers.map(o => ({
-    //   id: o.id,
-    //   name: o.name,
-    //   type: o.type,
-    //   role: o.users[0]?.role, // safe access
-    // })),
+    organizers: mappedOrganizers
   });
 };
