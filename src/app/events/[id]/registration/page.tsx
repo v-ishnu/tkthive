@@ -355,6 +355,29 @@ export default function RegistrationPage() {
                 </div>
             );
         }
+        if (field.type === 'RADIO' || field.type === 'radio') {
+            return (
+                <div className="flex flex-col gap-2">
+                    {field.options?.map((opt) => (
+                        <label key={opt} className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${value === opt ? 'bg-primary/20 border-primary text-white' : 'bg-tertiary border-white/10 text-gray-400 hover:bg-white/5'}`}>
+                            <div className={`w-5 h-5 rounded-full border flex items-center justify-center ${value === opt ? 'border-primary' : 'border-gray-500'}`}>
+                                {value === opt && <div className="w-2.5 h-2.5 rounded-full bg-primary" />}
+                            </div>
+                            <input
+                                type="radio"
+                                name={field.id}
+                                value={opt}
+                                checked={value === opt}
+                                onChange={() => onChange(opt)}
+                                className="hidden"
+                                required={field.required}
+                            />
+                            <span className="text-sm font-medium">{opt}</span>
+                        </label>
+                    ))}
+                </div>
+            );
+        }
         if (field.type === 'textarea') {
             return (
                 <textarea

@@ -59,7 +59,7 @@ export interface Submission {
 export interface RegistrationFormField {
   id: string;
   label: string;
-  type: 'text' | 'email' | 'tel' | 'select' | 'url' | 'number' | 'textarea';
+  type: 'text' | 'email' | 'tel' | 'select' | 'url' | 'number' | 'textarea' | 'RADIO' | 'radio';
   options?: string[]; // For select
   required: boolean;
   placeholder?: string;
@@ -243,6 +243,6 @@ export enum View {
 export interface CustomField {
   id: string;
   label: string;
-  type: 'text' | 'number' | 'email' | 'select';
+  type: 'text' | 'number' | 'email' | 'select' | 'RADIO';
   required: boolean;
 }
