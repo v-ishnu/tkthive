@@ -38,6 +38,7 @@ export interface Organizer {
     events?: any[];
     totalEvents?: number;
     totalTicketsSold?: number;
+    totalRevenue?: number; // ✅
 }
 
 export interface EventRegistration {

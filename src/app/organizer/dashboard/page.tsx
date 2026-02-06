@@ -109,7 +109,7 @@ const Dashboard: React.FC = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 <StatCard
                     title="Total Revenue"
-                    value="₹--"
+                    value={`₹${(selectedOrganization?.totalRevenue || 0).toLocaleString('en-IN')}`}
                     change="N/A"
                     icon={IndianRupee}
                     colorClass="bg-primary shadow-primary/40 shadow-lg"
