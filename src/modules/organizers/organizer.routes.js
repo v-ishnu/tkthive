@@ -31,4 +31,8 @@ organizerRouter.get("/events/:id/registrations", protect, getEventRegistrationsC
 organizerRouter.get("/events/:eventId/export", protect, exportRegistrations);
 
 
+// Maintenance
+import { recalculateAllRevenues } from "./controller/admin.fixRevenue.js";
+organizerRouter.post("/maintenance/fix-revenue", protect, authorize("SUPER_ADMIN"), recalculateAllRevenues);
+
 export default organizerRouter;

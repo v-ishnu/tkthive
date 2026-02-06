@@ -319,7 +319,7 @@ export const verifyBooking = async (req, res) => {
 async function finalizeBooking(orderId) {
     const booking = await prisma.booking.findUnique({
         where: { orderId },
-        include: { items: { include: { ticket: true } } }
+        include: { items: { include: { ticket: { include: { event: true } } } } }
     });
 
     if (!booking) return { success: false, message: "BOOKING_NOT_FOUND" };
@@ -340,6 +340,22 @@ async function finalizeBooking(orderId) {
                 where: { id: item.ticketId },
                 data: { sold: { increment: item.quantity } }
             });
+
+            // Calculate Item Revenue (Ticket + Addons)
+            const itemTicketRevenue = item.unitPrice * item.quantity;
+            let itemAddonRevenue = 0;
+            if (item.addons && Array.isArray(item.addons)) {
+                itemAddonRevenue = item.addons.reduce((sum, addon) => sum + (addon.price * addon.quantity), 0);
+            }
+            const totalItemRevenue = itemTicketRevenue + itemAddonRevenue;
+
+            // Increment Organizer Revenue
+            if (item.ticket.event && item.ticket.event.organizerId) {
+                await tx.organizer.update({
+                    where: { id: item.ticket.event.organizerId },
+                    data: { totalRevenue: { increment: totalItemRevenue } }
+                });
+            }
 
             // 2. Create Registrations from BookingItem Data
             const attendees = item.attendeeData || [];

@@ -76,6 +76,17 @@ export const getOrganizerController = async (req, res) => {
                   }
                 }
               }
+            },
+            registrations: {
+              where: {
+                status: {
+                  in: ["CONFIRMED", "USED"]
+                }
+              },
+              select: {
+                unitPrice: true,
+                addons: true
+              }
             }
           },
           orderBy: {
@@ -101,9 +112,17 @@ export const getOrganizerController = async (req, res) => {
       // Frontend logic: end || start + 24h
       const effectiveEnd = end.getTime() > 0 ? end : new Date(start.getTime() + 86400000);
 
+      // Calculate Revenue
+      const grossSales = event.registrations.reduce((sum, reg) => {
+        const ticketRevenue = reg.unitPrice || 0;
+        const addonsRevenue = reg.addons ? reg.addons.reduce((acc, addon) => acc + (addon.price * addon.quantity), 0) : 0;
+        return sum + ticketRevenue + addonsRevenue;
+      }, 0);
+
       return {
         ...event,
         totalBooked: event._count.registrations,
+        grossSales,
         isLive: (now >= start && now <= effectiveEnd)
       };
     });

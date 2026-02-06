@@ -191,6 +191,7 @@ model Organizer {
   // Stats (cached, optional but useful)
   totalEvents      Int @default(0)
   totalTicketsSold Int @default(0)
+  totalRevenue     Float @default(0.0) // ✅ Added
 
   // Admin-managed vs independent
   adminId   String?  @map("admin_id") @db.ObjectId
