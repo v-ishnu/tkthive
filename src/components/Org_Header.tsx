@@ -1,7 +1,11 @@
 "use client"
 import React from 'react';
-import { Search, Bell, Mail, User as UserIcon, Menu } from 'lucide-react';
+import { Search, Bell, Mail, User as UserIcon, Menu, ChevronDown } from 'lucide-react';
 import { View, User } from '../types';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { RootState } from '@/store/store';
+import { fetchMyOrganizations, setSelectedOrganization } from '@/store/slices/organizerSlice';
+import { useRouter } from 'next/navigation';
 
 interface HeaderProps {
     currentView: View;
@@ -10,6 +14,21 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ currentView, user, toggleSidebar }) => {
+    const dispatch = useAppDispatch();
+    const router = useRouter();
+
+    // Access organizer state
+    const { organizations, selectedOrganization, orgLoading } = useAppSelector((state: RootState) => state.organizer);
+
+    // Fetch organizations on mount
+    React.useEffect(() => {
+        dispatch(fetchMyOrganizations());
+    }, [dispatch]);
+
+    const handleOrgChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        dispatch(setSelectedOrganization(e.target.value));
+    };
+
     const getTitle = () => {
         switch (currentView) {
             case View.DASHBOARD: return 'Dashboard Overview';
@@ -47,13 +66,32 @@ const Header: React.FC<HeaderProps> = ({ currentView, user, toggleSidebar }) => 
             </div>
 
             <div className="flex items-center gap-6">
-                <div className="relative hidden md:block">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted w-4 h-4" />
-                    <input
-                        type="text"
-                        placeholder="Search transactions..."
-                        className="pl-10 pr-4 py-2 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all w-64 text-sm"
-                    />
+                {/* Organization Switcher */}
+                <div className="hidden md:flex items-center gap-2 bg-background border border-border rounded-xl px-3 py-1.5 min-w-[200px]">
+                    <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center text-primary text-xs font-bold overflow-hidden">
+                        {selectedOrganization?.imageUrl ? (
+                            <img src={selectedOrganization.imageUrl} alt="" className="w-full h-full object-cover" />
+                        ) : (
+                            selectedOrganization?.name?.charAt(0) || 'O'
+                        )}
+                    </div>
+                    {orgLoading ? (
+                        <div className="text-sm text-text-muted animate-pulse">Loading...</div>
+                    ) : (
+                        <select
+                            value={selectedOrganization?.id || ''}
+                            onChange={handleOrgChange}
+                            className="bg-transparent text-sm text-text-main font-medium focus:outline-none w-full cursor-pointer"
+                        >
+                            {organizations.length === 0 && <option value="" disabled>No Organizations</option>}
+                            {organizations.map(org => (
+                                <option key={org.id} value={org.id} className="bg-card text-text-main">
+                                    {org.role ? `${org.name} (${org.role})` : org.name}
+                                </option>
+                            ))}
+                        </select>
+                    )}
+                    <ChevronDown size={14} className="text-text-muted pointer-events-none" />
                 </div>
 
                 <div className="flex items-center gap-3 border-r border-border pr-6">

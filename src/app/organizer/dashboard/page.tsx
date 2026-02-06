@@ -24,6 +24,9 @@ import {
     Bar,
     Cell
 } from 'recharts';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { RootState } from '@/store/store';
+import { fetchOrganizerDetails } from '@/store/slices/organizerSlice';
 
 const data = [
     { name: 'Mon', value: 4000 },
@@ -61,48 +64,86 @@ const StatCard = ({ title, value, change, icon: Icon, colorClass }: any) => (
 );
 
 const Dashboard: React.FC = () => {
+    const dispatch = useAppDispatch();
+    const { selectedOrganization, orgDetailsLoading } = useAppSelector((state: RootState) => state.organizer);
+
+    React.useEffect(() => {
+        if (selectedOrganization?.id) {
+            dispatch(fetchOrganizerDetails(selectedOrganization.id));
+        }
+    }, [dispatch, selectedOrganization?.id]);
+
+    // Derived Stats
+    const events = selectedOrganization?.events || [];
+
+    // 1. Total Revenue (Approximate based on basic calculation if prices available, else mock logic or 0)
+    // Note: Backend doesn't return revenue yet, so we might need to rely on totalTicketsSold for now or sum up if we had sales data.
+    // For now, let's just show Total Tickets as a primary metric we have.
+
+    const totalTicketsSold = selectedOrganization?.totalTicketsSold || 0;
+    const totalEvents = selectedOrganization?.totalEvents || events.length || 0;
+
+    // Upcoming Events Count
+    const now = new Date();
+    const upcomingEventsCount = events.filter((e: any) => new Date(e.startDate) > now).length;
+
+    // Live Events
+    const liveEventsCount = events.filter((e: any) => e.isLive).length;
+
+    // Category Data for Chart
+    const categoryCounts: Record<string, number> = {};
+    events.forEach((e: any) => {
+        const cat = e.category || 'Other';
+        categoryCounts[cat] = (categoryCounts[cat] || 0) + 1;
+    });
+
+    const dynamicBarData = Object.keys(categoryCounts).map(cat => ({
+        name: cat,
+        value: categoryCounts[cat]
+    })).slice(0, 4); // Limit to 4
+
+
     return (
         <div className="space-y-8 pb-10">
             {/* Stats Row */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 <StatCard
-                    title="Total Ticket Sales"
-                    value="₹24,500"
-                    change="+12.5%"
-
+                    title="Total Revenue"
+                    value="₹--"
+                    change="N/A"
                     icon={IndianRupee}
                     colorClass="bg-primary shadow-primary/40 shadow-lg"
                 />
                 <StatCard
-                    title="Active Registered Users"
-                    value="1,240"
-                    change="+8.2%"
+                    title="Live Events"
+                    value={liveEventsCount}
+                    change={liveEventsCount > 0 ? "Active Now" : "Inactive"}
                     icon={Users}
                     colorClass="bg-primary-hover shadow-primary/40 shadow-lg"
                 />
                 <StatCard
                     title="Upcoming Events"
-                    value="14"
-                    change="+2"
+                    value={upcomingEventsCount}
+                    change={`Total: ${totalEvents}`}
                     icon={CalendarCheck}
                     colorClass="bg-secondary shadow-secondary/40 shadow-lg"
                 />
                 <StatCard
-                    title="Tickets Reserved"
-                    value="568"
-                    change="+18%"
+                    title="Tickets Sold"
+                    value={totalTicketsSold}
+                    change="Lifetime"
                     icon={Ticket}
                     colorClass="bg-primary shadow-primary/40 shadow-lg"
                 />
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Main Chart */}
+                {/* Main Chart - Keep Static for Demo until we have timeseries data */}
                 <div className="lg:col-span-2 bg-card p-6 rounded-3xl border border-border shadow-sm">
                     <div className="flex justify-between items-center mb-8">
                         <div>
                             <h3 className="text-lg font-bold text-text-main">Sales Analytics</h3>
-                            <p className="text-sm text-text-muted">Real-time revenue tracking over 7 days</p>
+                            <p className="text-sm text-text-muted">Real-time revenue tracking (Demo)</p>
                         </div>
                         <select className="bg-background border-none rounded-lg text-sm font-medium px-3 py-1 outline-none">
                             <option>Last 7 Days</option>
@@ -130,16 +171,16 @@ const Dashboard: React.FC = () => {
                     </div>
                 </div>
 
-                {/* Side Performance */}
+                {/* Side Performance - Dynamic Categories */}
                 <div className="bg-card p-6 rounded-3xl border border-border shadow-sm">
                     <h3 className="text-lg font-bold text-text-main mb-2">Category Performance</h3>
-                    <p className="text-sm text-text-muted mb-8">Engagement by event type</p>
+                    <p className="text-sm text-text-muted mb-8">Events by category</p>
 
                     <div className="h-48 w-full mb-8">
                         <ResponsiveContainer width="100%" height="100%">
-                            <BarChart data={barData}>
+                            <BarChart data={dynamicBarData.length > 0 ? dynamicBarData : barData}>
                                 <Bar dataKey="value" radius={[10, 10, 10, 10]}>
-                                    {barData.map((entry, index) => (
+                                    {(dynamicBarData.length > 0 ? dynamicBarData : barData).map((entry, index) => (
                                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                     ))}
                                 </Bar>

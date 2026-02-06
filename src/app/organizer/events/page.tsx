@@ -1,19 +1,38 @@
-
-import React from 'react';
+"use client"
+import React, { useEffect } from 'react';
 import { MoreVertical, Users, Plus, Filter, ArrowUpRight } from 'lucide-react';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { useRouter } from 'next/navigation';
+import { fetchMyOrganizations, fetchOrganizerDetails } from '@/store/slices/organizerSlice';
 
-const events = [
-    { id: 1, name: 'Sun & Bass Music Festival', date: 'Sept 12, 2024', location: 'Olbia, Italy', tickets: '850/1000', sales: '₹42,500', status: 'Active' },
-    { id: 2, name: 'AI Builders Meetup', date: 'Oct 05, 2024', location: 'San Francisco, CA', tickets: '120/150', sales: '₹6,000', status: 'Active' },
-    { id: 3, name: 'Hive Design Workshop', date: 'Oct 15, 2024', location: 'Online Event', tickets: '45/100', sales: '₹0', status: 'Draft' },
-    { id: 4, name: 'Annual Tech Gala', date: 'Aug 30, 2024', location: 'New York City', tickets: '500/500', sales: '₹25,000', status: 'Completed' },
-];
+const EventsList: React.FC = () => {
+    const router = useRouter();
+    const dispatch = useAppDispatch();
+    const { selectedOrganization, organizations } = useAppSelector((state) => state.organizer);
+    const events = selectedOrganization?.events || [];
 
-interface EventsListProps {
-    onCreateNew: () => void;
-}
+    // Fetch organizations on mount if empty
+    useEffect(() => {
+        if (organizations.length === 0) {
+            dispatch(fetchMyOrganizations());
+        }
+    }, [dispatch, organizations.length]);
 
-const EventsList: React.FC<EventsListProps> = ({ onCreateNew }) => {
+    // Fetch details (events) when organization is selected or on mount
+    useEffect(() => {
+        if (selectedOrganization?.id) {
+            dispatch(fetchOrganizerDetails(selectedOrganization.id));
+        }
+    }, [dispatch, selectedOrganization?.id]);
+
+    const handleCreateNew = () => {
+        router.push('/organizer/create-event');
+    };
+
+    const handleManageEvent = (eventId: string) => {
+        router.push(`/organizer/events/${eventId}`);
+    };
+
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
@@ -27,7 +46,7 @@ const EventsList: React.FC<EventsListProps> = ({ onCreateNew }) => {
                         Filters
                     </button>
                     <button
-                        onClick={onCreateNew}
+                        onClick={handleCreateNew}
                         className="flex items-center gap-2 px-6 py-2 bg-primary text-white font-bold rounded-xl shadow-lg shadow-primary/20 hover:bg-primary-hover transition-all"
                     >
                         <Plus size={18} />
@@ -48,46 +67,71 @@ const EventsList: React.FC<EventsListProps> = ({ onCreateNew }) => {
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-border">
-                        {events.map((event) => (
-                            <tr key={event.id} className="hover:bg-primary/5 transition-colors group">
-                                <td className="px-8 py-6">
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center font-bold text-primary text-xl">
-                                            {event.name.charAt(0)}
-                                        </div>
-                                        <div>
-                                            <p className="font-bold text-text-main group-hover:text-primary-hover transition-colors">{event.name}</p>
-                                            <p className="text-sm text-text-muted">{event.date} • {event.location}</p>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td className="px-6 py-6">
-                                    <div className="flex items-center gap-2">
-                                        <Users className="w-4 h-4 text-text-muted" />
-                                        <span className="font-semibold text-text-secondary">{event.tickets}</span>
-                                    </div>
-                                </td>
-                                <td className="px-6 py-6 font-bold text-text-main">{event.sales}</td>
-                                <td className="px-6 py-6">
-                                    <span className={`px-4 py-1.5 rounded-full text-xs font-bold ${event.status === 'Active' ? 'bg-green-100 text-green-700' :
-                                        event.status === 'Completed' ? 'bg-blue-100 text-blue-700' :
-                                            'bg-primary/10 text-primary'
-                                        }`}>
-                                        {event.status}
-                                    </span>
-                                </td>
-                                <td className="px-8 py-6 text-right">
-                                    <div className="flex items-center justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <button className="p-2 text-text-muted hover:text-primary hover:bg-primary/10 rounded-lg">
-                                            <ArrowUpRight size={18} />
-                                        </button>
-                                        <button className="p-2 text-text-muted hover:text-text-main">
-                                            <MoreVertical size={18} />
-                                        </button>
-                                    </div>
+                        {events.length === 0 ? (
+                            <tr>
+                                <td colSpan={5} className="px-8 py-10 text-center text-text-muted">
+                                    No events found. Create your first event!
                                 </td>
                             </tr>
-                        ))}
+                        ) : (
+                            events.map((event: any) => (
+                                <tr
+                                    key={event.id}
+                                    className="hover:bg-primary/5 transition-colors group cursor-pointer"
+                                    onClick={() => handleManageEvent(event.id)}
+                                >
+                                    <td className="px-8 py-6">
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center font-bold text-primary text-xl overflow-hidden">
+                                                {event.imageUrl ? (
+                                                    <img src={event.imageUrl} alt={event.title} className="w-full h-full object-cover" />
+                                                ) : (
+                                                    event.title.charAt(0)
+                                                )}
+                                            </div>
+                                            <div>
+                                                <p className="font-bold text-text-main group-hover:text-primary-hover transition-colors">{event.title}</p>
+                                                <p className="text-sm text-text-muted">
+                                                    {new Date(event.startDate).toLocaleDateString()} • {event.venue?.city || 'Online'}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-6">
+                                        <div className="flex items-center gap-2">
+                                            <Users className="w-4 h-4 text-text-muted" />
+                                            <span className="font-semibold text-text-secondary">
+                                                {event.totalBooked || 0} / {event.totalTickets || '∞'}
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-6 font-bold text-text-main">
+                                        {/* calc revenue if price is simple, else just show Tickets Sold * Price or N/A */}
+                                        ₹ --
+                                    </td>
+                                    <td className="px-6 py-6">
+                                        <span className={`px-4 py-1.5 rounded-full text-xs font-bold ${event.isLive ? 'bg-green-100 text-green-700' :
+                                            !event.isRegistrationOpen ? 'bg-red-100 text-red-700' :
+                                                'bg-blue-100 text-blue-700'
+                                            }`}>
+                                            {event.isLive ? 'Live' : (event.isRegistrationOpen ? 'Upcoming' : 'Closed')}
+                                        </span>
+                                    </td>
+                                    <td className="px-8 py-6 text-right">
+                                        <div className="flex items-center justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <button
+                                                onClick={(e) => { e.stopPropagation(); handleManageEvent(event.id); }}
+                                                className="p-2 text-text-muted hover:text-primary hover:bg-primary/10 rounded-lg"
+                                            >
+                                                <ArrowUpRight size={18} />
+                                            </button>
+                                            <button className="p-2 text-text-muted hover:text-text-main">
+                                                <MoreVertical size={18} />
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            )))}
                     </tbody>
                 </table>
             </div>
