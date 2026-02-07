@@ -87,6 +87,7 @@ export interface AddOn {
   description?: string;
   image?: string;
   type: 'merch' | 'meal' | 'access' | 'other';
+  maxLimit?: number;
 }
 
 export interface Organizer {

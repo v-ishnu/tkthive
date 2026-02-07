@@ -170,7 +170,19 @@ export default function RegistrationPage() {
     const handleAddOnQuantity = (id: string, delta: number) => {
         setSelectedAddOns(prev => {
             const current = prev[id] || 0;
-            return { ...prev, [id]: Math.max(0, current + delta) };
+            const newValue = current + delta;
+
+            if (newValue < 0) return prev;
+
+            const addon = event?.addOns?.find(a => a.id === id);
+            const limit = addon?.maxLimit ?? 10; // Default limit if not set
+
+            if (newValue > limit) {
+                toast.error(`Maximum limit of ${limit} reached for this add-on.`);
+                return prev;
+            }
+
+            return { ...prev, [id]: newValue };
         });
     };
 
