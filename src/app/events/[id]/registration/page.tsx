@@ -42,6 +42,7 @@ export default function RegistrationPage() {
     const [discount, setDiscount] = useState(0);
     const [couponMessage, setCouponMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
     const [referralCode, setReferralCode] = useState(''); // ✅ Added Referral Code State
+    const [isDeclared, setIsDeclared] = useState(false); // ✅ Added Declaration State
 
     // Initialize event
     useEffect(() => {
@@ -680,9 +681,29 @@ export default function RegistrationPage() {
                                 </div>
                             )}
 
+                            {/* Mandatory Declaration for Specific Event */}
+                            {(event.slug === "advitiya-2026-iit-ropar-driftx-go-karting-experience-2026-02-06" || event.id === "advitiya-2026-iit-ropar-driftx-go-karting-experience-2026-02-06") && (
+                                <div className="mt-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl">
+                                    <label className="flex items-start gap-4 cursor-pointer group">
+                                        <div className={`mt-1 w-6 h-6 rounded border flex items-center justify-center transition-all ${isDeclared ? 'bg-red-500 border-red-500 text-white' : 'bg-transparent border-red-500/50 group-hover:border-red-500'}`}>
+                                            {isDeclared && <Check size={16} />}
+                                        </div>
+                                        <input
+                                            type="checkbox"
+                                            checked={isDeclared}
+                                            onChange={(e) => setIsDeclared(e.target.checked)}
+                                            className="hidden"
+                                        />
+                                        <p className="text-sm text-red-200 leading-relaxed select-none">
+                                            I voluntarily agree to participate in the DriftX Go-Karting activity. I understand that while all safety measures will be ensured, I am participating at my own risk. DriftX and the organizing team will ensure safety standards but will not be responsible for unforeseen incidents.
+                                        </p>
+                                    </label>
+                                </div>
+                            )}
+
                             <button
                                 onClick={handlePayment}
-                                disabled={isProcessing}
+                                disabled={isProcessing || ((event.slug === "advitiya-2026-iit-ropar-driftx-go-karting-experience-2026-02-06" || event.id === "advitiya-2026-iit-ropar-driftx-go-karting-experience-2026-02-06") && !isDeclared)}
                                 className="w-full bg-primary hover:bg-primary-hover text-black font-bold py-4 rounded-xl transition-all shadow-lg shadow-primary/20 mt-8 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-lg"
                             >
                                 {isProcessing ? (
