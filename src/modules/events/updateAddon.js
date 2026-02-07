@@ -35,7 +35,8 @@ export const updateAddon = async (req, res) => {
       ...(price !== undefined && { price }),
       ...(quantity !== undefined && { quantity }),
       ...(image !== undefined && { image }),
-      ...(isActive !== undefined && { isActive })
+      ...(isActive !== undefined && { isActive }),
+      ...(req.body.maxLimit !== undefined && { maxLimit: parseInt(req.body.maxLimit) })
     };
 
     event.addons[addonIndex] = updatedAddon;

@@ -296,6 +296,7 @@ model Addon {
   price    Float
   quantity Int?
   sold     Int    @default(0)
+  maxLimit Int    @default(50) // ✅ Added: Per-user purchase limit. Default 5.
 
   isActive  Boolean  @default(true)
   image     String?  // ✅ Added
