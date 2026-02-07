@@ -123,6 +123,7 @@ export const fetchEventById = createAsyncThunk(
                         name: addon.name,
                         price: `₹${addon.price}`,
                         description: '',
+                        maxLimit: addon.maxLimit,
                         image: addon.image,
                         type: 'access'
                     })) || [],
