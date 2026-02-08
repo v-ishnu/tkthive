@@ -265,10 +265,13 @@ const ScannerPage: React.FC = () => {
                                         <div className="grid grid-cols-1 gap-2">
                                             {ticketDetails.addons.map((addon: any, idx: number) => (
                                                 <div key={idx} className="p-2 border rounded-lg flex justify-between items-center text-sm">
-                                                    <span>{addon.name || "Addon"}</span>
-                                                    {/* If price is available in addon object display it */}
+                                                    <span>
+                                                        {addon.quantity > 0 && <span className="font-bold mr-1">{addon.quantity}x</span>}
+                                                        {addon.name || "Addon"}
+                                                    </span>
+                                                    {/* Display total price for this addon line (unit price * quantity) */}
                                                     <span className="font-medium text-text-muted">
-                                                        {addon.price ? new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(addon.price) : ''}
+                                                        {addon.price ? new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(addon.price * (addon.quantity || 1)) : ''}
                                                     </span>
                                                 </div>
                                             ))}
