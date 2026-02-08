@@ -390,6 +390,17 @@ async function finalizeBooking(orderId) {
                 });
             }
         }
+
+        // 3. Update Organizer Stats
+        for (const [orgId, stats] of Object.entries(organizerUpdates)) {
+            await tx.organizer.update({
+                where: { id: orgId },
+                data: {
+                    totalRevenue: { increment: stats.revenue },
+                    totalTicketsSold: { increment: stats.tickets }
+                }
+            });
+        }
     });
 
     // Send Email Async
