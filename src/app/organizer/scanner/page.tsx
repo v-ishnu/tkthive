@@ -251,7 +251,7 @@ const ScannerPage: React.FC = () => {
                                         <p className="font-bold text-secondary-foreground truncate">{ticketDetails.event.title}</p>
                                     </div>
                                     <div className="p-3 bg-secondary/10 rounded-xl">
-                                        <p className="text-xs text-text-muted mb-1 flex items-center gap-1"> Amount Paid</p>
+                                        <p className="text-xs text-text-muted mb-1 flex items-center gap-1"> Ticket Price</p>
                                         <p className="font-bold text-secondary-foreground">
                                             {new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(ticketDetails.unitPrice)}
                                         </p>
