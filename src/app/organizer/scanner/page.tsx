@@ -191,7 +191,7 @@ const ScannerPage: React.FC = () => {
                 </div>
 
                 {/* Result Section */}
-                <div className="bg-card p-4 lg:p-6 rounded-3xl border border-border shadow-sm flex flex-col h-full min-h-[400px]">
+                <div className="bg-card p-4 lg:p-6 rounded-3xl border border-border shadow-sm flex flex-col h-full min-h-[600px]">
                     <h2 className="text-xl font-bold text-text-main mb-6">Details</h2>
 
                     {isLoading && !ticketDetails && !error ? (
