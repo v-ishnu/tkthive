@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { fetchEventRegistrations, fetchMyOrganizations, fetchOrganizerDetails } from '@/store/slices/organizerSlice';
+import { fetchEventRegistrations, fetchEventBookings, fetchMyOrganizations, fetchOrganizerDetails } from '@/store/slices/organizerSlice';
 import {
     Users, Ticket, Calendar, Search, Download,
     ArrowLeft, MoreVertical, CheckCircle
@@ -15,11 +15,15 @@ const EventManagementPage = () => {
     const eventId = params.id as string;
 
     // State
-    const [activeTab, setActiveTab] = useState<'overview' | 'registrations'>('overview');
+    const [activeTab, setActiveTab] = useState<'overview' | 'registrations' | 'transactions'>('overview');
     const [searchTerm, setSearchTerm] = useState('');
 
     // Redux selectors
-    const { selectedOrganization, organizations, currentEventRegistrations, registrationsLoading } = useAppSelector(state => state.organizer);
+    const {
+        selectedOrganization, organizations,
+        currentEventRegistrations, registrationsLoading,
+        currentEventBookings, bookingsLoading
+    } = useAppSelector(state => state.organizer);
 
     // Find the current event from the list (Assuming fetchOrganizerDetails was called in layout/dashboard)
     const event = selectedOrganization?.events?.find((e: any) => e.id === eventId);
@@ -44,10 +48,20 @@ const EventManagementPage = () => {
         }
     }, [dispatch, eventId]);
 
-    const handleExport = () => {
-        const token = localStorage.getItem('token'); // Simplistic auth check
-        // Direct link to download
+    useEffect(() => {
+        if (eventId && activeTab === 'transactions') {
+            dispatch(fetchEventBookings({ eventId }));
+        }
+    }, [dispatch, eventId, activeTab]);
+
+    const handleExportRegistrations = () => {
+        // Direct link to download registrations
         window.open(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5051/api/'}v1/organizer/events/${eventId}/export`, '_blank');
+    };
+
+    const handleExportTransactions = () => {
+        // Direct link to download transactions
+        window.open(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5051/api/'}v1/organizer/events/${eventId}/bookings/export`, '_blank');
     };
 
     if (!event) {
@@ -81,19 +95,24 @@ const EventManagementPage = () => {
             <div className="flex gap-8 border-b border-border">
                 <button
                     onClick={() => setActiveTab('overview')}
-                    className={`pb-4 px-2 font-semibold text-sm transition-all relative ${activeTab === 'overview' ? 'text-primary' : 'text-text-muted hover:text-text-main'
-                        }`}
+                    className={`pb-4 px-2 font-semibold text-sm transition-all relative ${activeTab === 'overview' ? 'text-primary' : 'text-text-muted hover:text-text-main'}`}
                 >
                     Overview
                     {activeTab === 'overview' && <span className="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-t-full" />}
                 </button>
                 <button
                     onClick={() => setActiveTab('registrations')}
-                    className={`pb-4 px-2 font-semibold text-sm transition-all relative ${activeTab === 'registrations' ? 'text-primary' : 'text-text-muted hover:text-text-main'
-                        }`}
+                    className={`pb-4 px-2 font-semibold text-sm transition-all relative ${activeTab === 'registrations' ? 'text-primary' : 'text-text-muted hover:text-text-main'}`}
                 >
                     Registrations
                     {activeTab === 'registrations' && <span className="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-t-full" />}
+                </button>
+                <button
+                    onClick={() => setActiveTab('transactions')}
+                    className={`pb-4 px-2 font-semibold text-sm transition-all relative ${activeTab === 'transactions' ? 'text-primary' : 'text-text-muted hover:text-text-main'}`}
+                >
+                    Transactions
+                    {activeTab === 'transactions' && <span className="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-t-full" />}
                 </button>
             </div>
 
@@ -142,7 +161,7 @@ const EventManagementPage = () => {
                         <p className="text-sm text-text-muted">Total Revenue</p>
                     </div>
                 </div>
-            ) : (
+            ) : activeTab === 'registrations' ? (
                 <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-2 duration-300">
                     {/* Table Header Controls */}
                     <div className="p-6 border-b border-border flex flex-col sm:flex-row gap-4 justify-between items-center">
@@ -157,7 +176,7 @@ const EventManagementPage = () => {
                             />
                         </div>
                         <button
-                            onClick={handleExport}
+                            onClick={handleExportRegistrations}
                             className="flex items-center gap-2 px-4 py-2 bg-background border border-border rounded-xl text-text-secondary font-semibold hover:bg-gray-50 text-sm"
                         >
                             <Download size={16} />
@@ -228,6 +247,94 @@ const EventManagementPage = () => {
                         </table>
                     </div>
                     {/* Pagination Controls could go here */}
+                </div>
+            ) : (
+                <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-2 duration-300">
+                    {/* Transactions Tab Content */}
+                    <div className="p-6 border-b border-border flex flex-col sm:flex-row gap-4 justify-between items-center">
+                        <div className="relative w-full sm:w-96">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted w-4 h-4" />
+                            <input
+                                type="text"
+                                placeholder="Search transactions by user..."
+                                className="w-full pl-10 pr-4 py-2 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all text-sm"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                        </div>
+                        <button
+                            onClick={handleExportTransactions}
+                            className="flex items-center gap-2 px-4 py-2 bg-background border border-border rounded-xl text-text-secondary font-semibold hover:bg-gray-50 text-sm"
+                        >
+                            <Download size={16} />
+                            Export Transactions
+                        </button>
+                    </div>
+
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left">
+                            <thead className="bg-gray-50/50 border-b border-border">
+                                <tr>
+                                    <th className="px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">S.No</th>
+                                    <th className="px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">Date</th>
+                                    <th className="px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">Order ID</th>
+                                    <th className="px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">User</th>
+                                    <th className="px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">Items</th>
+                                    <th className="px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">Amount</th>
+                                    <th className="px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-border">
+                                {bookingsLoading ? (
+                                    <tr><td colSpan={6} className="p-8 text-center text-text-muted">Loading transactions...</td></tr>
+                                ) : currentEventBookings.length === 0 ? (
+                                    <tr><td colSpan={6} className="p-8 text-center text-text-muted">No transactions found.</td></tr>
+                                ) : (
+                                    currentEventBookings
+                                        .filter(b =>
+                                            (b.user?.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                            (b.user?.email || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                            b.orderId.toLowerCase().includes(searchTerm.toLowerCase())
+                                        )
+                                        .map((booking, index) => (
+                                            <tr key={booking.id} className="hover:bg-primary/5 transition-colors">
+                                                <td className="px-6 py-4 text-sm text-text-muted">
+                                                    {index + 1}
+                                                </td>
+                                                <td className="px-6 py-4 text-sm text-text-muted">
+                                                    {new Date(booking.createdAt).toLocaleDateString()}
+                                                </td>
+                                                <td className="px-6 py-4 text-sm text-text-muted font-mono">{booking.orderId}</td>
+                                                <td className="px-6 py-4">
+                                                    <div>
+                                                        <p className="font-bold text-text-main text-sm">{booking.user?.name || "Unknown"}</p>
+                                                        <p className="text-xs text-text-muted">{booking.user?.email}</p>
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4 text-sm text-text-main">
+                                                    {booking.items.map((item, i) => (
+                                                        <div key={i}>
+                                                            {item.quantity}x {item.ticketName}
+                                                        </div>
+                                                    ))}
+                                                </td>
+                                                <td className="px-6 py-4 font-bold text-text-main">
+                                                    {booking.currency} {booking.amount}
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${booking.paymentStatus === 'PAID' ? 'bg-green-100 text-green-800' :
+                                                        booking.paymentStatus === 'PENDING' ? 'bg-yellow-100 text-yellow-800' :
+                                                            'bg-red-100 text-red-800'
+                                                        }`}>
+                                                        {booking.paymentStatus}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        ))
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             )}
         </div>

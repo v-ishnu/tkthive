@@ -59,6 +59,26 @@ export interface EventRegistration {
     createdAt: string;
 }
 
+export interface EventBooking {
+    id: string;
+    orderId: string;
+    user: {
+        name: string;
+        email: string;
+        phoneNumber?: string;
+    };
+    paymentStatus: string;
+    amount: number;
+    currency: string;
+    createdAt: string;
+    items: {
+        ticketName: string;
+        quantity: number;
+        attendeeData: any;
+        addons: any[];
+    }[];
+}
+
 interface OrganizerState {
     ticketDetails: TicketDetails | null;
     scanResult: string | null;
@@ -74,6 +94,16 @@ interface OrganizerState {
     // Event Management
     currentEventRegistrations: EventRegistration[];
     registrationsLoading: boolean;
+
+    // Transaction Management
+    currentEventBookings: EventBooking[];
+    bookingsLoading: boolean;
+    bookingsPagination: {
+        total: number;
+        page: number;
+        limit: number;
+        totalPages: number;
+    } | null;
 }
 
 const initialState: OrganizerState = {
@@ -88,7 +118,11 @@ const initialState: OrganizerState = {
     orgDetailsLoading: false,
 
     currentEventRegistrations: [],
-    registrationsLoading: false
+    registrationsLoading: false,
+
+    currentEventBookings: [],
+    bookingsLoading: false,
+    bookingsPagination: null
 };
 
 // Async Thunks
@@ -122,6 +156,24 @@ export const fetchEventRegistrations = createAsyncThunk<
             return response.data;
         } catch (error: any) {
             return rejectWithValue(error.response?.data?.message || "Failed to fetch registrations");
+        }
+    }
+);
+
+export const fetchEventBookings = createAsyncThunk<
+    { bookings: EventBooking[], pagination: any },
+    { eventId: string, page?: number, limit?: number, status?: string, search?: string },
+    { rejectValue: string }
+>(
+    "organizer/fetchEventBookings",
+    async ({ eventId, page = 1, limit = 1000, status, search = "" }, { rejectWithValue }) => {
+        try {
+            const response = await axios.get(API_BASE_URL + `v1/organizer/events/${eventId}/bookings`, {
+                params: { page, limit, status, search }
+            });
+            return response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || "Failed to fetch bookings");
         }
     }
 );
@@ -243,6 +295,21 @@ const organizerSlice = createSlice({
         builder.addCase(fetchEventRegistrations.rejected, (state) => {
             state.registrationsLoading = false;
             state.currentEventRegistrations = [];
+        });
+
+        // fetchEventBookings
+        builder.addCase(fetchEventBookings.pending, (state) => {
+            state.bookingsLoading = true;
+        });
+        builder.addCase(fetchEventBookings.fulfilled, (state, action) => {
+            state.bookingsLoading = false;
+            state.currentEventBookings = action.payload.bookings;
+            state.bookingsPagination = action.payload.pagination;
+        });
+        builder.addCase(fetchEventBookings.rejected, (state) => {
+            state.bookingsLoading = false;
+            state.currentEventBookings = [];
+            state.bookingsPagination = null;
         });
 
         // verifyTicket
