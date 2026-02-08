@@ -21,7 +21,15 @@ export const getTicketDetails = async (req, res) => {
                 event: {
                     select: { title: true, organizerId: true }
                 },
-                addons: true
+                addons: true,
+                booking: {
+                    select: {
+                        payment: true,
+                        discount: true,
+                        appliedCoupon: true,
+                        paymentStatus: true
+                    }
+                }
             }
         });
 
