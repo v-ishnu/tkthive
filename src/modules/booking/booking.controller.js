@@ -336,6 +336,8 @@ async function finalizeBooking(orderId) {
         });
 
         // 2. Process Items
+        const organizerUpdates = {}; // Map: organizerId -> { revenue, tickets }
+
         for (const item of booking.items) {
             // Update Stock
             await tx.ticket.update({
@@ -351,15 +353,14 @@ async function finalizeBooking(orderId) {
             }
             const totalItemRevenue = itemTicketRevenue + itemAddonRevenue;
 
-            // Increment Organizer Revenue and Tickets Sold
+            // Increment Organizer Revenue and Tickets Sold (Accumulate)
             if (item.ticket.event && item.ticket.event.organizerId) {
-                await tx.organizer.update({
-                    where: { id: item.ticket.event.organizerId },
-                    data: {
-                        totalRevenue: { increment: totalItemRevenue },
-                        totalTicketsSold: { increment: item.quantity }
-                    }
-                });
+                const orgId = item.ticket.event.organizerId;
+                if (!organizerUpdates[orgId]) {
+                    organizerUpdates[orgId] = { revenue: 0, tickets: 0 };
+                }
+                organizerUpdates[orgId].revenue += totalItemRevenue;
+                organizerUpdates[orgId].tickets += item.quantity;
             }
 
             // 2. Create Registrations from BookingItem Data
