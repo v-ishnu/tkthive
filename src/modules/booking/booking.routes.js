@@ -1,6 +1,7 @@
 import { Router } from "express";
-import { initiateBooking, createPaymentSession, cashfreeWebhook, verifyBooking, registerFreeEvent, getBooking, validateCoupon } from "./booking.controller.js";
+import { initiateBooking, createPaymentSession, cashfreeWebhook, verifyBooking, registerFreeEvent, getBooking, validateCoupon, confirmBooking } from "./booking.controller.js";
 import protect from "../../lib/middleware/protect.middleware.js";
+import { authorize } from "../../lib/middleware/authorize.middleware.js";
 
 const bookingRouter = Router();
 
@@ -21,9 +22,12 @@ bookingRouter.post("/payments/webhook/:provider", cashfreeWebhook);
 bookingRouter.post("/events/:eventId/register-free", protect, registerFreeEvent);
 
 // Get Booking
-bookingRouter.get("/bookings/:orderId", protect, getBooking);
+bookingRouter.get("/:orderId", protect, getBooking);
 
 // Validate Coupon
 bookingRouter.post("/events/:eventId/validate-coupon", protect, validateCoupon);
+
+// 5. Admin Confirm Booking
+bookingRouter.post("/:orderId/confirm", protect, authorize("CONFIRM_BOOKING"), confirmBooking);
 
 export default bookingRouter;

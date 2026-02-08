@@ -665,6 +665,20 @@ export const getBooking = async (req, res) => {
     res.json(booking);
 };
 
+export const confirmBooking = async (req, res) => {
+    const { orderId } = req.params;
+    try {
+        const result = await finalizeBooking(orderId);
+        if (!result.success) {
+            return res.status(400).json({ message: result.message });
+        }
+        return res.status(200).json(result);
+    } catch (error) {
+        console.error("Manual Confirm Error:", error);
+        return res.status(500).json({ message: "CONFIRMATION_FAILED" });
+    }
+};
+
 export const validateCoupon = async (req, res) => {
     try {
         const { eventId } = req.params;

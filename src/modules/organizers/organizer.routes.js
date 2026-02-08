@@ -35,4 +35,11 @@ organizerRouter.get("/events/:eventId/export", protect, exportRegistrations);
 import { recalculateAllRevenues } from "./controller/admin.fixRevenue.js";
 organizerRouter.post("/maintenance/fix-revenue", protect, authorize("SUPER_ADMIN"), recalculateAllRevenues);
 
+// Bookings (Transactions)
+import { getEventBookingsController } from "./controller/event.getBookings.js";
+import { exportEventBookings } from "./controller/export.bookings.controller.js";
+
+organizerRouter.get("/events/:id/bookings", protect, getEventBookingsController);
+organizerRouter.get("/events/:id/bookings/export", protect, exportEventBookings);
+
 export default organizerRouter;

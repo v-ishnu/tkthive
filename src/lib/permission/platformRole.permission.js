@@ -12,6 +12,7 @@ export const PlatformRolePermission = {
         Permission.CREATE_ORGANIZER,
         Permission.CREATE_EVENT,
         Permission.MANAGE_EVENT,
+        Permission.CONFIRM_BOOKING, // ✅ Added
     ],
 
     ORGANIZER: [
