@@ -421,7 +421,9 @@ async function finalizeBooking(orderId) {
             const ticketDetails = booking.items.map(item => ({
                 name: item.ticketName || item.ticket?.name || "Ticket",
                 quantity: item.quantity,
-                price: item.unitPrice // Optional display
+                price: item.unitPrice,
+                addons: item.addons || [],
+                attendees: item.attendeeData || []
             }));
 
             await sendRegistrationSuccessEmail({
@@ -639,12 +641,20 @@ export const registerFreeEvent = async (req, res) => {
         });
 
         // Prepare Ticket Details
-        const ticketDetails = inputTickets.map(item => {
-            const t = event.tickets.find(tick => tick.id === item.ticketId);
+        const ticketDetails = inputTickets.map((item, index) => {
+            // We need to retrieve the full attendee data that was processed earlier (flattened).
+            // However, inputTickets has raw data. We created 'bookingItemsToCreate'.
+            // Let's use 'bookingItemsToCreate' which has the 'attendeeData' populated.
+            // But we need to match it. 'bookingItemsToCreate' is in same order as 'inputTickets' loop?
+            // Yes, we pushed to it in the loop.
+            const matchingBookingItem = bookingItemsToCreate[index];
+
             return {
-                name: t?.name || "Ticket",
-                quantity: item.quantity,
-                price: 0
+                name: matchingBookingItem.ticketName,
+                quantity: matchingBookingItem.quantity,
+                price: 0,
+                addons: matchingBookingItem.addons || [],
+                attendees: matchingBookingItem.attendeeData || []
             };
         });
 

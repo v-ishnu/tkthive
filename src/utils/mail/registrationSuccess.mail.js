@@ -29,12 +29,54 @@ const sendRegistrationSuccessEmail = async ({
     ? `Booking Confirmed: ${eventTitle}`
     : `Booking Confirmed! Order #${orderId}`;
 
-  const ticketRows = ticketDetails.map(t => `
+  const ticketRows = ticketDetails.map(t => {
+    // 1. Addons HTML
+    let addonsHtml = '';
+    if (t.addons && t.addons.length > 0) {
+      addonsHtml = `
+            <div style="margin-top:4px; font-size:12px; color:#999; padding-left:10px; border-left:2px solid #333;">
+                <strong>Addons:</strong><br/>
+                ${t.addons.map(a => `${a.name} (x${a.quantity}) - ${currency} ${a.price * a.quantity}`).join('<br/>')}
+            </div>
+          `;
+    }
+
+    // 2. Attendees / Custom Fields HTML
+    let attendeesHtml = '';
+    if (t.attendees && t.attendees.length > 0) {
+      attendeesHtml = t.attendees.map((att, index) => {
+        // Filter out standard fields to just show "Custom" data if desired, or show all.
+        // User asked for "all registration data of custom fields".
+        // Let's just show key-value pairs that are not name/email/phone/id?
+        // Or just show everything nicely.
+        const entries = Object.entries(att).filter(([key]) => !['name', 'email', 'phone'].includes(key));
+
+        if (entries.length === 0) return ''; // No custom fields
+
+        const fieldsList = entries.map(([k, v]) => `<span style="color:#aaa;">${k}:</span> ${v}`).join('<br/>');
+
+        return `
+                <div style="margin-top:6px; font-size:12px; color:#ccc; padding-left:10px; border-left:2px solid #555;">
+                    <div style="font-weight:bold; color:#fff;">Attendee ${index + 1}: ${att.name || ''}</div>
+                    <div style="margin-top:2px;">${fieldsList}</div>
+                </div>
+              `;
+      }).join('');
+    }
+
+    return `
     <tr>
-      <td style="padding:8px 0; color:#dddddd;">${t.name} <span style="color:#777; font-size:12px;">x${t.quantity}</span></td>
-      <td style="padding:8px 0; text-align:right; color:#ffffff;">${t.price ? (currency + ' ' + t.price * t.quantity) : ''}</td>
+      <td style="padding:12px 0; color:#dddddd; border-bottom:1px solid #222;">
+        <div style="font-weight:600; font-size:14px;">${t.name} <span style="color:#777; font-size:12px;">x${t.quantity}</span></div>
+        ${addonsHtml}
+        ${attendeesHtml}
+      </td>
+      <td style="padding:12px 0; text-align:right; vertical-align:top; color:#ffffff; border-bottom:1px solid #222;">
+        ${t.price ? (currency + ' ' + (t.price * t.quantity)) : 'FREE'}
+      </td>
     </tr>
-  `).join('');
+  `;
+  }).join('');
 
   return sendMail({
     to: email,
