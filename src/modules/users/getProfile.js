@@ -42,7 +42,7 @@ export const getProfile = async (req, res) => {
                 eventId: reg.event.id,
                 eventTitle: reg.event.title,
                 eventDate: reg.event.startDate.toISOString(), // Frontend expects string
-                eventVenue: reg.event.venue,
+                eventVenue: reg.event.venue?.name ? `${reg.event.venue.name}, ${reg.event.venue.city || ''}` : "TBA",
                 eventImage: `https://picsum.photos/seed/${reg.event.id}/400/300`, // Placeholder as Event has no image
                 ticketType: reg.ticket.name,
                 price: reg.unitPrice?.toString() || "0",
