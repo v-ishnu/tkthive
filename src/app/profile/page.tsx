@@ -14,7 +14,7 @@ import { RootState } from '@/store/store';
 
 export default function ProfilePage() {
     const dispatch = useAppDispatch();
-    const { user, tickets, isLoading: loading } = useAppSelector((state: RootState) => state.auth);
+    const { user, tickets, isLoading: loading, isInitialized } = useAppSelector((state: RootState) => state.auth);
     const router = useRouter();
 
     React.useEffect(() => {
@@ -24,10 +24,10 @@ export default function ProfilePage() {
     }, [dispatch, user]);
 
     React.useEffect(() => {
-        if (!loading && !user) {
+        if (isInitialized && !loading && !user) {
             router.push('/auth');
         }
-    }, [user, loading, router]);
+    }, [user, loading, isInitialized, router]);
     const [activeTab, setActiveTab] = useState<'attended' | 'saved' | 'reviews'>('attended');
 
     // Filter attended tickets
