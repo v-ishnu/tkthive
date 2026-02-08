@@ -22,7 +22,13 @@ export const getUserTickets = async (req, res) => {
                         startDate: true,
                         endDate: true,
                         venue: true,
-                        slug: true, // ✅ Added
+                        slug: true,
+                        organizer: {
+                            select: {
+                                name: true,
+                                logoUrl: true
+                            }
+                        }
                         // images: true, // Not in schema currently
                         // city: true    // Not in schema currently
                     }
