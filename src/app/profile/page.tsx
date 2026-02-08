@@ -175,7 +175,7 @@ export default function ProfilePage() {
                                             <div className="mt-auto space-y-2">
                                                 <div className="flex items-center gap-2 text-gray-400 text-sm">
                                                     <List size={14} className="text-primary" />
-                                                    <span>{ticket.eventDate}</span>
+                                                    <span>{new Date(ticket.eventDate).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true })}</span>
                                                 </div>
                                                 <div className="flex items-center gap-2 text-gray-400 text-sm">
                                                     <MapPin size={14} className="text-primary" />
