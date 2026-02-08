@@ -198,9 +198,11 @@ export const createPaymentSession = async (req, res) => {
         const providerService = getPaymentProvider(provider);
 
         // session might be a string (Cashfree sessionId) or object depending on provider
+        const amount = Number(parseFloat(booking.payment).toFixed(2));
+
         const session = await providerService.initiate({
             orderId,
-            amount: booking.payment,
+            amount,
             user,
             returnUrl
         });
