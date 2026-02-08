@@ -12,6 +12,14 @@ const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
 });
 
+import { Poppins } from "next/font/google";
+
+const poppins = Poppins({
+  variable: "--font-poppins",
+  subsets: ["latin"],
+  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+});
+
 
 
 export const metadata: Metadata = {
@@ -81,12 +89,12 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${spaceGrotesk.variable} `}
+        className={`${spaceGrotesk.variable} ${poppins.variable}`}
         suppressHydrationWarning
       >
-        <Analytics/>
+        <Analytics />
         <RootComponent>{children}</RootComponent>
-              <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID as string} />
+        <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID as string} />
 
       </body>
     </html>

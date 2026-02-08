@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useMemo, useEffect } from 'react';
 import { Ticket, Search, CalendarClock, CheckCircle, AlertCircle, Clock } from 'lucide-react';
-import { TicketCard } from '@/components/TickectCard'; // Correct path
+import DetailedTicket from '@/components/DetailedTicket';
 import { useRouter } from 'next/navigation';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { fetchUserTickets, checkAuth } from '@/store/slices/authslice';
@@ -151,9 +151,9 @@ export default function TicketsPage() {
                     )}
                 </div>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     {filteredTickets.map((ticket) => (
-                        <TicketCard key={ticket.id} ticket={ticket} />
+                        <DetailedTicket key={ticket.id} ticket={ticket} />
                     ))}
                 </div>
             )}
