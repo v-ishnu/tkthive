@@ -18,9 +18,10 @@ export default function ProfilePage() {
     const router = useRouter();
 
     React.useEffect(() => {
-        dispatch(checkAuth());
-        dispatch(fetchUserTickets());
-    }, [dispatch]);
+        if (!user) {
+            dispatch(checkAuth());
+        }
+    }, [dispatch, user]);
 
     React.useEffect(() => {
         if (!loading && !user) {
@@ -31,7 +32,7 @@ export default function ProfilePage() {
 
     // Filter attended tickets
     const attendedTickets = React.useMemo(() => {
-        const ticketSource = tickets && tickets.length > 0 ? tickets : (user?.tickets || []);
+        const ticketSource = user?.tickets || [];
         if (!ticketSource) return [];
 
         const now = new Date();
@@ -165,17 +166,10 @@ export default function ProfilePage() {
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                 {attendedTickets.map((ticket) => (
                                     <div key={ticket.id} className="bg-card rounded-3xl overflow-hidden border border-white/5 hover:border-white/20 transition-all group cursor-pointer flex flex-col">
-                                        <div className="h-48 bg-gray-800 relative">
-                                            <img
-                                                src={ticket.eventImage || `https://picsum.photos/seed/${ticket.id}/400/300`}
-                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                                alt={ticket.eventTitle}
-                                            />
-                                            <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-md text-white px-3 py-1 rounded-full text-xs font-bold border border-white/10 uppercase tracking-wider">
+                                        <div className="p-6 flex-1 flex flex-col relative w-full">
+                                            <div className="absolute top-6 right-6 bg-white/5 text-gray-400 px-2 py-1 rounded text-[10px] font-bold border border-white/10 uppercase tracking-wider">
                                                 Attended
                                             </div>
-                                        </div>
-                                        <div className="p-6 flex-1 flex flex-col">
                                             <div className="text-xs font-bold text-primary uppercase tracking-wider mb-2">{ticket.ticketType}</div>
                                             <h3 className="text-xl font-bold text-white mb-2 line-clamp-2">{ticket.eventTitle}</h3>
                                             <div className="mt-auto space-y-2">
