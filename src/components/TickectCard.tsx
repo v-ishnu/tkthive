@@ -29,6 +29,12 @@ interface TicketCardProps {
         scanned: boolean;
         createdAt: string;
         registrationData?: any;
+        booking?: {
+            payment: number;
+            discount?: number;
+            appliedCoupon?: string;
+            paymentStatus: string;
+        };
     };
 }
 
@@ -261,8 +267,14 @@ export const TicketCard: React.FC<TicketCardProps> = ({ ticket }) => {
                         </div>
                         <div className="flex justify-between text-[10px] text-gray-400 font-mono">
                             <span>Price:</span>
-                            <span className="text-white">₹{ticket.unitPrice}</span>
+                            <span className="text-white">₹{Number(ticket.unitPrice).toFixed(2)}</span>
                         </div>
+                        {ticket.booking && (
+                            <div className="flex justify-between text-[10px] text-gray-400 font-mono border-t border-white/10 pt-1 mt-1">
+                                <span>Total Paid:</span>
+                                <span className="text-green-400 font-bold">₹{Number(ticket.booking.payment).toFixed(2)}</span>
+                            </div>
+                        )}
                     </div>
 
 
