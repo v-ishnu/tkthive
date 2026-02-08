@@ -418,6 +418,12 @@ async function finalizeBooking(orderId) {
 
             const totalTickets = booking.items.reduce((acc, item) => acc + item.quantity, 0);
 
+            const ticketDetails = booking.items.map(item => ({
+                name: item.ticketName || item.ticket?.name || "Ticket",
+                quantity: item.quantity,
+                price: item.unitPrice // Optional display
+            }));
+
             await sendRegistrationSuccessEmail({
                 email: user.email,
                 orderId: booking.orderId,
@@ -427,7 +433,12 @@ async function finalizeBooking(orderId) {
                 actionUrl: `${process.env.FRONTEND_URL || "https://tkthive.com"}/mytickets`,
                 communityLink: firstTicket?.event?.communityLink,
                 communityMessage: firstTicket?.event?.communityMessage,
-                organizerEmail: firstTicket?.event?.organizer?.contactEmail
+                organizerEmail: firstTicket?.event?.organizer?.contactEmail,
+                ticketDetails,
+                userDetails: {
+                    name: user.name,
+                    email: user.email
+                }
             });
         } catch (err) {
             console.error("Email Sending Failed in Finalize:", err);
@@ -627,6 +638,16 @@ export const registerFreeEvent = async (req, res) => {
             }
         });
 
+        // Prepare Ticket Details
+        const ticketDetails = inputTickets.map(item => {
+            const t = event.tickets.find(tick => tick.id === item.ticketId);
+            return {
+                name: t?.name || "Ticket",
+                quantity: item.quantity,
+                price: 0
+            };
+        });
+
         // Send Email Async
         sendRegistrationSuccessEmail({
             email: userEmail,
@@ -637,7 +658,12 @@ export const registerFreeEvent = async (req, res) => {
             actionUrl: `${process.env.FRONTEND_URL || "https://tkthive.com"}/mytickets`,
             communityLink: event.communityLink,
             communityMessage: event.communityMessage,
-            organizerEmail: event.organizer?.contactEmail
+            organizerEmail: event.organizer?.contactEmail,
+            ticketDetails,
+            userDetails: {
+                name: req.user.name || "User",
+                email: req.user.email
+            }
         }).catch(err => console.error("Email API Error:", err));
 
         // Create Notification

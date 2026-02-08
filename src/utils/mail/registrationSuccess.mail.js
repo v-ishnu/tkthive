@@ -21,11 +21,20 @@ const sendRegistrationSuccessEmail = async ({
   actionUrl,
   communityLink,
   communityMessage,
-  organizerEmail
+  organizerEmail,
+  ticketDetails = [],
+  userDetails = {}
 }) => {
   const subject = eventTitle
     ? `Booking Confirmed: ${eventTitle}`
     : `Booking Confirmed! Order #${orderId}`;
+
+  const ticketRows = ticketDetails.map(t => `
+    <tr>
+      <td style="padding:8px 0; color:#dddddd;">${t.name} <span style="color:#777; font-size:12px;">x${t.quantity}</span></td>
+      <td style="padding:8px 0; text-align:right; color:#ffffff;">${t.price ? (currency + ' ' + t.price * t.quantity) : ''}</td>
+    </tr>
+  `).join('');
 
   return sendMail({
     to: email,
@@ -46,6 +55,7 @@ const sendRegistrationSuccessEmail = async ({
         <!-- Body -->
         <div style="padding:30px;">
           <p style="text-align:center; color:#ffffff; font-size:16px; margin:0 0 20px;">
+            Hi <strong style="color:#ffffff;">${userDetails.name || 'User'}</strong>,<br/>
             Your tickets for <strong style="color:#ffa116;">${eventTitle || "your event"}</strong> are successfully booked.
           </p>
 
@@ -57,9 +67,15 @@ const sendRegistrationSuccessEmail = async ({
                 <td style="padding:8px 0; text-align:right; color:#ffffff; font-weight:600;">${orderId}</td>
               </tr>
               <tr>
-                <td style="padding:8px 0; color:#bbbbbb;">Tickets</td>
-                <td style="padding:8px 0; text-align:right; color:#ffffff; font-weight:600;">${ticketCount}</td>
+                <td style="padding:8px 0; color:#bbbbbb;">Booked By</td>
+                <td style="padding:8px 0; text-align:right; color:#ffffff;">${userDetails.name} (${userDetails.email})</td>
               </tr>
+              
+              <tr><td colspan="2" style="padding:10px 0 5px; border-bottom:1px dashed #333;"></td></tr>
+              
+              <!-- Ticket Details -->
+              ${ticketRows}
+
               <tr style="border-top:1px solid #333;">
                 <td style="padding:12px 0 0; color:#ffffff; font-weight:600;">Total Paid</td>
                 <td style="padding:12px 0 0; text-align:right; color:#ffa116; font-weight:700; font-size:18px;">
