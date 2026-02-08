@@ -37,6 +37,14 @@ export const getUserTickets = async (req, res) => {
                 },
                 addons: true, // Selected addons
                 // responses: false // User requested to remove responses
+                booking: {
+                    select: {
+                        payment: true,
+                        discount: true,
+                        appliedCoupon: true,
+                        paymentStatus: true
+                    }
+                }
             },
             orderBy: { createdAt: 'desc' }
         });
