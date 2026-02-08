@@ -64,8 +64,16 @@ export const exportEventBookings = async (req, res) => {
                 const attendees = item.attendeeData || [];
                 // Format attendee data specifically
                 const attendeeStr = Array.isArray(attendees)
-                    ? attendees.map(a => `${a.name || 'N/A'} (${a.email || 'N/A'})`).join('; ')
-                    : (attendees.name ? `${attendees.name} (${attendees.email})` : JSON.stringify(attendees));
+                    ? attendees.map(a => `${a.name || 'N/A'} (${a.email || 'N/A'}) - ${a.phone || a.phoneNumber || 'N/A'}`).join('; ')
+                    : (attendees.name ? `${attendees.name} (${attendees.email}) - ${attendees.phone || attendees.phoneNumber || 'N/A'}` : JSON.stringify(attendees));
+
+                // Try to find a phone number for the booking contact if the user one is missing
+                let contactPhone = booking.user?.phoneNumber;
+                if (!contactPhone && (attendees.phone || attendees.phoneNumber)) {
+                    contactPhone = attendees.phone || attendees.phoneNumber;
+                } else if (!contactPhone && Array.isArray(attendees) && attendees.length > 0) {
+                    contactPhone = attendees[0].phone || attendees[0].phoneNumber;
+                }
 
                 const addonsStr = (item.addons || []).map(a => `${a.name} x${a.quantity}`).join(', ');
 
@@ -76,7 +84,7 @@ export const exportEventBookings = async (req, res) => {
                     date: new Date(booking.createdAt).toLocaleString(),
                     userName: booking.user?.name || "N/A",
                     userEmail: booking.user?.email || "N/A",
-                    userPhone: booking.user?.phoneNumber || "N/A",
+                    userPhone: contactPhone || "N/A",
                     amount: booking.payment,
                     currency: booking.currency,
                     ticket: item.ticket?.name || "Unknown",
