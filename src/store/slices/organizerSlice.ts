@@ -27,6 +27,12 @@ export interface TicketDetails {
     addons: any[];
     unitPrice: number;
     registrationData?: any;
+    booking?: {
+        payment: number;
+        discount?: number;
+        appliedCoupon?: string;
+        paymentStatus: string;
+    };
 }
 
 export interface Organizer {

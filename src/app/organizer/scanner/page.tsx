@@ -316,6 +316,31 @@ const ScannerPage: React.FC = () => {
                                                 ))
                                             )}
                                         </div>
+
+                                        {/* Booking Payment Details */}
+                                        {ticketDetails.booking && (
+                                            <div className="space-y-2 pt-2 border-t border-dashed">
+                                                <h3 className="font-semibold text-text-main text-sm">Payment Details</h3>
+                                                <div className="bg-blue-50 p-3 rounded-xl space-y-1 text-sm">
+                                                    <div className="flex justify-between">
+                                                        <span className="text-text-muted">Total Order Amount:</span>
+                                                        <span className="font-bold text-text-main">{new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(ticketDetails.booking.payment)}</span>
+                                                    </div>
+                                                    {ticketDetails.booking.discount && ticketDetails.booking.discount > 0 && (
+                                                        <div className="flex justify-between text-green-700">
+                                                            <span>Discount ({ticketDetails.booking.appliedCoupon || 'Applied'}):</span>
+                                                            <span className="font-bold">-{new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(ticketDetails.booking.discount)}</span>
+                                                        </div>
+                                                    )}
+                                                    <div className="flex justify-between items-center mt-2 pt-2 border-t border-blue-200">
+                                                        <span className="text-text-muted text-xs">Payment Status:</span>
+                                                        <span className={`px-2 py-0.5 rounded text-xs font-bold ${ticketDetails.booking.paymentStatus === 'PAID' ? 'bg-green-200 text-green-800' : 'bg-yellow-200 text-yellow-800'}`}>
+                                                            {ticketDetails.booking.paymentStatus}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
                                 )}
                             </div>
