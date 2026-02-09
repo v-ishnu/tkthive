@@ -384,15 +384,16 @@ model Booking {
   bookingStatus BookingStatus @default(PENDING)
   paymentStatus PaymentStatus @default(PENDING)
   
-  registrationData Json? // Stores full payload (items, attendees, addons) for postponed creation
+  // Payment Gateway Tracking
+  transactionId String?  @unique // Gateway Transaction ID (e.g., cf_payment_id)
+  gateway       String?  // e.g., "CASHFREE", "RAZORPAY"
+  gatewayStatus String?  // e.g., "SUCCESS", "FAILED", "USER_DROPPED"
+  failureReason String?  // Details for failure analysis
   
   discount      Float?   // ✅ Added
   appliedCoupon String?  // ✅ Added
   referralCode  String?  // ✅ Added
 
-  // scanned       Boolean       @default(false)
-
-  // scanned       Boolean       @default(false)
   usedAt      DateTime?
   cancelledAt DateTime?
   expiresAt   DateTime

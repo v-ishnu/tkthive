@@ -246,29 +246,39 @@ export const cashfreeWebhook = async (req, res) => {
 
         const payload = JSON.parse(rawBody.toString());
 
-        // 2️⃣ Only care about successful payments
-        if (payload.type !== "PAYMENT_SUCCESS_WEBHOOK") {
-            return res.status(200).json({ message: "IGNORED_EVENT" });
-        }
-
         const orderId = payload.data?.order?.order_id;
-        const orderStatus = payload.data?.order?.order_status;
+        const orderStatus = payload.data?.payment?.payment_status; // Make sure to check payment_status
+        const transactionId = payload.data?.payment?.cf_payment_id;
+        const failureReason = payload.data?.payment?.payment_message || payload.data?.error_details?.error_description;
 
         if (!orderId) {
             return res.status(400).json({ message: "ORDER_ID_MISSING" });
         }
 
-        if (orderStatus !== "PAID") {
-            return res.status(200).json({ message: "PAYMENT_NOT_PAID" });
+        // 2️⃣ Handle different statuses
+        // If SUCCESS
+        if (payload.type === "PAYMENT_SUCCESS_WEBHOOK") {
+            const result = await finalizeBooking(orderId, {
+                transactionId,
+                gateway: "CASHFREE",
+                gatewayStatus: "SUCCESS",
+                paymentStatus: "PAID"
+            });
+            return res.status(200).json({ message: "WEBHOOK_PROCESSED", result });
         }
 
-        // 3️⃣ Finalize booking (idempotent)
-        const result = await finalizeBooking(orderId);
+        // If FAILED or USER_DROPPED (Optional: Record failure)
+        if (payload.type === "PAYMENT_FAILED_WEBHOOK" || payload.type === "PAYMENT_USER_DROPPED_WEBHOOK") {
+            await updateBookingPaymentStatus(orderId, {
+                transactionId,
+                gateway: "CASHFREE",
+                gatewayStatus: "FAILED",
+                failureReason: failureReason || "Payment Failed or Dropped"
+            });
+            return res.status(200).json({ message: "FAILURE_RECORDED" });
+        }
 
-        return res.status(200).json({
-            message: "WEBHOOK_PROCESSED",
-            result
-        });
+        return res.status(200).json({ message: "IGNORED_EVENT" });
 
     } catch (error) {
         console.error("CASHFREE WEBHOOK ERROR:", error);
@@ -292,7 +302,35 @@ export const verifyBooking = async (req, res) => {
         const providerService = getPaymentProvider("CASHFREE");
         const providerData = await providerService.verify({ orderId });
 
-        if (providerData.order_status !== "PAID") {
+        // Extract relevant info from provider response
+        // Cashfree verify response typically matches order structure
+        const transactionId = providerData.cf_payment_id || providerData.id; // Adjust based on actual provider response
+        const gatewayStatus = providerData.order_status;
+        const failureReason = providerData.order_note || providerData.payment_message;
+
+        if (providerData.order_status === "PAID") {
+            // 2. Finalize Booking (Idempotent)
+            const result = await finalizeBooking(orderId, {
+                transactionId,
+                gateway: "CASHFREE",
+                gatewayStatus: "SUCCESS",
+                paymentStatus: "PAID"
+            });
+
+            return res.status(200).json({
+                status: "PAID",
+                message: result.message,
+                bookingStatus: result.bookingStatus || "CONFIRMED"
+            });
+        } else {
+            // Record the check/failure
+            await updateBookingPaymentStatus(orderId, {
+                transactionId,
+                gateway: "CASHFREE",
+                gatewayStatus: gatewayStatus, // e.g. ACTIVE, EXPIRED, FAILED
+                failureReason: failureReason
+            });
+
             return res.status(200).json({
                 status: providerData.order_status,
                 message: "PAYMENT_NOT_PAID",
@@ -300,25 +338,33 @@ export const verifyBooking = async (req, res) => {
             });
         }
 
-        // 2. Finalize Booking (Idempotent)
-        const result = await finalizeBooking(orderId);
-
-        return res.status(200).json({
-            status: "PAID",
-            message: result.message,
-            bookingStatus: result.bookingStatus || "CONFIRMED"
-        });
-
     } catch (error) {
         console.error("Verify Booking Error:", error);
         return res.status(500).json({ message: "VERIFICATION_FAILED" });
     }
 };
 
+// --- Helper: Update Booking Status (for failures/tracking) ---
+async function updateBookingPaymentStatus(orderId, { transactionId, gateway, gatewayStatus, failureReason }) {
+    try {
+        await prisma.booking.update({
+            where: { orderId },
+            data: {
+                transactionId,
+                gateway,
+                gatewayStatus,
+                failureReason
+            }
+        });
+    } catch (e) {
+        console.warn("Failed to update booking status log:", e.message);
+    }
+}
+
 // --- Helper: Finalize Booking ---
 // Handles DB updates, Stock, Registration creation.
 // Idempotent: Checks if already PAID.
-async function finalizeBooking(orderId) {
+async function finalizeBooking(orderId, paymentData = {}) {
     const booking = await prisma.booking.findUnique({
         where: { orderId },
         include: { items: { include: { ticket: { include: { event: true } } } } }
@@ -332,7 +378,13 @@ async function finalizeBooking(orderId) {
         // 1. Update Booking
         await tx.booking.update({
             where: { orderId },
-            data: { paymentStatus: "PAID", bookingStatus: "CONFIRMED" }
+            data: {
+                paymentStatus: "PAID",
+                bookingStatus: "CONFIRMED",
+                transactionId: paymentData.transactionId,
+                gateway: paymentData.gateway,
+                gatewayStatus: paymentData.gatewayStatus || "SUCCESS"
+            }
         });
 
         // 2. Process Items
