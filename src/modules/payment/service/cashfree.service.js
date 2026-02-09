@@ -31,7 +31,7 @@ export async function initiate({ orderId, amount, user, returnUrl }) {
         },
         order_meta: {
             return_url: returnUrl || `${process.env.FRONTEND_URL}?order_id=${orderId}`,
-            
+
         },
     };
 
@@ -58,6 +58,32 @@ export async function verify({ orderId }) {
         "x-client-secret": process.env.CASHFREE_SECRET_KEY,
     };
 
-    const response = await axios.get(cashfreeURL, { headers });
-    return response.data; // Return full object so caller can check order_status
+    try {
+        const response = await axios.get(cashfreeURL, { headers });
+        const orderData = response.data;
+
+        // If PAID, we need the Transaction ID (cf_payment_id)
+        // Order object typically doesn't have it. We must fetch payments.
+        if (orderData.order_status === "PAID") {
+            try {
+                const paymentsURL = `${cashfreeURL}/payments`;
+                const paymentsResponse = await axios.get(paymentsURL, { headers });
+                const payments = paymentsResponse.data;
+
+                // Find the successful payment
+                const successPayment = payments.find(p => p.payment_status === "SUCCESS");
+                if (successPayment) {
+                    orderData.cf_payment_id = successPayment.cf_payment_id;
+                    orderData.payment_message = successPayment.payment_message || successPayment.payment_group;
+                }
+            } catch (err) {
+                console.warn("Failed to fetch payments for PAID order, cf_payment_id might be missing:", err.message);
+            }
+        }
+
+        return orderData;
+    } catch (error) {
+        console.error("Cashfree Verify Error:", error.response?.data || error.message);
+        throw error;
+    }
 }
