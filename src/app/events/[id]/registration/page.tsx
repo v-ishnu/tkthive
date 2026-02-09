@@ -18,7 +18,16 @@ export default function RegistrationPage() {
 
     const dispatch = useAppDispatch();
     const { event, loading, error, bookingStatus, bookingError } = useAppSelector((state: RootState) => state.event);
-    const { user } = useAppSelector((state: RootState) => state.auth);
+    const { user, isInitialized } = useAppSelector((state: RootState) => state.auth);
+
+    useEffect(() => {
+        if (isInitialized && !user) {
+            toast.error("Please login to register for this event");
+            const paramValue = params.slug || params.id;
+            const slugOrId = Array.isArray(paramValue) ? paramValue[0] : paramValue;
+            router.push(`/events/${slugOrId}`);
+        }
+    }, [isInitialized, user, router, params]);
 
     const [step, setStep] = useState(1);
     const [selectedTier, setSelectedTier] = useState<TicketTier | null>(null);
@@ -422,7 +431,7 @@ export default function RegistrationPage() {
         setStep(prevStep);
     };
 
-    if (loading || (!event && !error)) {
+    if (loading || !isInitialized || (!event && !error)) {
         return <div className="min-h-screen bg-background text-white flex items-center justify-center gap-2"><Loader2 className="animate-spin text-primary" size={32} /><span>Loading...</span></div>;
     }
 
