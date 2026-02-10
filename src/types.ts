@@ -76,6 +76,7 @@ export interface TicketTier {
   description?: string;
   validDate?: string; // Specific date validity
   validTime?: string; // Specific time validity
+  priceType?: 'PER_PERSON' | 'FIXED';
   // Custom fields specific to this ticket type (e.g. Song Name for singing, Github for coding)
   requiredFields?: RegistrationFormField[];
 }

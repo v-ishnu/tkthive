@@ -227,7 +227,22 @@ export default function RegistrationPage() {
     const calculateTotal = () => {
         if (!selectedTier) return "0";
         const basePrice = getPriceValue(selectedTier.price);
-        const ticketTotal = basePrice * (selectedTier.type === 'group' ? 1 : attendeeDetails.length);
+
+        let multiplier = 1;
+        if (selectedTier.type === 'group') {
+            // If Group + Per Person -> Multiplier = Attendees
+            // If Group + Fixed (Default) -> Multiplier = 1
+            if (selectedTier.priceType === 'PER_PERSON') {
+                multiplier = attendeeDetails.length || 1;
+            } else {
+                multiplier = 1;
+            }
+        } else {
+            // Individual -> Multiplier = Attendees (which matches ticket quantity)
+            multiplier = attendeeDetails.length;
+        }
+
+        const ticketTotal = basePrice * multiplier;
         const addOnTotal = getAddOnTotal();
         const total = ticketTotal + addOnTotal;
 
@@ -610,7 +625,16 @@ export default function RegistrationPage() {
                                 <div className="text-xl font-bold">{selectedTier.price}</div>
                             </div>
                             <div className="py-4 space-y-2 border-b border-white/5 text-sm text-gray-300">
-                                <div className="flex justify-between"><span>Ticket Price</span><span>{selectedTier.price} x {attendeeDetails.length}</span></div>
+                                <div className="flex justify-between">
+                                    <span>Ticket Price</span>
+                                    <span>
+                                        {selectedTier.price} x {
+                                            selectedTier.type === 'group' && selectedTier.priceType === 'PER_PERSON'
+                                                ? attendeeDetails.length
+                                                : (selectedTier.type === 'group' ? 1 : attendeeDetails.length)
+                                        }
+                                    </span>
+                                </div>
                                 {getAddOnTotal() > 0 && <div className="flex justify-between text-purple-400"><span>Add-ons Total</span><span>+₹{getAddOnTotal()}</span></div>}
                                 {discount > 0 && <div className="flex justify-between text-green-400"><span>Discount ({discount}%)</span><span>- ₹{((parseFloat(calculateTotal()) / (100 - discount)) * discount).toFixed(2)}</span></div>}
                             </div>
