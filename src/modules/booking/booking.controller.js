@@ -75,7 +75,23 @@ export const initiateBooking = async (req, res) => {
             return res.status(400).json({ message: "MINIMUM_MEMBERS_REQUIRED", details: `${ticket.name} requires at least ${ticket.minMembers} members.` });
         }
 
-        const ticketTotal = ticket.price * item.quantity;
+        const isGroup = ticket.type === "GROUP";
+        const isPerPerson = ticket.priceType === "PER_PERSON";
+
+        // Logic:
+        // Group + Fixed: Price * Quantity (Quantity is usually 1 for a group ticket item)
+        // Group + PerPerson: Price * Attendees Count * Quantity
+        // Individual: Price * Quantity (Item Qty matches Attendee Count)
+
+        let ticketTotal = 0;
+
+        if (isGroup && isPerPerson) {
+            const attendeeCount = item.attendees?.length || 1;
+            ticketTotal = ticket.price * attendeeCount * item.quantity;
+        } else {
+            // Fixed Group OR Individual (where item.quantity === attendees.length)
+            ticketTotal = ticket.price * item.quantity;
+        }
         let addonTotal = 0;
         const selectedAddons = [];
 

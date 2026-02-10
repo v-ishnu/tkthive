@@ -112,6 +112,11 @@ enum EventCategory {
   OTHERS
 }
 
+enum TicketPriceType {
+  PER_PERSON
+  FIXED
+}
+
 // =====================================
 // MODELS
 // =====================================
@@ -346,6 +351,8 @@ model Ticket {
   type       TicketType @default(INDIVIDUAL)
   maxMembers Int?
   minMembers Int?
+
+  priceType  TicketPriceType @default(FIXED)
 
   startDate DateTime?
   endDate   DateTime?

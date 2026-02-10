@@ -15,7 +15,8 @@ export const createTickets = async (req, res) => {
             endDate,
             startTime,
             endTime,
-            allowMultipleBooking
+            allowMultipleBooking,
+            priceType
         } = req.body;
 
         if (!user) {
@@ -53,7 +54,8 @@ export const createTickets = async (req, res) => {
                 endDate: endDate ? new Date(endDate) : undefined,
                 startTime,
                 endTime,
-                allowMultipleBooking: allowMultipleBooking !== undefined ? allowMultipleBooking : true
+                allowMultipleBooking: allowMultipleBooking !== undefined ? allowMultipleBooking : true,
+                priceType: priceType || "FIXED"
             },
         });
 
