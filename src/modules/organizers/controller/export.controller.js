@@ -50,11 +50,24 @@ export const exportRegistrations = async (req, res) => {
             orderBy: { createdAt: 'desc' }
         });
 
-        // 3. Setup Workbook
+        // 3. Identify all unique Custom Field Keys first
+        const customFieldKeys = new Set();
+        registrations.forEach(reg => {
+            const rawData = reg.registrationData || {};
+            const attendeeList = Array.isArray(rawData) ? rawData : [rawData];
+            attendeeList.forEach(attendee => {
+                const { name, email, phone, ...others } = attendee;
+                Object.keys(others).forEach(key => customFieldKeys.add(key));
+            });
+        });
+
+        const sortedCustomKeys = Array.from(customFieldKeys).sort();
+
+        // 4. Setup Workbook & Columns
         const workbook = new ExcelJS.Workbook();
         const worksheet = workbook.addWorksheet('Registrations');
 
-        worksheet.columns = [
+        const baseColumns = [
             { header: 'S.No', key: 'sNo', width: 8 },
             { header: 'Registration ID', key: 'regId', width: 25 },
             { header: 'Order ID', key: 'orderId', width: 25 },
@@ -72,10 +85,19 @@ export const exportRegistrations = async (req, res) => {
             { header: 'Coupon', key: 'coupon', width: 15 },
             { header: 'Referral', key: 'referral', width: 15 },
             { header: 'Add-ons', key: 'addons', width: 30 },
-            { header: 'Custom Fields', key: 'customFields', width: 40 },
+            // Removed fixed 'Custom Fields' column
         ];
 
-        // 4. Transform and Add Data
+        // Add dynamic columns for custom fields
+        const dynamicColumns = sortedCustomKeys.map(key => ({
+            header: key,
+            key: key,
+            width: 20
+        }));
+
+        worksheet.columns = [...baseColumns, ...dynamicColumns];
+
+        // 5. Transform and Add Data
         let serialNo = 1;
         registrations.forEach(reg => {
             const rawData = reg.registrationData || {};
@@ -86,10 +108,8 @@ export const exportRegistrations = async (req, res) => {
                 // Extract custom fields (everything except standard profile fields)
                 const { name, email, phone, ...others } = attendee;
 
-                // Format custom fields as key:value string
-                const customFieldStr = Object.entries(others).map(([k, v]) => `${k}: ${v}`).join('; ');
-
-                worksheet.addRow({
+                // Create the base row object
+                const rowData = {
                     sNo: serialNo++,
                     regId: reg.id,
                     orderId: reg.orderId,
@@ -107,8 +127,13 @@ export const exportRegistrations = async (req, res) => {
                     coupon: reg.booking?.appliedCoupon || "",
                     referral: reg.booking?.referralCode || "",
                     addons: (reg.addons || []).map(a => `${a.name} (x${a.quantity})`).join(', '),
-                    customFields: customFieldStr
-                });
+                };
+
+                // Merge custom fields into the row object
+                // ExcelJS will match keys in rowData to column keys
+                Object.assign(rowData, others);
+
+                worksheet.addRow(rowData);
             });
         });
 
