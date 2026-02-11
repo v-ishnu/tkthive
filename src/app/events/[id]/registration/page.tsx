@@ -730,7 +730,7 @@ export default function RegistrationPage() {
                             {event.declaration && (
                                 <div className="mt-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl">
                                     <label className="flex items-start gap-4 cursor-pointer group">
-                                        <div className={`mt-1 w-6 h-6 rounded border flex items-center justify-center transition-all ${isDeclared ? 'bg-red-500 border-red-500 text-white' : 'bg-transparent border-red-500/50 group-hover:border-red-500'}`}>
+                                        <div className={`mt-1 w-6 h-6 flex-shrink-0 rounded border flex items-center justify-center transition-all ${isDeclared ? 'bg-red-500 border-red-500 text-white' : 'bg-transparent border-red-500/50 group-hover:border-red-500'}`}>
                                             {isDeclared && <Check size={16} />}
                                         </div>
                                         <input
