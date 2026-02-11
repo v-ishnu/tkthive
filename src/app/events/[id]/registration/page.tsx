@@ -726,8 +726,8 @@ export default function RegistrationPage() {
                                 </div>
                             )}
 
-                            {/* Mandatory Declaration for Specific Event */}
-                            {(event.slug === "advitiya-2026-iit-ropar-driftx-go-karting-experience-2026-02-06" || event.id === "advitiya-2026-iit-ropar-driftx-go-karting-experience-2026-02-06") && (
+                            {/* Dynamic Declaration / Waiver */}
+                            {event.declaration && (
                                 <div className="mt-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl">
                                     <label className="flex items-start gap-4 cursor-pointer group">
                                         <div className={`mt-1 w-6 h-6 rounded border flex items-center justify-center transition-all ${isDeclared ? 'bg-red-500 border-red-500 text-white' : 'bg-transparent border-red-500/50 group-hover:border-red-500'}`}>
@@ -740,7 +740,7 @@ export default function RegistrationPage() {
                                             className="hidden"
                                         />
                                         <p className="text-sm text-red-200 leading-relaxed select-none">
-                                            I voluntarily agree to participate in the DriftX Go-Karting activity. I understand that while all safety measures will be ensured, I am participating at my own risk. DriftX and the organizing team will ensure safety standards but will not be responsible for unforeseen incidents.
+                                            {event.declaration}
                                         </p>
                                     </label>
                                 </div>
@@ -748,7 +748,7 @@ export default function RegistrationPage() {
 
                             <button
                                 onClick={handlePayment}
-                                disabled={isProcessing || ((event.slug === "advitiya-2026-iit-ropar-driftx-go-karting-experience-2026-02-06" || event.id === "advitiya-2026-iit-ropar-driftx-go-karting-experience-2026-02-06") && !isDeclared)}
+                                disabled={isProcessing || (!!event.declaration && !isDeclared)}
                                 className="w-full bg-primary hover:bg-primary-hover text-black font-bold py-4 rounded-xl transition-all shadow-lg shadow-primary/20 mt-8 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-lg"
                             >
                                 {isProcessing ? (

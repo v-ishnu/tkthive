@@ -10,7 +10,8 @@ import {
     Calendar,
     MapPin,
     // Fix: Added missing DollarSign icon import
-    IndianRupee
+    IndianRupee,
+    AlertCircle
 } from 'lucide-react';
 import { CustomField } from '@/types';
 
@@ -21,6 +22,7 @@ interface CreateEventProps {
 const CreateEvent: React.FC<CreateEventProps> = ({ onBack }) => {
     const [customFields, setCustomFields] = useState<CustomField[]>([]);
     const [title, setTitle] = useState('');
+    const [declaration, setDeclaration] = useState('');
 
     const addField = () => {
         const newField: CustomField = {
@@ -155,6 +157,29 @@ const CreateEvent: React.FC<CreateEventProps> = ({ onBack }) => {
                                     </div>
                                 ))
                             )}
+                        </div>
+                    </section>
+
+                    {/* Declaration Section */}
+                    <section className="bg-card p-8 rounded-3xl border border-border shadow-sm space-y-6">
+                        <h3 className="text-xl font-bold text-text-main flex items-center gap-2">
+                            <AlertCircle className="w-5 h-5 text-primary" />
+                            Declaration / Waiver
+                        </h3>
+                        <div>
+                            <label className="block text-sm font-semibold text-text-secondary mb-2">
+                                Event Declaration (Optional)
+                            </label>
+                            <p className="text-xs text-text-muted mb-3">
+                                If provided, users must agree to this declaration before registering.
+                            </p>
+                            <textarea
+                                value={declaration}
+                                onChange={(e) => setDeclaration(e.target.value)}
+                                placeholder="e.g., I hereby declare that I am participating at my own risk..."
+                                rows={4}
+                                className="w-full px-5 py-3 rounded-2xl bg-background border border-border focus:outline-none focus:ring-2 focus:ring-primary focus:bg-card transition-all resize-y"
+                            />
                         </div>
                     </section>
                 </div>

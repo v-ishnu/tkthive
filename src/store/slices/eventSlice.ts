@@ -79,6 +79,7 @@ export const fetchEventById = createAsyncThunk(
                     endDate: fetchedEvent.endDate,     // ✅ Added raw end date
                     venue: fetchedEvent.venue,
                     description: fetchedEvent.description,
+                    declaration: fetchedEvent.declaration,
                     imageUrl: fetchedEvent.imageUrl || '', // fetchedEvent.imageUrl || ...
                     price: fetchedEvent.price,
                     category: fetchedEvent.category || 'Event',

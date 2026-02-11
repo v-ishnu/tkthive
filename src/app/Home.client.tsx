@@ -12,6 +12,8 @@ import { AdSection } from "@/components/home/Adsection";
 import { HomeUpcomingSection } from "@/components/home/UpcomingEvents";
 import { CalendarSection } from "@/components/home/CalendarSection";
 import { StaggeredReviews } from "@/components/home/StaggeredReviews";
+
+import { LiveEventsCarousel } from "@/components/home/LiveEventsCarousel";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { fetchAllEvents } from "@/store/slices/eventSlice";
 import { RootState } from "@/store/store";
@@ -30,6 +32,11 @@ export default function Home() {
       <section className="bg-background">
         <Hero />
       </section>
+
+      {/* Live Events Carousel */}
+      {/* {!loading && events.length > 0 && (
+        <LiveEventsCarousel events={events} />
+      )} */}
 
       <MarqueeSection />
 
@@ -65,14 +72,14 @@ export default function Home() {
         />
       </section>
 
-          <div className="container mx-auto px-4 mt-20 mb-12">
-                      <AdSection
-                          title="Sponsorship Opportunities"
-                          description="Want to see your brand here? Partner with the biggest events in the region."
-                          cta="Contact Sales"
-                          align="left"
-                      />
-                  </div>
+      <div className="container mx-auto px-4 mt-20 mb-12">
+        <AdSection
+          title="Sponsorship Opportunities"
+          description="Want to see your brand here? Partner with the biggest events in the region."
+          cta="Contact Sales"
+          align="left"
+        />
+      </div>
 
       {/* <CreativePromoSection /> */}
 

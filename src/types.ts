@@ -172,6 +172,7 @@ export interface EventData {
   showevent?: boolean; // ✅ Added
   startDate?: string;
   endDate?: string;
+  declaration?: string; // ✅ Added
 }
 
 export interface LocationData {
