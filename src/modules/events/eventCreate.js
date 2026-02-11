@@ -48,7 +48,8 @@ export const eventCreate = async (req, res) => {
             subCategory,   // ✅ Added
             communityLink,  // ✅ Added
             communityMessage, // ✅ Added
-            referralCodes // ✅ Added
+            referralCodes, // ✅ Added
+            declaration // ✅ Added
         } = req.body;
 
 
@@ -170,6 +171,7 @@ export const eventCreate = async (req, res) => {
 
                 showevent: showevent !== undefined ? Boolean(showevent) : true, // ✅ Added
                 referralCodes: referralCodes || [], // ✅ Added
+                declaration, // ✅ Added
             },
         });
 

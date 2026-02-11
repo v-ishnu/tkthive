@@ -27,7 +27,8 @@ export async function updateEvent(req, res) {
       showevent, // ✅ Added
       communityLink,  // ✅ Added
       communityMessage, // ✅ Added
-      referralCodes // ✅ Added
+      referralCodes, // ✅ Added
+      declaration // ✅ Added
     } = req.body;
 
     // 1. Check if event exists
@@ -80,6 +81,7 @@ export async function updateEvent(req, res) {
         ...(communityMessage !== undefined && { communityMessage }), // ✅ Added
         ...(showevent !== undefined && { showevent: Boolean(showevent) }), // ✅ Added
         ...(referralCodes !== undefined && { referralCodes }), // ✅ Added
+        ...(declaration !== undefined && { declaration }), // ✅ Added
         // ...(req.body.coupons !== undefined && { coupons: req.body.coupons }), // ✅ Added
       },
     });

@@ -261,6 +261,7 @@ model Event {
 
   communityLink        String?        // ✅ Added
   communityMessage     String?        // ✅ Added
+  declaration          String?        // ✅ Added
 
   approvalStatus        ApprovalStatus @default(PENDING)
   approvedBy            String?        @map("approved_by") @db.ObjectId
