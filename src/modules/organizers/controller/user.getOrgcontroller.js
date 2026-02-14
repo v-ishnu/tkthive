@@ -77,17 +77,6 @@ export const getOrganizerController = async (req, res) => {
                   }
                 }
               }
-            },
-            registrations: {
-              where: {
-                status: {
-                  in: ["CONFIRMED", "USED"]
-                }
-              },
-              select: {
-                unitPrice: true,
-                addons: true
-              }
             }
           },
           orderBy: {
@@ -103,6 +92,85 @@ export const getOrganizerController = async (req, res) => {
       });
     }
 
+    // Get all event IDs
+    const eventIds = organizer.events.map(event => event.id);
+
+    // Query all successful bookings for these events to calculate gross sales
+    const bookings = await prisma.booking.findMany({
+      where: {
+        paymentStatus: "PAID",
+        bookingStatus: { in: ["CONFIRMED", "USED"] },
+        items: {
+          some: {
+            ticket: {
+              eventId: { in: eventIds }
+            }
+          }
+        }
+      },
+      include: {
+        items: {
+          include: {
+            ticket: {
+              select: {
+                eventId: true
+              }
+            }
+          }
+        }
+      }
+    });
+
+    // Calculate gross sales per event
+    const eventGrossSales = {};
+    for (const eventId of eventIds) {
+      eventGrossSales[eventId] = 0;
+    }
+
+    for (const booking of bookings) {
+      // Group items by event
+      const itemsByEvent = {};
+      for (const item of booking.items) {
+        const eventId = item.ticket.eventId;
+        if (!itemsByEvent[eventId]) {
+          itemsByEvent[eventId] = [];
+        }
+        itemsByEvent[eventId].push(item);
+      }
+
+      // Calculate total original price for proportional distribution
+      let totalOriginalPrice = 0;
+      for (const item of booking.items) {
+        const itemTicketPrice = item.unitPrice * item.quantity;
+        let itemAddonPrice = 0;
+        if (item.addons && Array.isArray(item.addons)) {
+          itemAddonPrice = item.addons.reduce((sum, addon) => sum + (addon.price * addon.quantity), 0);
+        }
+        totalOriginalPrice += itemTicketPrice + itemAddonPrice;
+      }
+
+      // Distribute payment proportionally to each event
+      for (const [eventId, items] of Object.entries(itemsByEvent)) {
+        if (!eventIds.includes(eventId)) continue;
+
+        let eventItemsOriginalPrice = 0;
+        for (const item of items) {
+          const itemTicketPrice = item.unitPrice * item.quantity;
+          let itemAddonPrice = 0;
+          if (item.addons && Array.isArray(item.addons)) {
+            itemAddonPrice = item.addons.reduce((sum, addon) => sum + (addon.price * addon.quantity), 0);
+          }
+          eventItemsOriginalPrice += itemTicketPrice + itemAddonPrice;
+        }
+
+        const proportionalPayment = totalOriginalPrice > 0
+          ? (eventItemsOriginalPrice / totalOriginalPrice) * booking.payment
+          : 0;
+
+        eventGrossSales[eventId] += proportionalPayment;
+      }
+    }
+
     // Compute isLive for each event
     const now = new Date();
     const eventsWithLiveStatus = organizer.events.map(event => {
@@ -113,12 +181,8 @@ export const getOrganizerController = async (req, res) => {
       // Frontend logic: end || start + 24h
       const effectiveEnd = end.getTime() > 0 ? end : new Date(start.getTime() + 86400000);
 
-      // Calculate Revenue
-      const grossSales = event.registrations.reduce((sum, reg) => {
-        const ticketRevenue = reg.unitPrice || 0;
-        const addonsRevenue = reg.addons ? reg.addons.reduce((acc, addon) => acc + (addon.price * addon.quantity), 0) : 0;
-        return sum + ticketRevenue + addonsRevenue;
-      }, 0);
+      // Get gross sales from pre-calculated map (actual booking payments)
+      const grossSales = Math.round((eventGrossSales[event.id] || 0) * 100) / 100;
 
       return {
         ...event,

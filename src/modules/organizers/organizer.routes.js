@@ -26,6 +26,8 @@ organizerRouter.post("/tickets/:id/scan", protect, markTicketUsed);
 import { exportRegistrations } from "./controller/export.controller.js";
 // Event Management
 import { getEventRegistrationsController } from "./controller/event.getRegistrations.js";
+import { getEventStatistics } from "./controller/event.getStatistics.js";
+organizerRouter.get("/events/:id/statistics", protect, getEventStatistics);
 organizerRouter.get("/events/:id/registrations", protect, getEventRegistrationsController);
 
 organizerRouter.get("/events/:eventId/export", protect, exportRegistrations);

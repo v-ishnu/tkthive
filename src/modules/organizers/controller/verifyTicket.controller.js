@@ -37,9 +37,28 @@ export const getTicketDetails = async (req, res) => {
             return res.status(404).json({ success: false, message: "INVALID_TICKET" });
         }
 
-        // Authorization check: Ensure logged-in user is staff/organizer for this event
-        // (Assuming basic protection for now, can be enhanced with event-specific permissions)
-        // const organizerId = req.user.organizerId; // Implement based on your auth model
+        // Authorization check: Ensure logged-in user is associated with the event's organizer
+        const user = req.user;
+
+        // Allow ADMIN users to access all QR codes
+        if (user.platformRole !== "ADMIN") {
+            // Check if user is associated with the event's organizer
+            const userOrganizer = await prisma.userOrganizer.findUnique({
+                where: {
+                    userId_organizerId: {
+                        userId: user.id,
+                        organizerId: registration.event.organizerId
+                    }
+                }
+            });
+
+            if (!userOrganizer) {
+                return res.status(403).json({
+                    success: false,
+                    message: "You cannot access this QR data"
+                });
+            }
+        }
 
         return res.status(200).json({
             success: true,
@@ -61,11 +80,39 @@ export const markTicketUsed = async (req, res) => {
         const { id } = req.params;
 
         const registration = await prisma.eventRegistration.findUnique({
-            where: { qrCode: id }
+            where: { qrCode: id },
+            include: {
+                event: {
+                    select: { organizerId: true }
+                }
+            }
         });
 
         if (!registration) {
             return res.status(404).json({ success: false, message: "INVALID_TICKET" });
+        }
+
+        // Authorization check: Ensure logged-in user is associated with the event's organizer
+        const user = req.user;
+
+        // Allow ADMIN users to scan all QR codes
+        if (user.platformRole !== "ADMIN") {
+            // Check if user is associated with the event's organizer
+            const userOrganizer = await prisma.userOrganizer.findUnique({
+                where: {
+                    userId_organizerId: {
+                        userId: user.id,
+                        organizerId: registration.event.organizerId
+                    }
+                }
+            });
+
+            if (!userOrganizer) {
+                return res.status(403).json({
+                    success: false,
+                    message: "You cannot access this QR data"
+                });
+            }
         }
 
         if (registration.scanned) {

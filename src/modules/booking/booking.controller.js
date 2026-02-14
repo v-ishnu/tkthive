@@ -403,8 +403,19 @@ async function finalizeBooking(orderId, paymentData = {}) {
             }
         });
 
-        // 2. Process Items
+        // 2. Process Items and Calculate Revenue
         const organizerUpdates = {}; // Map: organizerId -> { revenue, tickets }
+
+        // Calculate total original price (before discount) for proportional distribution
+        let totalOriginalPrice = 0;
+        for (const item of booking.items) {
+            const itemTicketRevenue = item.unitPrice * item.quantity;
+            let itemAddonRevenue = 0;
+            if (item.addons && Array.isArray(item.addons)) {
+                itemAddonRevenue = item.addons.reduce((sum, addon) => sum + (addon.price * addon.quantity), 0);
+            }
+            totalOriginalPrice += itemTicketRevenue + itemAddonRevenue;
+        }
 
         for (const item of booking.items) {
             // Update Stock
@@ -413,13 +424,19 @@ async function finalizeBooking(orderId, paymentData = {}) {
                 data: { sold: { increment: item.quantity } }
             });
 
-            // Calculate Item Revenue (Ticket + Addons)
+            // Calculate Item's Original Price (Ticket + Addons)
             const itemTicketRevenue = item.unitPrice * item.quantity;
             let itemAddonRevenue = 0;
             if (item.addons && Array.isArray(item.addons)) {
                 itemAddonRevenue = item.addons.reduce((sum, addon) => sum + (addon.price * addon.quantity), 0);
             }
-            const totalItemRevenue = itemTicketRevenue + itemAddonRevenue;
+            const itemOriginalPrice = itemTicketRevenue + itemAddonRevenue;
+
+            // Calculate proportional revenue based on actual payment (after discount)
+            // This ensures coupon discounts are properly distributed across items
+            const itemRevenue = totalOriginalPrice > 0
+                ? (itemOriginalPrice / totalOriginalPrice) * booking.payment
+                : 0;
 
             // Increment Organizer Revenue and Tickets Sold (Accumulate)
             if (item.ticket.event && item.ticket.event.organizerId) {
@@ -427,9 +444,10 @@ async function finalizeBooking(orderId, paymentData = {}) {
                 if (!organizerUpdates[orgId]) {
                     organizerUpdates[orgId] = { revenue: 0, tickets: 0 };
                 }
-                organizerUpdates[orgId].revenue += totalItemRevenue;
+                organizerUpdates[orgId].revenue += itemRevenue;
                 organizerUpdates[orgId].tickets += item.quantity;
             }
+
 
             // 2. Create Registrations from BookingItem Data
             const attendees = item.attendeeData || [];

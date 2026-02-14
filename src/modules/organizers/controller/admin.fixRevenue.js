@@ -7,16 +7,8 @@ export const recalculateAllRevenues = async (req, res) => {
         const organizers = await prisma.organizer.findMany({
             include: {
                 events: {
-                    include: {
-                        registrations: {
-                            where: {
-                                status: { in: ["CONFIRMED", "USED"] }
-                            },
-                            select: {
-                                unitPrice: true,
-                                addons: true
-                            }
-                        }
+                    select: {
+                        id: true
                     }
                 }
             }
@@ -28,16 +20,51 @@ export const recalculateAllRevenues = async (req, res) => {
             let totalRevenue = 0;
             let totalTicketsSold = 0;
 
-            for (const event of org.events) {
-                const eventRevenue = event.registrations.reduce((sum, reg) => {
-                    const ticketRevenue = reg.unitPrice || 0;
-                    const addonsRevenue = reg.addons ? reg.addons.reduce((acc, addon) => acc + (addon.price * addon.quantity), 0) : 0;
-                    return sum + ticketRevenue + addonsRevenue;
-                }, 0);
-                totalRevenue += eventRevenue;
+            // Get all event IDs for this organizer
+            const eventIds = org.events.map(event => event.id);
 
-                // Count confirmed registrations for this event
-                totalTicketsSold += event.registrations.length;
+            if (eventIds.length > 0) {
+                // Query all successful bookings for this organizer's events
+                const bookings = await prisma.booking.findMany({
+                    where: {
+                        paymentStatus: "PAID",
+                        bookingStatus: { in: ["CONFIRMED", "USED"] },
+                        items: {
+                            some: {
+                                ticket: {
+                                    eventId: { in: eventIds }
+                                }
+                            }
+                        }
+                    },
+                    include: {
+                        items: {
+                            include: {
+                                ticket: {
+                                    select: {
+                                        eventId: true
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+
+                // Sum up revenue from successful bookings
+                for (const booking of bookings) {
+                    // Check if this booking belongs to this organizer's events
+                    const belongsToOrg = booking.items.some(item =>
+                        eventIds.includes(item.ticket.eventId)
+                    );
+
+                    if (belongsToOrg) {
+                        // Add the actual payment amount (already excludes coupon discount)
+                        totalRevenue += booking.payment;
+
+                        // Count total tickets sold
+                        totalTicketsSold += booking.items.reduce((sum, item) => sum + item.quantity, 0);
+                    }
+                }
             }
 
             if (totalRevenue !== org.totalRevenue || totalTicketsSold !== org.totalTicketsSold) {
@@ -60,3 +87,4 @@ export const recalculateAllRevenues = async (req, res) => {
         return res.status(500).json({ message: "FAILED" });
     }
 };
+
