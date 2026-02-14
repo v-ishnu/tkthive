@@ -19,6 +19,12 @@ export const createCustomField = async (req, res) => {
       throw new Error("CUSTOM_FIELDS_LOCKED");
     }
 
+    // Transform type: convert SELECT to DROPDOWN to match Prisma enum
+    let fieldType = type;
+    if (fieldType === 'SELECT' || fieldType === 'select') {
+      fieldType = 'DROPDOWN';
+    }
+
     const field = await prisma.eventCustomField.create({
       data: {
         eventId,
@@ -26,7 +32,7 @@ export const createCustomField = async (req, res) => {
         label,
         scope,
         placeholder,
-        type,
+        type: fieldType,
         required: required ?? false,
         options,
         order
@@ -76,17 +82,25 @@ export const createBulkCustomFields = async (req, res) => {
 
     // Prepare data for bulk creation
     // map fields to include eventId and defaults
-    const fieldsData = fields.map(field => ({
-      eventId,
-      ticketId: field.ticketId || null,
-      label: field.label,
-      scope: field.scope,
-      placeholder: field.placeholder,
-      type: field.type,
-      required: field.required ?? false,
-      options: field.options || [],
-      order: field.order || 0
-    }));
+    const fieldsData = fields.map(field => {
+      // Transform type: convert SELECT to DROPDOWN to match Prisma enum
+      let fieldType = field.type;
+      if (fieldType === 'SELECT' || fieldType === 'select') {
+        fieldType = 'DROPDOWN';
+      }
+
+      return {
+        eventId,
+        ticketId: field.ticketId || null,
+        label: field.label,
+        scope: field.scope,
+        placeholder: field.placeholder,
+        type: fieldType,
+        required: field.required ?? false,
+        options: field.options || [],
+        order: field.order || 0
+      };
+    });
 
     // Use transaction or createMany
     const createdFields = await prisma.eventCustomField.createMany({
