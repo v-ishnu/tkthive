@@ -37,7 +37,7 @@ authRouter.get(
 
 
 authRouter.get("/me", protect, authenticateMe);
-authRouter.get("/logout", protect, signOutController);
+authRouter.post("/logout", protect, signOutController);
 authRouter.post("/verify-email", verifyEmailController);
 authRouter.post("/resend-otp", resendOtpController);
 authRouter.post("/forgot-password", forgotPasswordController);
