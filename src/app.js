@@ -21,11 +21,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(passport.initialize());
 app.use(cors({
-  origin: true,
+  origin: ["https://www.tkthive.com", "https://tkthive.com", "http://localhost:3000"],
   credentials: true,
+
   exposeHeaders: ["set-cookie"]
-}
-));
+}));
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
