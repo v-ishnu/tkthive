@@ -7,6 +7,8 @@ import { localRedisClient } from "../config/redis.local.js";
 import { cloudRedisClient } from "../config/redis.cloud.js";
 import { cashfreeWebhook } from "./lib/webhook/cashfreeWebhook.js";
 import passport from "../src/config/passport.config.js";
+import rateLimit from "express-rate-limit";
+
 
 
 dotenv.config();
@@ -24,6 +26,19 @@ app.use(cors({
   exposeHeaders: ["set-cookie"]
 }
 ));
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per window
+  message: {
+    success: false,
+    message: "Too many requests, please try again later."
+  },
+  standardHeaders: true,
+  legacyHeaders: false
+});
+
+app.use(limiter);
 
 
 /**

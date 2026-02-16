@@ -19,10 +19,12 @@ export const createCustomField = async (req, res) => {
       throw new Error("CUSTOM_FIELDS_LOCKED");
     }
 
-    // Transform type: convert SELECT to DROPDOWN to match Prisma enum
+    // Transform type: convert SELECT to DROPDOWN and URL to TEXT to match Prisma enum
     let fieldType = type;
     if (fieldType === 'SELECT' || fieldType === 'select') {
       fieldType = 'DROPDOWN';
+    } else if (fieldType === 'URL' || fieldType === 'url') {
+      fieldType = 'TEXT';
     }
 
     const field = await prisma.eventCustomField.create({
@@ -83,10 +85,12 @@ export const createBulkCustomFields = async (req, res) => {
     // Prepare data for bulk creation
     // map fields to include eventId and defaults
     const fieldsData = fields.map(field => {
-      // Transform type: convert SELECT to DROPDOWN to match Prisma enum
+      // Transform type: convert SELECT to DROPDOWN and URL to TEXT to match Prisma enum
       let fieldType = field.type;
       if (fieldType === 'SELECT' || fieldType === 'select') {
         fieldType = 'DROPDOWN';
+      } else if (fieldType === 'URL' || fieldType === 'url') {
+        fieldType = 'TEXT';
       }
 
       return {
