@@ -156,7 +156,7 @@ export const checkAuth = createAsyncThunk<
     async (_, { rejectWithValue }) => {
         try {
 
-            const response = await axios.get(API_BASE_URL + "user/profile");
+            const response = await axios.get(API_BASE_URL + "user/profile", { withCredentials: true });
             return response.data.user;
         } catch (error: any) {
             return rejectWithValue(error.response?.data?.message || "Session invalid");
@@ -172,7 +172,7 @@ export const logoutUser = createAsyncThunk<
     "auth/logoutUser",
     async (_, { rejectWithValue }) => {
         try {
-            await axios.get(API_BASE_URL + "v1/auth/logout");
+            await axios.post(API_BASE_URL + "v1/auth/logout", { withCredentials: true });
         } catch (error: any) {
             return rejectWithValue(error.response?.data?.message || "logout failed");
         }
@@ -187,7 +187,7 @@ export const fetchUserTickets = createAsyncThunk<
     "auth/fetchUserTickets",
     async (_, { rejectWithValue }) => {
         try {
-            const response = await axios.get(API_BASE_URL + "user/tickets");
+            const response = await axios.get(API_BASE_URL + "user/tickets", { withCredentials: true });
             return response.data.data;
         } catch (error: any) {
             return rejectWithValue(error.response?.data?.message || "Failed to fetch tickets");
