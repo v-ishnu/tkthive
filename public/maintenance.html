@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Auth Page</title>
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    body {
+      background: #0f0f0f;
+    }
+
+    @keyframes scroll-up {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-50%); }
+    }
+
+    @keyframes scroll-down {
+      0% { transform: translateY(-50%); }
+      100% { transform: translateY(0); }
+    }
+
+    .animate-scroll-up {
+      animation: scroll-up 40s linear infinite;
+    }
+
+    .animate-scroll-down {
+      animation: scroll-down 45s linear infinite;
+    }
+  </style>
+</head>
+
+<body class="min-h-screen flex bg-[#0f0f0f] text-white">
+
+<!-- LEFT SIDE -->
+<div class="hidden md:flex w-1/2 h-screen sticky top-0 relative overflow-hidden items-center justify-center border-r border-white/5">
+
+  <!-- Animated Grid -->
+  <div class="absolute inset-0 flex gap-4 p-4 opacity-40 -skew-x-6 scale-110">
+
+    <!-- Column 1 -->
+    <div class="flex-1 space-y-4 animate-scroll-up">
+      <img src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=400&auto=format&fit=crop" class="rounded-2xl aspect-[3/4] object-cover grayscale hover:grayscale-0 transition-all duration-700"/>
+      <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=400&auto=format&fit=crop" class="rounded-2xl aspect-[3/4] object-cover grayscale hover:grayscale-0 transition-all duration-700"/>
+      <img src="https://images.unsplash.com/photo-1511578314322-379afb476865?q=80&w=400&auto=format&fit=crop" class="rounded-2xl aspect-[3/4] object-cover grayscale hover:grayscale-0 transition-all duration-700"/>
+    </div>
+
+    <!-- Column 2 -->
+    <div class="flex-1 space-y-4 animate-scroll-down">
+      <img src="https://images.unsplash.com/photo-1552674605-4696c2458404?q=80&w=400&auto=format&fit=crop" class="rounded-2xl aspect-[3/4] object-cover grayscale hover:grayscale-0 transition-all duration-700"/>
+      <img src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=400&auto=format&fit=crop" class="rounded-2xl aspect-[3/4] object-cover grayscale hover:grayscale-0 transition-all duration-700"/>
+      <img src="https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?q=80&w=400&auto=format&fit=crop" class="rounded-2xl aspect-[3/4] object-cover grayscale hover:grayscale-0 transition-all duration-700"/>
+    </div>
+
+    <!-- Column 3 -->
+    <div class="flex-1 space-y-4 animate-scroll-up">
+      <img src="https://images.unsplash.com/photo-1552820728-8b83bb6b773f?q=80&w=400&auto=format&fit=crop" class="rounded-2xl aspect-[3/4] object-cover grayscale hover:grayscale-0 transition-all duration-700"/>
+      <img src="https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?q=80&w=400&auto=format&fit=crop" class="rounded-2xl aspect-[3/4] object-cover grayscale hover:grayscale-0 transition-all duration-700"/>
+      <img src="https://images.unsplash.com/photo-1523580494863-6f3031224c94?q=80&w=400&auto=format&fit=crop" class="rounded-2xl aspect-[3/4] object-cover grayscale hover:grayscale-0 transition-all duration-700"/>
+    </div>
+
+  </div>
+
+  <!-- Overlay -->
+  <div class="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-black/50"></div>
+
+  <!-- Content -->
+  <div class="relative z-10 text-center space-y-6 max-w-lg">
+    <img src="logo/whitelogo.png" class="w-24 mx-auto mb-6 transition duration-500" />
+    <h2 class="text-5xl font-bold px-12">Under Maintenance </h2>
+    <p class="text-gray-300 text-lg">We are currently performing scheduled maintenance. We should be back shortly. Thank you for your patience.
+    </p>
+  </div>
+</div>
+
+
+<!-- RIGHT SIDE -->
+<div class="w-full md:w-1/2 bg-[#181818] min-h-screen flex flex-col justify-center items-center p-8 md:p-20">
+
+  <div class="max-w-md w-full text-center space-y-10">
+
+    <!-- Icon -->
+    <div class="flex justify-center">
+      <div class="w-24 h-24 rounded-full bg-purple-500/20 flex items-center justify-center">
+        <svg class="w-12 h-12 text-purple-500" fill="none" stroke="currentColor" stroke-width="2"
+          viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      </div>
+    </div>
+
+    <!-- Title -->
+    <div>
+      <h2 class="text-4xl font-bold mb-4">Event Starts In</h2>
+      <p class="text-gray-400 text-lg">
+        Please wait until the countdown finishes.
+      </p>
+    </div>
+
+    <!-- TIMER DISPLAY -->
+    <div id="countdown"
+      class="grid grid-cols-4 gap-4 text-center">
+
+      <div class="bg-black/40 border border-white/10 rounded-2xl py-6">
+        <p id="days" class="text-3xl font-bold text-purple-500">00</p>
+        <p class="text-xs text-gray-500 uppercase mt-2">Days</p>
+      </div>
+
+      <div class="bg-black/40 border border-white/10 rounded-2xl py-6">
+        <p id="hours" class="text-3xl font-bold text-purple-500">00</p>
+        <p class="text-xs text-gray-500 uppercase mt-2">Hours</p>
+      </div>
+
+      <div class="bg-black/40 border border-white/10 rounded-2xl py-6">
+        <p id="minutes" class="text-3xl font-bold text-purple-500">00</p>
+        <p class="text-xs text-gray-500 uppercase mt-2">Minutes</p>
+      </div>
+
+      <div class="bg-black/40 border border-white/10 rounded-2xl py-6">
+        <p id="seconds" class="text-3xl font-bold text-purple-500">00</p>
+        <p class="text-xs text-gray-500 uppercase mt-2">Seconds</p>
+      </div>
+
+    </div>
+
+    <!-- Status -->
+    <div id="statusMessage" class="text-gray-400 text-sm">
+      Waiting for countdown...
+    </div>
+
+  </div>
+</div>
+
+
+</body>
+</html>

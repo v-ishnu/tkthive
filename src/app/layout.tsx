@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Space_Grotesk } from "next/font/google";
 import { GoogleAnalytics } from '@next/third-parties/google';
 import { Analytics } from "@vercel/analytics/next"
+import ServiceWorkerRegister from "./ServiceWorkerRegister";
 
 import "./globals.css";
 

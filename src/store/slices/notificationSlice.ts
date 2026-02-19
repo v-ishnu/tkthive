@@ -80,6 +80,7 @@ export const markAllRead = createAsyncThunk(
     }
 );
 
+
 const notificationSlice = createSlice({
     name: 'notification',
     initialState,

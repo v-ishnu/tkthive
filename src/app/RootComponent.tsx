@@ -8,6 +8,7 @@ import { store } from "@/store/store";
 import AuthInitializer from "@/components/AuthInitializer";
 import { ToastProvider } from "@/context/ToastContext";
 import LenisProvider from "@/components/LenisProvider";
+import ServiceWorkerRegister from "./ServiceWorkerRegister";
 
 export default function RootComponent({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
@@ -22,8 +23,10 @@ export default function RootComponent({ children }: { children: React.ReactNode 
     return (
         <LenisProvider>
             <Provider store={store}>
+
                 <ToastProvider>
                     <AuthInitializer />
+                    <ServiceWorkerRegister />
                     <div className="">
                         {!isLoginPage && !isOrganizerPage && <Navbar />}
                         <main className={!isLoginPage && !isOrganizerPage && !isTransparentNavPage ? "pt-20" : ""}>{children}</main>

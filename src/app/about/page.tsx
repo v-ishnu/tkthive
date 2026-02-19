@@ -7,7 +7,7 @@ export default function AboutUsPage() {
         <div className="min-h-screen bg-dark text-white pt-20">
             {/* Hero Section */}
             <div className="relative overflow-hidden py-24 px-4">
-                <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1523580494863-6f3031224c94?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center opacity-10" />
+                <div className="absolute inset-0 bg-cover bg-center opacity-10" />
                 <div className="absolute inset-0 bg-gradient-to-b from-dark via-transparent to-dark" />
 
                 <div className="relative container mx-auto text-center max-w-4xl">
@@ -61,8 +61,8 @@ export default function AboutUsPage() {
                         </div>
                     </div>
                     <div className="md:w-1/2 grid grid-cols-2 gap-4">
-                        <img src="https://images.unsplash.com/photo-1511578314322-379afb476865?q=80&w=1000&auto=format&fit=crop" className="rounded-2xl border border-white/10 w-full h-64 object-cover transform translate-y-8" alt="Event Crowd" />
-                        <img src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678?q=80&w=1000&auto=format&fit=crop" className="rounded-2xl border border-white/10 w-full h-64 object-cover" alt="Conference" />
+                        <img src="/unsplash/photo-1511578314322-379afb476865.avif" className="rounded-2xl border border-white/10 w-full h-64 object-cover transform translate-y-8" alt="Event Crowd" />
+                        <img src="/unsplash/photo-1505373877841-8d25f7d46678.avif" className="rounded-2xl border border-white/10 w-full h-64 object-cover" alt="Conference" />
                     </div>
                 </div>
             </div>

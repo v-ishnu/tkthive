@@ -6,6 +6,7 @@ import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { loginUser, googleLogin, signupUser, verifyEmail, resendOtp, forgotPassword, resetPassword } from '@/store/slices/authslice';
 
 import { useToast } from '@/context/ToastContext';
+import { enablePushNotifications } from '@/context/usePush';
 
 const EVENT_IMAGES_COL_1 = [
     "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=400&auto=format&fit=crop", // Concert
@@ -77,6 +78,12 @@ function AuthContent() {
                         setTimer(30);
                     } else {
                         showToast("Login successful! Welcome back.", "success");
+
+                        // Enable push notifications after successful login
+                        // if(Notification.permission !== "granted") {
+                        //     await  enablePushNotifications(resultAction.payload.data.id);
+                        // }
+
                         if (resultAction.payload.data.role === 'ORGANIZER') {
                             router.push('/organizer/dashboard');
                         } else {
@@ -100,6 +107,12 @@ function AuthContent() {
                         setTimer(30); // Start 30s timer
                     } else {
                         showToast("Signup successful!", "success");
+
+                        // Enable push notifications after successful signup
+                        // if(Notification.permission !== "granted") {
+                        //     await  enablePushNotifications(resultAction.payload.data.id);
+                        // }
+
                         router.push(redirectPath);
                     }
                 } else {
