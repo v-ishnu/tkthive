@@ -1,45 +1,16 @@
-// "use client";
-
-// import { useEffect } from "react";
-
-// export default function ServiceWorkerRegister(): null {
-//   useEffect(() => {
-//     if ("serviceWorker" in navigator) {
-//       navigator.serviceWorker
-//         .register("/sw.js")
-//         .then(() => {
-//           console.log("Service Worker registered");
-//         })
-//         .catch((err) => {
-//           console.error("SW registration failed:", err);
-//         });
-//     }
-//   }, []);
-
-//   return null;
-// }
-
-
-
 "use client";
-
 import { useEffect, useState } from "react";
 import PushPermissionModal from "@/components/model/PushPermissionModal";
 import { useAppSelector } from "@/store/hooks";
+import { subscribeUser } from "@/lib/push";
 
 export default function ServiceWorkerRegister() {
   const [showModal, setShowModal] = useState(false);
   const { user, isInitialized } = useAppSelector((state) => state.auth);
 
   useEffect(() => {
-    // Check if browser supports SW
-    if (!("serviceWorker" in navigator)) return;
-
-    // Wait for auth init
-    if (!isInitialized) return;
-
-    // Check if user is logged in
-    if (!user) return;
+    // Check if browser supports SW, auth is initialized, and user is logged in
+    if (!("serviceWorker" in navigator) || !isInitialized || !user) return;
 
     // Check localStorage preference
     const permissionStatus = localStorage.getItem("notification_permission_status");
@@ -84,9 +55,19 @@ export default function ServiceWorkerRegister() {
     if (permission === "granted") {
       // 2. Register SW
       registerSw();
-      // 3. Save Preference
+
+      // 3. Subscribe User
+      if (user?.id) {
+        try {
+          await subscribeUser(user.id);
+        } catch (err) {
+          console.error("Failed to subscribe user for push notifications:", err);
+        }
+      }
+
+      // 4. Save Preference
       localStorage.setItem("notification_permission_status", "granted");
-      console.log("Notification permission granted.");
+      console.log("Notification permission granted."); //Debugging
     } else {
       localStorage.setItem("notification_permission_status", "denied");
       console.log("Notification permission denied.");

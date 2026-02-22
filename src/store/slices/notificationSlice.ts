@@ -1,7 +1,7 @@
 
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5051/api/";
+const API_BASE_URL = `${process.env.NEXT_PUBLIC_API_URL}/api/` || "http://localhost:5051/api/";
 
 
 export interface Notification {

@@ -17,7 +17,7 @@ import { LiveEventsCarousel } from "@/components/home/LiveEventsCarousel";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { fetchAllEvents } from "@/store/slices/eventSlice";
 import { RootState } from "@/store/store";
-import { enablePushNotifications } from "@/context/usePush";
+// import { enablePushNotifications } from "@/context/usePush";
 
 export default function Home() {
 
@@ -28,14 +28,6 @@ export default function Home() {
   useEffect(() => {
     dispatch(fetchAllEvents());
   }, [dispatch]);
-
-  useEffect(() => {
-    if (!user?.id) return;
-
-    enablePushNotifications(user?.id).catch((err) => {
-      console.error("Failed to enable push notifications:", err);
-    });
-  }, [user]);
 
   return (
     <>

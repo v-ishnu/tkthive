@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, use } from 'react';
 import { MapPin, Search, User, Menu, LogOut, Ticket, X, Home, Calendar, Info, ChevronDown, Cpu, Gamepad2, Music, Trophy, Palette, Bell, AlignRight, LayoutDashboard } from 'lucide-react';
 import { LocationData, User as UserType } from '../types';
 import { LocationModal } from './LocationModel';
@@ -10,7 +10,7 @@ import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { logoutUser } from '@/store/slices/authslice';
 import { fetchAllEvents } from '@/store/slices/eventSlice';
 import { fetchNotifications } from '@/store/slices/notificationSlice';
-
+import { useLockBodyScroll } from '@/lib/useLockBodyScroll';
 
 
 export const Navbar = () => {
@@ -87,6 +87,8 @@ export const Navbar = () => {
         // handleSearch(searchQuery || 'Popular events'); // Replaced with direct fetch
         dispatch(fetchAllEvents(newLocation.city));
     };
+
+    useLockBodyScroll(isMenuOpen || isLocationModalOpen || isNotificationOpen);
 
     return (
         <>

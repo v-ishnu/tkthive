@@ -9,6 +9,7 @@ import AuthInitializer from "@/components/AuthInitializer";
 import { ToastProvider } from "@/context/ToastContext";
 import LenisProvider from "@/components/LenisProvider";
 import ServiceWorkerRegister from "./ServiceWorkerRegister";
+// import SocketProvider from "@/components/SocketProvider";  ---Future Use
 
 export default function RootComponent({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
@@ -27,6 +28,9 @@ export default function RootComponent({ children }: { children: React.ReactNode 
                 <ToastProvider>
                     <AuthInitializer />
                     <ServiceWorkerRegister />
+                    {/* Future Use 
+                    <SocketProvider /> 
+                    */}
                     <div className="">
                         {!isLoginPage && !isOrganizerPage && <Navbar />}
                         <main className={!isLoginPage && !isOrganizerPage && !isTransparentNavPage ? "pt-20" : ""}>{children}</main>
