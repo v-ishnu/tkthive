@@ -1,17 +1,18 @@
+import dotenv from "dotenv";
+dotenv.config();
+
+
 import express from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import dotenv from "dotenv";
 import transporter from "../config/mail.config.js";
-import { localRedisClient } from "../config/redis.local.js";
+// import { localRedisClient } from "../config/redis.local.js";
 import { cloudRedisClient } from "../config/redis.cloud.js";
 import { cashfreeWebhook } from "./lib/webhook/cashfreeWebhook.js";
 import passport from "../src/config/passport.config.js";
-import rateLimit from "express-rate-limit";
+import maintenanceMiddleware from "./lib/middleware/maintenance.middleware.js";
+import { globalLimiter, rateLimitMiddleware } from "./lib/middleware/rateLimiter.js";
 
-
-
-dotenv.config();
 
 const app = express();
 
@@ -20,25 +21,33 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(passport.initialize());
+
+
 app.use(cors({
-  origin: ["https://www.tkthive.com", "https://tkthive.com", "http://localhost:3000"],
+  origin: [
+    "https://www.tkthive.com",
+    "https://tkthive.com",
+    "http://localhost:3000",
+    "https://www.tkthive.com"
+  ],
   credentials: true,
 
   exposeHeaders: ["set-cookie"]
 }));
 
-// const limiter = rateLimit({
-//   windowMs: 15 * 60 * 1000, // 15 minutes
-//   max: 100, // limit each IP to 100 requests per window
-//   message: {
-//     success: false,
-//     message: "Too many requests, please try again later."
-//   },
-//   standardHeaders: true,
-//   legacyHeaders: false
-// });
 
-// app.use(limiter);
+// Maintenance mode middleware (check Redis before processing requests)
+app.use(maintenanceMiddleware);
+
+
+// GLOBLE IP LIMIT
+app.use(
+  rateLimitMiddleware(
+    globalLimiter, 
+    (req)=> req.ip
+  )
+)
+
 
 
 /**
@@ -50,6 +59,18 @@ app.get("/", (req, res) => {
     message: "Server is running",
   });
 });
+
+// app.get("/test-notification/696a9fd7af4bd88af1b55dea", (req, res) => {
+//   const io = req.app.get("io");
+
+//   io.to(`user:${req.params.userId}`).emit("notification:new", {
+//     id: "test123",
+//     title: "Test Notification",
+//     message: "Realtime working 🚀"
+//   });
+
+//   res.json({ success: true });
+// });
 
 
 
@@ -68,7 +89,7 @@ app.use(
  * Mail Transporter Health check
 */
 transporter.verify().then(() => {
-  console.log("📍 [MAILER] Mailer is ready to send emails");
+  console.log("📍 [MAILER] Mailer is ready");
 }).catch((err) => {
   console.error("❗ [MAILER] Mailer verification failed:", err);
 });
@@ -76,25 +97,27 @@ transporter.verify().then(() => {
 /**
  * Cloud Redis Health Check
 */
-try {
-  const cloudPingPong = await cloudRedisClient.ping();
-  console.log("✅ Cloud Redis connected:", cloudPingPong);
-} catch (error) {
-  console.error("❌ Redis connection error:", error);
-  process.exit(1);
-}
+(async () => {
+  try {
+    const pong = await cloudRedisClient.ping();
+    console.log("✅ Cloud Redis connected:", pong);
+  } catch (error) {
+    console.error("❌ Redis connection error:", error);
+    process.exit(1);
+  }
+})();
 
 /**
  * Local Redis Health Check
 */
-try {
-  const localPingPong = await localRedisClient.ping();
-  console.log("✅ Local Redis connected:", localPingPong);
-} catch (error) {
-  console.warn("⚠️ Local Redis connection failed (running without it):", error.message);
-  localRedisClient.disconnect();
-  // process.exit(1);
-}
+// try {
+//   const localPingPong = await localRedisClient.ping();
+//   console.log("✅ Local Redis connected:", localPingPong);
+// } catch (error) {
+//   console.warn("⚠️ Local Redis connection failed (running without it):", error.message);
+//   localRedisClient.disconnect();
+//   // process.exit(1);
+// }
 
 // Routes
 import authRouter from "../src/modules/auth/auth.routes.js";
@@ -103,8 +126,8 @@ import organizerRouter from "./modules/organizers/organizer.routes.js";
 import adminRouter from "./modules/admin/admin.route.js";
 import eventRouter from "./modules/events/event.routes.js";
 import bookingRoute from "./modules/booking/booking.routes.js";
-
 import notificationRouter from "./modules/notifications/notification.routes.js";
+import pushRouter from "./modules/pushNotify/push.route.js";
 
 app.use("/api/v1/auth", authRouter);
 app.use("/api/user", userRouter);
@@ -112,9 +135,9 @@ app.use('/api/v1/organizer', organizerRouter);
 app.use("/admin/auth", adminRouter);
 app.use("/api/event", eventRouter)
 app.use("/api/booking", bookingRoute)
-
-
+app.use("/api/push-notification", pushRouter);
 app.use("/api/notifications", notificationRouter);
+
 
 app.post(
   "/api/payments/cashfree/webhook",

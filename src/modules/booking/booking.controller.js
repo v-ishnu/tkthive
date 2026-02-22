@@ -5,7 +5,8 @@ import { getPaymentProvider } from "../payment/factory/paymentProviderFactory.js
 import crypto from "crypto";
 import sendRegistrationSuccessEmail from "../../utils/mail/registrationSuccess.mail.js";
 import { createNotification } from "../notifications/notification.service.js";
-
+import { sendSuccessNotification } from "../pushNotify/notificationContoller/sucessfullBooking.js";
+import { promise } from "zod";
 /* 
   1. initiateBooking()
   → Validate stock, custom fields
@@ -558,6 +559,19 @@ async function finalizeBooking(orderId, paymentData = {}) {
             console.error("Notification Error in Finalize:", err);
         }
 
+        // Send Push Notification
+        try {
+            console.log("Sending push notification for free registration...", req.user.id);
+            await sendSuccessNotification({
+                userId: req.user.id,
+                title: "Download Your Tickets!",
+                message: `Your registration for ${event.title} is confirmed. Download your tickets now!`,
+                slug: "mytickets"
+            });
+        } catch (err) {
+            console.error("Push Notification Error in Finalize:", err);
+        }
+
     })();
 
     return { success: true, message: "BOOKING_FINALIZED", bookingStatus: "CONFIRMED" };
@@ -783,6 +797,19 @@ export const registerFreeEvent = async (req, res) => {
             actionUrl: "/mytickets",
             data: { orderId, amount: 0 }
         }).catch(err => console.error("Notification Error:", err));
+
+        // Send Push Notification
+        try {
+            console.log("Sending push notification for free registration...", req.user.id);
+            await sendSuccessNotification({
+                userId: req.user.id,
+                title: "Download Your Tickets!",
+                message: `Your registration for ${event.title} is confirmed. Download your tickets now!`,
+                slug: "mytickets"
+            });
+        } catch (err) {
+            console.error("Push Notification Error in Finalize:", err);
+        }
 
         return res.json({ message: "FREE_REGISTRATION_SUCCESS", orderId });
     } catch (e) {

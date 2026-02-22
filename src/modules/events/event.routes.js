@@ -153,4 +153,14 @@ eventRouter.post("/:eventId/submit",
     submitProject
 );
 
+
+
+// Announcement Routes
+import { createAnnouncement } from "./event.announcement.js";
+eventRouter.post("/:eventId/announcement",
+    // protect,
+    // authorize(Permission.MANAGE_EVENT),
+    createAnnouncement
+);
+
 export default eventRouter;

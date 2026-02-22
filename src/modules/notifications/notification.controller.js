@@ -1,4 +1,4 @@
-import { getUserNotifications, markNotificationRead, markAllNotificationsRead } from "./notification.service.js";
+import { getUserNotifications, markNotificationRead, markAllNotificationsRead, deleteReadNotifications } from "./notification.service.js";
 
 export const getNotifications = async (req, res) => {
     try {
@@ -40,3 +40,15 @@ export const markAllRead = async (req, res) => {
         return res.status(500).json({ success: false, message: "FAILED" });
     }
 };
+
+
+export const deleteReaded = async (req, res)=>{
+    try {
+        const userId = req.user.id;
+        await deleteReadNotifications(userId);
+        return res.status(200).json({ success: true, message: "READ_NOTIFICATIONS_DELETED" });
+    } catch (error) {
+        console.error("DELETE_READ_NOTIFICATIONS_ERROR:", error);
+        return res.status(500).json({ success: false, message: "FAILED_TO_DELETE_READ_NOTIFICATIONS" });
+    }
+}

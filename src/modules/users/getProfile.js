@@ -53,6 +53,7 @@ export const getProfile = async (req, res) => {
         });
 
         const userProfile = {
+            id: user.id,
             name: user.name,
             email: user.email,
             phone: user.phoneNumber,

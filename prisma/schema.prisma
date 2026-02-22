@@ -168,6 +168,14 @@ model Notification {
   @@map("notifications")
 }
 
+model PushSubscription {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  userId   String @db.ObjectId
+  endpoint String @unique
+  p256dh   String
+  auth     String
+}
+
 model Otp {
   id        String     @id @default(auto()) @map("_id") @db.ObjectId
   userId    String     @db.ObjectId
@@ -393,7 +401,7 @@ model Booking {
   paymentStatus PaymentStatus @default(PENDING)
   
   // Payment Gateway Tracking
-  transactionId String?  @unique // Gateway Transaction ID (e.g., cf_payment_id)
+  transactionId String?   // Gateway Transaction ID (e.g., cf_payment_id)
   gateway       String?  // e.g., "CASHFREE", "RAZORPAY"
   gatewayStatus String?  // e.g., "SUCCESS", "FAILED", "USER_DROPPED"
   failureReason String?  // Details for failure analysis

@@ -18,4 +18,7 @@ adminRouter.post("/create-user",
     createUser
 );
 
+
+// TODO ADD ROUTE FOR MAINTAINANCE MODE TOGGLE (SET IN REDIS) - PROTECTED, ONLY ADMIN CAN TOGGLE
+
 export default adminRouter;
